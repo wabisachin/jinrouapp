@@ -1,0 +1,33 @@
+.field {
+    display: none;
+}
+
+.card {
+    height: 100px;
+    width: 100px;
+    background: skyblue;
+    margin:5px;
+    display: flexbox;
+}
+.villageField{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
+.cemetryField{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
+
+.userArea{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(190, 190, 190);
+    padding: 10px;
+    margin: 5px;
+
+}
