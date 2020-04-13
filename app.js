@@ -1,13 +1,13 @@
-    let http = require('http'),
-        fs  =   require('fs');
+    let app = require('http').createServer(handler),
+        fs  =   require('fs'),
+        io  =   require('socket.io').listen(app);
 
-    let server = http.createServer();
+    app.listen(1338, 'localhost');
+    // app.on('request', handler);
 
-server.on('request', getCss);
-server.listen(1338, 'localhost');
 console.log('Server running …');
 
-function getCss(req, res) {
+function handler(req, res) {
   let url = req.url;
   if ('/' == url) {
     fs.readFile('./index.html', 'UTF-8', function (err, data) {
