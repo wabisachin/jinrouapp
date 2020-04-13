@@ -44,14 +44,20 @@ $(function(){
         fortune = parseInt($('#fortune').val(), 10);
         e.preventDefault();
         if (playerNum + 2 === (villager + wolfman + thief + fortune)) {
+            //フィールド表示、カードが表示されていれば削除
             $('.field').css('display', 'inline');
+            $('#villageField').children().remove();
+            $('#cemetryField').children().remove();
+
+            //人数分のフィールドを表示
             for (let i = 1; i < playerNum + 1; i++) {
                 showForm(i);
             }
+            //墓地に二枚カード表示
             showCemetry();
+
         } else {
             alert('合計をプレイヤー人数+2枚にしてください。');
-
         }
     });
 
