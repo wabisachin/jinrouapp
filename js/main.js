@@ -1,5 +1,7 @@
 'use strict';
 
+
+
 //設定値を初期化
 let playerNum = 0;
 let villager = 0;
@@ -33,6 +35,8 @@ function showCemetry(num) {
 }
             
 $(function(){
+
+    let socket = io.connect();
     
     //村作成ボタンを押したとき
     $('#settings').submit( e => {
@@ -49,16 +53,31 @@ $(function(){
             $('#villageField').children().remove();
             $('#cemetryField').children().remove();
 
-            //人数分のフィールドを表示
-            for (let i = 1; i < playerNum + 1; i++) {
-                showForm(i);
-            }
-            //墓地に二枚カード表示
-            showCemetry();
-
         } else {
             alert('合計をプレイヤー人数+2枚にしてください。');
         }
+        //サーバーに設定情報を送信する。
+        socket.emit('settings_from_master', {
+            playerNum:  playerNum,
+            villager:   villager,
+            wolfman:    wolfman,
+            thief:  thief,
+            fortune:    fortune
+        });
+        
+    })
+
+    socket.on('settings_from_server', data => {
+        console.log(data.wolfman);
+        playerNum = data.playerNum;
+        //人数分のフィールドを表示
+        for (let i = 1; i < playerNum + 1; i++) {
+            showForm(i);
+        }
+        //墓地に二枚カード表示
+        showCemetry();
     });
 
 });
+
+

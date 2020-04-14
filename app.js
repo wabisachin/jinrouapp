@@ -29,3 +29,9 @@ function handler(req, res) {
         });
     }
 }
+io.sockets.on('connection', socket =>{
+  socket.on('settings_from_master', data => {
+    io.emit('settings_from_server', data);
+  });
+
+});
