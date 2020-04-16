@@ -1,34 +1,55 @@
-    let app = require('http').createServer(handler),
+    let express = require("express"),
+        app = express(),
+        server = require("http").Server(app),
+        // app = require('http').createServer(handler),     Expressになってから不要
         fs  =   require('fs'),
-        io  =   require('socket.io').listen(app);
+        io  =   require('socket.io')(server),
+        morgan = require("morgan");
 
-    app.listen(8080, 'localhost');
-    // app.on('request', handler);
+      server.listen(8080, 'localhost');
+      
+      //テンプレートはviewsフォルダに保存
+      app.set('views', __dirname + '/views');
+      app.set('view engine', 'ejs');
+      
+      //middleware
+      app.use(express.json());
+      app.use(morgan('dev'));
+      app.use(express.static('public'));
+      
+      //routing
+      
+      app.get('/', function(req, res){
+        res.render('index');
+      });
 
 console.log('Server running …');
 
-function handler(req, res) {
-  let url = req.url;
-  if ('/' == url) {
-    fs.readFile('./index.html', 'UTF-8', function (err, data) {
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write(data);
-      res.end();
-    });
-  } else if ('/css/style.css' == url) {
-        fs.readFile('./css/style.css', 'UTF-8', function (err, data) {
-        res.writeHead(200, {'Content-Type': 'text/css'});
-        res.write(data);
-        res.end();
-        });
-    } else if ('/js/main.js' == url) {
-        fs.readFile('./js/main.js', 'UTF-8', function (err, data) {
-        res.writeHead(200, {'Content-Type': 'text/js'});
-        res.write(data);
-        res.end();
-        });
-    }
-}
+// 下記、Express移行のため不要になった
+// 
+// 
+// function handler(req, res) {
+//   let url = req.url;
+//   if ('/' == url) {
+//     fs.readFile('./index.html', 'UTF-8', function (err, data) {
+//       res.writeHead(200, {'Content-Type': 'text/html'});
+//       res.write(data);
+//       res.end();
+//     });
+//   } else if ('/css/style.css' == url) {
+//         fs.readFile('./css/style.css', 'UTF-8', function (err, data) {
+//         res.writeHead(200, {'Content-Type': 'text/css'});
+//         res.write(data);
+//         res.end();
+//         });
+//     } else if ('/js/main.js' == url) {
+//         fs.readFile('./js/main.js', 'UTF-8', function (err, data) {
+//         res.writeHead(200, {'Content-Type': 'text/js'});
+//         res.write(data);
+//         res.end();
+//         });
+//     }
+// }
 
 // プレイ人数の役職の配列を作る
 function randomRole (field) {

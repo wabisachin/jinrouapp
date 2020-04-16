@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>JinrouApp</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+        <h1>Jinrou App</h1>
+        <h2>設定</h2>
+        <p>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
+        <form id="settings">
+            <p>
+                プレイ人数:<select id="playerNum">
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select><br>
+            </p>
+            <p>
+                村人:<select id="villager">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>    
+                    <option value="3">3</option>
+                </select>
+                人狼:<select id="wolfman">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    </select>
+                怪盗:<select id="thief">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    </select>
+                占い師:<select id="fortune">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    </select>
+            </p>
+            <p><input type="submit"  value="村作成"></p>
+
+
+        </form>
+
+        <h2 class="field">村</h2><br>
+        <div id="villageField" class="villageField"></div>
+        <h2 class="field">墓地</h2>
+        <div class="cemetryField" id="cemetryField"></div>
+
+        <h2>操作ボタン</h2>
+        <button id="toDate">昼へ</button>
+        <button id="toNight">夜へ</button>
+        <button id="result">結果発表</button>
+        <div class="test100">
+            <form id="test">
+                <input type="submit" value="test">
+            </form>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/main.js"></script>
+
+    </body>
+</html>
