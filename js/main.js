@@ -10,22 +10,28 @@ let thief = 0;
 let fortune = 0;
 
 // 人数分のフォームとカードを表示
+
+// オッパイオッパイオッパイ by wasabi
+// 隠しフィールドの追加、未設定だったid,classの指定
 function showForm (num) {
     let userArea = $(`<div id="userArea${num}" class="userArea">`);
-    let number = $(`<p>`); 
-    let form = $(`<form id="userName${num}">`); 
-    let userNameForm = $('<input type="text">'); 
-    let submit = $('<input type="submit" value="参加">');
-    // let card = $('<div class="card">');　
+    let number = $(`<p id="name${num}">Player${num}</p>`); 
+    let form = $(`<form class="userName" id="userName${num}">`); 
+    let userNameForm = $(`<input type="text" id="nameSet${num}">`); 
+    let playerNum = $(`<input type="hidden"  id="playerNum${num}" value="${num}">`); 
+    let submit = $(`<input type="submit" id="join${num}" value="参加">`);
     let card = $(`<div class="card" id="card${num}">`);
 
+
     $('#villageField').append(userArea);
-    $(`#userArea${num}`).append(number).text('Player' + num);
+    $(`#userArea${num}`).append(number);
     $(`#userArea${num}`).append(form);
-    $(`#userArea${num}`).append(userNameForm);
-    $(`#userArea${num}`).append(submit);
+    $(`#userName${num}`).append(userNameForm);
+    $(`#userName${num}`).append(playerNum);
+    $(`#userName${num}`).append(submit);
     $(`#userArea${num}`).append(card);
 }
+
 
 // 墓地にカードを二枚表示
 function showCemetry(playerNum) {
@@ -77,10 +83,20 @@ $(function(){
         //     thief:  thief,
         //     fortune:    fortune
         // });
+
+        // 参加ボタンを押した時のクリックアクション
+        for (let num = 0; num < playerNum; num++) {
+            $(document).on('submit', `#userName${num+1}`, (e) => {
+                e.preventDefault();
+                socket.emit('join_from_player', {
+                    name: $(this).find(`#nameSet${num+1}`).val(),
+                    num: $(this).find(`#playerNum${num+1}`).val()
+                });
+            });
+        }
+
         
     });
-    
-
 
     socket.on('settings_from_server', data => {
         console.log(data.wolfman);
@@ -103,6 +119,13 @@ $(function(){
             $(`#card${i+1}`).text(roles[i]);
         }
         
+    })
+
+    socket.on('join_from_server', data => {
+        // player名の変更
+        $(`#name${data.num}`).text(data.name);
+        // フォームを非表示
+        $(`#userName${data.num}`).css("display", "none");
     })
 
 });

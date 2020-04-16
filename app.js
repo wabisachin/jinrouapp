@@ -81,4 +81,9 @@ io.sockets.on('connection', socket =>{
     
   });
 
+  socket.on('join_from_player', data =>{
+    console.log(`${data.num}`);
+    console.log(`${data.name}`);
+    io.emit(`join_from_server`, data);
+  });
 });
