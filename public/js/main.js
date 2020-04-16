@@ -44,10 +44,19 @@ function showCemetry(playerNum) {
     $('#cemetryField').append(cemetryCard1);
     $('#cemetryField').append(cemetryCard2);
 }
+
+// Vue.jsのテスト
+var app = new Vue({
+  el: '#total',
+  data: {
+    合計人数: 10
+  }
+})
             
 $(function(){
 
     let socket = io.connect();
+    
     
     //村作成ボタンを押したとき
     $('#settings').submit( e => {

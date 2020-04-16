@@ -4,6 +4,7 @@
         // app = require('http').createServer(handler),     Expressになってから不要
         fs  =   require('fs'),
         io  =   require('socket.io')(server),
+        session = require("express-session"),
         morgan = require("morgan");
 
       server.listen(8080, 'localhost');
@@ -15,12 +16,21 @@
       //middleware
       app.use(express.json());
       app.use(morgan('dev'));
+      // express-sessionで1時間セッション情報保持
+      app.use(session({ 
+        secret: 'wabisaRin',
+        cookie: { maxAge: 1000 * 60 * 60 },
+        resave: false,
+        saveUninitialized: true
+      }));
       app.use(express.static('public'));
       
       //routing
       
       app.get('/', function(req, res){
         res.render('index');
+        console.log(req.session.id);
+
       });
 
 console.log('Server running …');
