@@ -2,7 +2,7 @@
         fs  =   require('fs'),
         io  =   require('socket.io').listen(app);
 
-    app.listen(1338, 'localhost');
+    app.listen(8080, 'localhost');
     // app.on('request', handler);
 
 console.log('Server running …');
@@ -29,9 +29,56 @@ function handler(req, res) {
         });
     }
 }
+
+// プレイ人数の役職の配列を作る
+function randomRole (field) {
+  let roles = [];
+  
+  for (var i = 0; i < field.villager; i++) {
+    roles.push('villager');
+  }
+  for (var i = 0; i < field.wolfman; i++) {
+    roles.push('wolfman');
+  }
+  for (var i = 0; i < field.thief; i++) {
+    roles.push('thief');
+  }
+  for (var i = 0; i < field.fortune; i++) {
+    roles.push('thief');
+  }
+  for(let i = roles.length - 1; i > 0; i--){
+    let r = Math.floor(Math.random() * (i + 1));
+    let tmp = roles[i];
+    roles[i] = roles[r];
+    roles[r] = tmp;
+  }
+  return roles;
+}
+
 io.sockets.on('connection', socket =>{
+  //Field初期化
+  let field = {
+    playerNum : 0,
+    villager : 0,
+    wolfman : 0,
+    thief : 0,
+    fortune : 0,
+  }
+
   socket.on('settings_from_master', data => {
+    //　settingsでもらった値をサーバに保存
+    field.playerNum = data.playerNum;
+    field.villager = data.villager;
+    field.wolfman = data.wolfman;
+    field.thief = data.thief;
+    field.fortune = data.fortune;
+    
     io.emit('settings_from_server', data);
+  });
+  
+  socket.on('toNightClicked', () => {
+    io.emit('roles_from_server',randomRole(field));
+    
   });
 
 });

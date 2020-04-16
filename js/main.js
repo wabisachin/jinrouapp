@@ -16,7 +16,8 @@ function showForm (num) {
     let form = $(`<form id="userName${num}">`); 
     let userNameForm = $('<input type="text">'); 
     let submit = $('<input type="submit" value="参加">');
-    let card = $('<div class="card">');
+    // let card = $('<div class="card">');　
+    let card = $(`<div class="card" id="card${num}">`);
 
     $('#villageField').append(userArea);
     $(`#userArea${num}`).append(number).text('Player' + num);
@@ -25,13 +26,17 @@ function showForm (num) {
     $(`#userArea${num}`).append(submit);
     $(`#userArea${num}`).append(card);
 }
+
 // 墓地にカードを二枚表示
-function showCemetry(num) {
-    let cemetryCard1 = $(`<div class="card" id=cemetry1>`);
-    let cemetryCard2 = $(`<div class="card" id=cemetry2>`);
+function showCemetry(playerNum) {
+    let cemetry1 = playerNum + 1;
+    let cemetry2 = playerNum + 2;
+    // let cemetryCard1 = $(`<div class="card" id=cemetry1>`);
+    // let cemetryCard2 = $(`<div class="card" id=cemetry2>`); 
+    let cemetryCard1 = $(`<div class="card" id="card${playerNum +1}">`);
+    let cemetryCard2 = $(`<div class="card" id="card${playerNum +2}">`);
     $('#cemetryField').append(cemetryCard1);
     $('#cemetryField').append(cemetryCard2);
-
 }
             
 $(function(){
@@ -52,11 +57,7 @@ $(function(){
             $('.field').css('display', 'inline');
             $('#villageField').children().remove();
             $('#cemetryField').children().remove();
-
-        } else {
-            alert('合計をプレイヤー人数+2枚にしてください。');
-        }
-        //サーバーに設定情報を送信する。
+            
         socket.emit('settings_from_master', {
             playerNum:  playerNum,
             villager:   villager,
@@ -64,8 +65,22 @@ $(function(){
             thief:  thief,
             fortune:    fortune
         });
+
+        } else {
+            alert('合計をプレイヤー人数+2枚にしてください。');
+        }
+        //サーバーに設定情報を送信する。
+        //         socket.emit('settings_from_master', {  -->上のif文の中に移動
+        //     playerNum:  playerNum,
+        //     villager:   villager,
+        //     wolfman:    wolfman,
+        //     thief:  thief,
+        //     fortune:    fortune
+        // });
         
-    })
+    });
+    
+
 
     socket.on('settings_from_server', data => {
         console.log(data.wolfman);
@@ -75,8 +90,20 @@ $(function(){
             showForm(i);
         }
         //墓地に二枚カード表示
-        showCemetry();
+        showCemetry(playerNum);
     });
+    
+        // 夜へボタンを押した時
+    $('#toNight').on('click', () => {
+        socket.emit('toNightClicked');
+    });
+    
+    socket.on('roles_from_server', roles => {
+        for (var i = 0; i < roles.length; i++) {
+            $(`#card${i+1}`).text(roles[i]);
+        }
+        
+    })
 
 });
 
