@@ -2,7 +2,7 @@
         fs  =   require('fs'),
         io  =   require('socket.io').listen(app);
 
-    app.listen(1338, 'localhost');
+    app.listen(8080, 'localhost');
     // app.on('request', handler);
 
 console.log('Server running …');
@@ -31,7 +31,12 @@ function handler(req, res) {
 }
 io.sockets.on('connection', socket =>{
   socket.on('settings_from_master', data => {
+    console.log("setting");
     io.emit('settings_from_server', data);
   });
-
+  socket.on('join_from_player', data =>{
+    console.log(`${data.num}`);
+    console.log(`${data.name}`);
+    io.emit(`join_from_server`, data);
+  });
 });
