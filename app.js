@@ -5,7 +5,10 @@
         fs  =   require('fs'),
         io  =   require('socket.io')(server),
         session = require("express-session"),
-        morgan = require("morgan");
+        morgan = require("morgan"),
+        redis = require("redis"), 
+        client = redis.createClient();
+ 
 
       server.listen(8080, 'localhost');
       
@@ -31,6 +34,17 @@
         res.render('index');
         console.log(req.session.id);
 
+      });
+      
+      // redisのテストコード
+      client.on("error", function(error) {
+        console.error(error);
+      });
+      client.get("test", redis.print);
+      client.get("key", redis.print);
+      client.get("misssing-key", function(err, reply) {
+        // reply is null when the key is missing
+          console.log(reply);
       });
 
 console.log('Server running …');

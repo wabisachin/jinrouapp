@@ -49,7 +49,7 @@ function showCemetry(playerNum) {
 var app = new Vue({
   el: '#total',
   data: {
-    合計人数: 10
+    total: 22
   }
 })
             
