@@ -12,7 +12,7 @@
         <p>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
         <form id="settings">
             <p>
-                プレイ人数:<select id="playerNum">
+                プレイ人数:<select id="playerNum" v-model.number = "playerNum">
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
@@ -20,31 +20,29 @@
                 </select><br>
             </p>
             <p>
-                村人:<select id="villager">
+                村人:<select id="villager" v-model.number="villager">
                     <option value="0">0</option>
                     <option value="1">1</option>
                     <option value="2">2</option>    
                     <option value="3">3</option>
                 </select>
-                人狼:<select id="wolfman">
+                人狼:<select id="wolfman" v-model.number="wolfman">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     </select>
-                怪盗:<select id="thief">
+                怪盗:<select id="thief" v-model.number="thief">
                     <option value="0">0</option>
                     <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
                     </select>
-                占い師:<select id="fortune">
+                占い師:<select id="fortune"v-model.number="fortune">
                     <option value="0">0</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     </select>
             </p>
-            <div id="total">{{total}}</div>
+            <p>現在の合計枚数: {{total}}</p><p v-if="total == playerNum + 2">OK!</p>
             <p><input type="submit"  value="村作成"></p>
 
 
@@ -66,7 +64,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="js/main.js"></script>
 
