@@ -41,10 +41,11 @@
       // roomページへリダイレクト
       app.post('/', function(req, res) {
         let id = req.body.id;
-        res.redirect(`/room/${id}`);
+        res.redirect(`/${id}`);
+        // res.location('/${id}')
       })
       // roomページ
-      app.get('/room/:room_id', function(req, res){
+      app.get('/:room_id', function(req, res){
         res.render('room', {
           num: req.params.room_id,
           name: 'rinsei'
