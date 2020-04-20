@@ -47,11 +47,21 @@ function showCemetry(playerNum) {
 
 // Vue.jsのテスト
 var app = new Vue({
-  el: '#total',
-  data: {
-    total: 22
+  el: '#settings',
+  data: { 
+    playerNum: 3,
+    villager: 0,
+    wolfman: 1,
+    thief: 0,
+    fortune: 0
+  },
+  computed: {
+    total: function(){
+        return this.villager + this.wolfman + this.thief + this.fortune
+    }
   }
-})
+
+  })
             
 $(function(){
 
