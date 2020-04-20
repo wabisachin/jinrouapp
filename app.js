@@ -9,6 +9,15 @@
         redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
         client = redis.createClient();
+    
+    //Field初期化    
+    let field = {
+                  playerNum : 0,
+                  villager : 0,
+                  wolfman : 0,
+                  fortune : 0,
+                  thief : 0,
+                }
  
 
       server.listen(8080, 'localhost');
@@ -41,6 +50,12 @@
       // roomページへリダイレクト
       app.post('/', function(req, res) {
         let id = req.body.id;
+        field.playerNum = req.body.playerNum;
+        field.villager = req.body.villager;
+        field.wolfman = req.body.wolfman;
+        field.fortune = req.body.fortune;
+        field.thief = req.body.thief;
+        
         res.redirect(`/${id}`);
         // res.location('/${id}')
       })
@@ -48,7 +63,9 @@
       app.get('/:room_id', function(req, res){
         res.render('room', {
           num: req.params.room_id,
-          name: 'rinsei'
+          name: 'rinsei',
+          playerNum:  field.playerNum,
+          players: ['wasabi', 'rinsei', 'yutaroh']
         });
       });
       
@@ -105,7 +122,7 @@ function randomRole (field) {
     roles.push('thief');
   }
   for (var i = 0; i < field.fortune; i++) {
-    roles.push('thief');
+    roles.push('fortune');
   }
   for(let i = roles.length - 1; i > 0; i--){
     let r = Math.floor(Math.random() * (i + 1));
@@ -117,25 +134,17 @@ function randomRole (field) {
 }
 
 io.sockets.on('connection', socket =>{
-  //Field初期化
-  let field = {
-    playerNum : 0,
-    villager : 0,
-    wolfman : 0,
-    thief : 0,
-    fortune : 0,
-  }
 
-  socket.on('settings_from_master', data => {
-    //　settingsでもらった値をサーバに保存
-    field.playerNum = data.playerNum;
-    field.villager = data.villager;
-    field.wolfman = data.wolfman;
-    field.thief = data.thief;
-    field.fortune = data.fortune;
+  // socket.on('settings_from_master', data => {
+  //   //　settingsでもらった値をサーバに保存
+  //   field.playerNum = data.playerNum;
+  //   field.villager = data.villager;
+  //   field.wolfman = data.wolfman;
+  //   field.thief = data.thief;
+  //   field.fortune = data.fortune;
     
-    io.emit('settings_from_server', data);
-  });
+  //   io.emit('settings_from_server', data);
+  // });
   
   socket.on('toNightClicked', () => {
     io.emit('roles_from_server',randomRole(field));

@@ -8,17 +8,11 @@
 
     <body>
         <h1>Jinrou App</h1>
-        <!--動的URLのリンク作成のテスト-->
-        <form action="/" method="post">
-            <input type="text" name="id">
-            <input type="submit" value="ルーム作成">
-        </form>
-        
+
         <h2>設定</h2>
-        <p>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
-        <form id="settings">
+        <form id="settings" action="/" method="post">
             <p>
-                プレイ人数:<select id="playerNum" v-model.number = "playerNum">
+                プレイ人数:<select id="playerNum" v-model.number = "playerNum" name="playerNum">
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
@@ -26,43 +20,34 @@
                 </select><br>
             </p>
             <p>
-                村人:<select id="villager" v-model.number="villager">
+                村人:<select id="villager" v-model.number="villager" name="villager">
                     <option value="0">0</option>
                     <option value="1">1</option>
                     <option value="2">2</option>    
                     <option value="3">3</option>
                 </select>
-                人狼:<select id="wolfman" v-model.number="wolfman">
+                人狼:<select id="wolfman" v-model.number="wolfman" name="wolfman">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     </select>
-                怪盗:<select id="thief" v-model.number="thief">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    </select>
-                占い師:<select id="fortune"v-model.number="fortune">
+                占い師:<select id="fortune"v-model.number="fortune" name="fortune">
                     <option value="0">0</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
+                    </select>
+                怪盗:<select id="thief" v-model.number="thief" name="thief">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
                     </select>
             </p>
-            <p>現在の合計枚数: {{total}}</p><p v-if="total == playerNum + 2">OK!</p>
-            <p><input type="submit"  value="村作成"></p>
-
-
+            <p>現在の合計枚数: {{total}}</p>
+            ルーム番号:<input type="text" name="id">
+            <p  v-if="total == playerNum + 2" ><input type="submit" value="ルーム作成" ></p>
+            <p v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
         </form>
 
-        <h2 class="field">村</h2><br>
-        <div id="villageField" class="villageField"></div>
-        <h2 class="field">墓地</h2>
-        <div class="cemetryField" id="cemetryField"></div>
-
-        <h2>操作ボタン</h2>
-        <button id="toDate">昼へ</button>
-        <button id="toNight">夜へ</button>
-        <button id="result">結果発表</button>
         <div class="test100">
             <form id="test">
                 <input type="submit" value="test">

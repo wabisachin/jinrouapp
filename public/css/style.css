@@ -1,7 +1,3 @@
-.field {
-    display: none;
-}
-
 .card {
     height: 100px;
     width: 100px;
@@ -9,13 +5,7 @@
     margin:5px;
     display: flexbox;
 }
-.villageField{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-
-}
-.cemetryField{
+.field{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -23,6 +13,7 @@
 }
 
 .userArea{
+    width:120px;
     display: flex;
     flex-direction: column;
     align-items: center;
