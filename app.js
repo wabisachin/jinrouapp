@@ -7,6 +7,7 @@
         session = require("express-session"),
         morgan = require("morgan"),
         redis = require("redis"), 
+        // client = redis.createClient(6379, 'redis');
         client = redis.createClient();
  
 
@@ -19,6 +20,7 @@
       //middleware
       app.use(express.json());
       app.use(morgan('dev'));
+      app.use(express.urlencoded({extended: true}));//postデータを受け取れるようにするため
       // express-sessionで1時間セッション情報保持
       app.use(session({ 
         secret: 'wabisaRin',
@@ -30,10 +32,23 @@
       
       //routing
       
+      // トップページ
       app.get('/', function(req, res){
         res.render('index');
         console.log(req.session.id);
 
+      });
+      // roomページへリダイレクト
+      app.post('/', function(req, res) {
+        let id = req.body.id;
+        res.redirect(`/room/${id}`);
+      })
+      // roomページ
+      app.get('/room/:room_id', function(req, res){
+        res.render('room', {
+          num: req.params.room_id,
+          name: 'rinsei'
+        });
       });
       
       // redisのテストコード

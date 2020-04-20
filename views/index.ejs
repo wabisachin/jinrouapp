@@ -8,6 +8,12 @@
 
     <body>
         <h1>Jinrou App</h1>
+        <!--動的URLのリンク作成のテスト-->
+        <form action="/" method="post">
+            <input type="text" name="id">
+            <input type="submit" value="ルーム作成">
+        </form>
+        
         <h2>設定</h2>
         <p>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
         <form id="settings">
@@ -44,7 +50,7 @@
                     <option value="3">3</option>
                     </select>
             </p>
-            <div id="total">{{total}}</div>
+            <div id="total">vueのテスト:{{total}}</div>
             <p><input type="submit"  value="村作成"></p>
 
 
