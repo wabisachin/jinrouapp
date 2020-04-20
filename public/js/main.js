@@ -11,7 +11,6 @@ let fortune = 0;
 
 // 人数分のフォームとカードを表示
 
-// オッパイオッパイオッパイ by wasabi
 // 隠しフィールドの追加、未設定だったid,classの指定
 function showForm (num) {
     let userArea = $(`<div id="userArea${num}" class="userArea">`);
@@ -45,6 +44,21 @@ function showCemetry(playerNum) {
     $('#cemetryField').append(cemetryCard2);
 }
 
+// URLが部屋ページかどうかの判定
+function isRoomPage() {
+    let page = location.pathname;
+    let result = page.split('/');
+    return (result[1] != "") ? true :false;
+}
+
+// URLから部屋番号を抽出
+function getRoomId() {
+    let page = location.pathname;
+    let result = page.split('/');
+    
+    return result[1];
+}
+
 // Vue.jsのテスト
 var app = new Vue({
   el: '#settings',
@@ -67,6 +81,7 @@ $(function(){
 
     let socket = io.connect();
     
+    socket.emit("getId_from_client");
     
     // 村作成ボタンを押したとき
     // $('#settings').submit( e => {
@@ -129,24 +144,35 @@ $(function(){
     // });
     
         // 夜へボタンを押した時
-    $('#toNight').on('click', () => {
-        socket.emit('toNightClicked');
-    });
+    // $('#toNight').on('click', () => {
+    //     socket.emit('toNightClicked');
+    // });
     
+    // roomページに遷移した時
+    if (isRoomPage()) {
+        let roomId = getRoomId();
+        socket.emit('joinRoom_from_client', roomId);
+        // 夜へボタンを押した時
+        $('#toNight').on('click', () => {
+            socket.emit('toNightClicked', roomId);
+        });
+        
+    }
+    
+    // サーバーからの配信
     socket.on('roles_from_server', roles => {
         for (var i = 0; i < roles.length; i++) {
             $(`#card${i+1}`).text(roles[i]);
         }
         
     })
-
     socket.on('join_from_server', data => {
         // player名の変更
         $(`#name${data.num}`).text(data.name);
         // フォームを非表示
         $(`#userName${data.num}`).css("display", "none");
     })
-
+    
 });
 
 

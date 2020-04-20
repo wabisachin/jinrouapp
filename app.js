@@ -5,10 +5,10 @@
         fs  =   require('fs'),
         io  =   require('socket.io')(server),
         session = require("express-session"),
-        morgan = require("morgan"),
-        redis = require("redis"), 
+        morgan = require("morgan");
+        // redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
-        client = redis.createClient();
+        // client = redis.createClient();
     
     //Field初期化    
     let field = {
@@ -44,7 +44,7 @@
       // トップページ
       app.get('/', function(req, res){
         res.render('index');
-        console.log(req.session.id);
+        console.log(`session: ${req.session.id}`);
 
       });
       // roomページへリダイレクト
@@ -70,15 +70,15 @@
       });
       
       // redisのテストコード
-      client.on("error", function(error) {
-        console.error(error);
-      });
-      client.get("test", redis.print);
-      client.get("key", redis.print);
-      client.get("misssing-key", function(err, reply) {
-        // reply is null when the key is missing
-          console.log(reply);
-      });
+      // client.on("error", function(error) {
+      //   console.error(error);
+      // });
+      // client.get("test", redis.print);
+      // client.get("key", redis.print);
+      // client.get("misssing-key", function(err, reply) {
+      //   // reply is null when the key is missing
+      //     console.log(reply);
+      // });
 
 console.log('Server running …');
 
@@ -146,14 +146,27 @@ io.sockets.on('connection', socket =>{
   //   io.emit('settings_from_server', data);
   // });
   
-  socket.on('toNightClicked', () => {
-    io.emit('roles_from_server',randomRole(field));
+  // socket.on('toNightClicked', () => {
+  //   io.emit('roles_from_server',randomRole(field));
     
+  // });
+  
+  socket.on('toNightClicked', (data) => {
+    io.to(data).emit('roles_from_server',randomRole(field));
   });
+  
+  // socket.on('joinRoom_from_client', data => {
+  //   console.log(`socket_id: ${data.user_id}がroom: ${data.room_id}に入室しました`);
+  //   io.join(data.room_id);
+  // });
 
   socket.on('join_from_player', data =>{
     console.log(`${data.num}`);
     console.log(`${data.name}`);
     io.emit(`join_from_server`, data);
   });
+  
+  socket.on("joinRoom_from_client", (data)=> {
+    socket.join(data);
+  })
 });
