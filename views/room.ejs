@@ -9,9 +9,10 @@
         <h1>room:<%= num %></h1>
         
         <div class="field">
-        <% players.forEach( (player, i) => { %>
+        <% Object.keys(players).forEach( (id, i) => { %>
         <div class="userArea">
-            <p><%= player %></p>
+            <p><%= id %></p>
+            <p><%= players[id] %></p>
             <div class="card" id="card<%= i+1 %>"> </div>
         </div>
         <% }) %>

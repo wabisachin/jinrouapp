@@ -34,18 +34,18 @@ function showForm (num) {
 
 
 // 墓地にカードを二枚表示
-function showCemetry(playerNum) {
-    let cemetry1 = playerNum + 1;
-    let cemetry2 = playerNum + 2;
-    // let cemetryCard1 = $(`<div class="card" id=cemetry1>`);
-    // let cemetryCard2 = $(`<div class="card" id=cemetry2>`); 
-    let cemetryCard1 = $(`<div class="card" id="card${playerNum +1}">`);
-    let cemetryCard2 = $(`<div class="card" id="card${playerNum +2}">`);
-    $('#cemetryField').append(cemetryCard1);
-    $('#cemetryField').append(cemetryCard2);
-}
+// function showCemetry(playerNum) {
+//     let cemetry1 = playerNum + 1;
+//     let cemetry2 = playerNum + 2;
+//     // let cemetryCard1 = $(`<div class="card" id=cemetry1>`);
+//     // let cemetryCard2 = $(`<div class="card" id=cemetry2>`); 
+//     let cemetryCard1 = $(`<div class="card" id="card${playerNum +1}">`);
+//     let cemetryCard2 = $(`<div class="card" id="card${playerNum +2}">`);
+//     $('#cemetryField').append(cemetryCard1);
+//     $('#cemetryField').append(cemetryCard2);
+// }
 
-// Vue.jsのテスト
+//Vue.jsの設定、カードの合計枚数によって部屋作成ボタンを表示
 var app = new Vue({
   el: '#settings',
   data: { 

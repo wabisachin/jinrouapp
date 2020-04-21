@@ -11,12 +11,14 @@
         client = redis.createClient();
     
     //Field初期化    
-    let field = {
+    let field = { 
+                  currentPlayerNum :0,
                   playerNum : 0,
                   villager : 0,
                   wolfman : 0,
                   fortune : 0,
                   thief : 0,
+                  players : {},
                 }
  
 
@@ -49,15 +51,31 @@
       });
       // roomページへリダイレクト
       app.post('/', function(req, res) {
-        let id = req.body.id;
+        
+        let roomId = req.body.roomId;
+        
+        //部屋作成の場合
+        if(req.body.makeRoom === 'true'){
+          
+          console.log(req.session.id);
+          
         field.playerNum = req.body.playerNum;
         field.villager = req.body.villager;
         field.wolfman = req.body.wolfman;
         field.fortune = req.body.fortune;
         field.thief = req.body.thief;
+        userAdd(req.session.id,req.body.name);
         
-        res.redirect(`/${id}`);
+        res.redirect(`/${roomId}`);
         // res.location('/${id}')
+        } else {
+          
+          console.log(req.session.id);
+          
+          userAdd(req.session.id,req.body.name);
+          console.log(field.players);
+          res.redirect(`/${roomId}`);
+        }
       })
       // roomページ
       app.get('/:room_id', function(req, res){
@@ -65,7 +83,7 @@
           num: req.params.room_id,
           name: 'rinsei',
           playerNum:  field.playerNum,
-          players: ['wasabi', 'rinsei', 'yutaroh']
+          players: field.players
         });
       });
       
@@ -81,6 +99,16 @@
       });
 
 console.log('Server running …');
+
+//  sessionと[セッション番号、ユーザー名]のディクショナリ追加
+      function userAdd(sessionId, userName){
+        field.currentPlayerNum++;
+        if (field.currentPlayerNum < field.playerNum) {
+          field.players[sessionId] = [field.currentPlayerNum, userName];
+        } else {
+          //プレイヤー数以上のアクセスが有った場合の処理
+        }
+      }
 
 // 下記、Express移行のため不要になった
 // 
