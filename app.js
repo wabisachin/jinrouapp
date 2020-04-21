@@ -1,8 +1,6 @@
     let express = require("express"),
         app = express(),
         server = require("http").Server(app),
-        // app = require('http').createServer(handler),     Expressになってから不要
-        fs  =   require('fs'),
         io  =   require('socket.io')(server),
         session = require("express-session"),
         morgan = require("morgan");
@@ -10,14 +8,9 @@
         // client = redis.createClient(6379, 'redis');
         // client = redis.createClient();
     
-    //Field初期化    
-    let field = {
-                  playerNum : 0,
-                  villager : 0,
-                  wolfman : 0,
-                  fortune : 0,
-                  thief : 0,
-                }
+    // roomの初期化
+    
+    let room = {}
  
 
       server.listen(8080, 'localhost');
@@ -41,31 +34,68 @@
       
       //routing
       
-      // トップページ
+      // トップページ ->アクセスしたときクライアントCookieにセッション保存
       app.get('/', function(req, res){
+        setCookie("sessionId", req.session.id, res);
         res.render('index');
         console.log(`session: ${req.session.id}`);
 
       });
+      
       // roomページへリダイレクト
       app.post('/', function(req, res) {
-        let id = req.body.id;
+        
+        let roomId = req.body.roomId;
+        
+        //部屋作成の場合
+        if(req.body.makeRoom === 'true'){
+          
+          // fieldの初期化
+              let field = { 
+                  currentPlayerNum :0,
+                  playerNum : 0,
+                  villager : 0,
+                  wolfman : 0,
+                  fortune : 0,
+                  thief : 0,
+                  players : {},
+                }
+                
+          console.log(req.session.id);
+          
         field.playerNum = req.body.playerNum;
         field.villager = req.body.villager;
         field.wolfman = req.body.wolfman;
         field.fortune = req.body.fortune;
         field.thief = req.body.thief;
         
-        res.redirect(`/${id}`);
+        userAdd(field, req.session.id,req.body.name);
+        
+        //新規room作成し、fieldを入れる
+        room[roomId] = field;
+        
+        res.redirect(`/${roomId}`);
         // res.location('/${id}')
+        
+        
+        } else {
+          
+          
+          //既存ルームに入室する場合
+          console.log(req.session.id);
+          
+          userAdd(room[req.body.roomId],req.session.id,req.body.name);
+          console.log(room[roomId].players);
+          
+          res.redirect(`/${req.body.roomId}`);
+        }
       })
-      // roomページ
+      
+      // roomページにfieldを渡す
       app.get('/:room_id', function(req, res){
         res.render('room', {
-          num: req.params.room_id,
-          name: 'rinsei',
-          playerNum:  field.playerNum,
-          players: ['wasabi', 'rinsei', 'yutaroh']
+          roomId: req.params.room_id,
+          field: room[req.params.room_id],
         });
       });
       
@@ -82,31 +112,25 @@
 
 console.log('Server running …');
 
-// 下記、Express移行のため不要になった
-// 
-// 
-// function handler(req, res) {
-//   let url = req.url;
-//   if ('/' == url) {
-//     fs.readFile('./index.html', 'UTF-8', function (err, data) {
-//       res.writeHead(200, {'Content-Type': 'text/html'});
-//       res.write(data);
-//       res.end();
-//     });
-//   } else if ('/css/style.css' == url) {
-//         fs.readFile('./css/style.css', 'UTF-8', function (err, data) {
-//         res.writeHead(200, {'Content-Type': 'text/css'});
-//         res.write(data);
-//         res.end();
-//         });
-//     } else if ('/js/main.js' == url) {
-//         fs.readFile('./js/main.js', 'UTF-8', function (err, data) {
-//         res.writeHead(200, {'Content-Type': 'text/js'});
-//         res.write(data);
-//         res.end();
-//         });
-//     }
-// }
+//  sessionと[セッション番号、ユーザー名]のディクショナリ追加
+      function userAdd(field, sessionId, userName){
+        field.currentPlayerNum++;
+        if (field.currentPlayerNum <= field.playerNum) {
+          field.players[sessionId] = [field.currentPlayerNum, userName];
+        } else {
+          //プレイヤー数以上のアクセスが有った場合の処理
+          
+        }
+      }
+      
+      
+  //ユーザのブラウザにCookie保存する
+  function setCookie(key, value, res) {
+            const escapedValue = escape(value);
+            res.setHeader('Set-Cookie', [`${key}=${escapedValue}`]);
+          }
+
+
 
 // プレイ人数の役職の配列を作る
 function randomRole (field) {
@@ -133,26 +157,16 @@ function randomRole (field) {
   return roles;
 }
 
-io.sockets.on('connection', socket =>{
+io.sockets.on('connection', socket => {
 
-  // socket.on('settings_from_master', data => {
-  //   //　settingsでもらった値をサーバに保存
-  //   field.playerNum = data.playerNum;
-  //   field.villager = data.villager;
-  //   field.wolfman = data.wolfman;
-  //   field.thief = data.thief;
-  //   field.fortune = data.fortune;
-    
-  //   io.emit('settings_from_server', data);
-  // });
   
   // socket.on('toNightClicked', () => {
   //   io.emit('roles_from_server',randomRole(field));
     
   // });
   
-  socket.on('toNightClicked', (data) => {
-    io.to(data).emit('roles_from_server',randomRole(field));
+  socket.on('toNightClicked', (roomId) => {
+    io.to(roomId).emit('roles_from_server',randomRole(room[roomId]));
   });
   
   // socket.on('joinRoom_from_client', data => {
@@ -170,3 +184,4 @@ io.sockets.on('connection', socket =>{
     socket.join(data);
   })
 });
+

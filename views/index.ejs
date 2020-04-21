@@ -9,8 +9,9 @@
     <body>
         <h1>Jinrou App</h1>
 
-        <h2>設定</h2>
+        <h2>部屋作成</h2>
         <form id="settings" action="/" method="post">
+            <input type="hidden" name="makeRoom" value="true"> 
             <p>
                 プレイ人数:<select id="playerNum" v-model.number = "playerNum" name="playerNum">
                     <option value="3">3</option>
@@ -43,10 +44,19 @@
                     </select>
             </p>
             <p>現在の合計枚数: {{total}}</p>
-            ルーム番号:<input type="text" name="id">
+            プレイヤー名：<input type="text" name="name">
+            ルーム番号:<input type="text" name="roomId">
             <p  v-if="total == playerNum + 2" ><input type="submit" value="ルーム作成" ></p>
             <p v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</p>
         </form>
+        
+        <h2>入室</h2>
+            <form id="enter" action="/" method="post">
+                 <input type="hidden" name="makeRoom" value="false"> 
+                 プレイヤー名：<input type="text" name="name"> 
+                 ルーム番号：<input type="text" name="roomId"> 
+                 <input type="submit">
+            </form>
 
         <div class="test100">
             <form id="test">

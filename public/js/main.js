@@ -31,7 +31,6 @@ function showForm (num) {
     $(`#userArea${num}`).append(card);
 }
 
-
 // 墓地にカードを二枚表示
 function showCemetry(playerNum) {
     let cemetry1 = playerNum + 1;
@@ -142,13 +141,10 @@ $(function(){
     //     //墓地に二枚カード表示
     //     showCemetry(playerNum);
     // });
+    console.log("cookieの表示")
+    console.log(document.cookie);
     
-        // 夜へボタンを押した時
-    // $('#toNight').on('click', () => {
-    //     socket.emit('toNightClicked');
-    // });
-    
-    // roomページに遷移した時
+    // roomページに遷移した場合の処理
     if (isRoomPage()) {
         let roomId = getRoomId();
         // socketに部屋番号に応じたルームを作成
@@ -175,6 +171,5 @@ $(function(){
         $(`#userName${data.num}`).css("display", "none");
     })
     
+
 });
-
-

@@ -2,16 +2,17 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Room<%= num %></title>
+        <title>Room<%= roomId %></title>
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <h1>room:<%= num %></h1>
+        <h1>room:<%= roomId %></h1>
         
         <div class="field">
-        <% players.forEach( (player, i) => { %>
+        <% Object.keys(field.players).forEach( (id, i) => { %>
         <div class="userArea">
-            <p><%= player %></p>
+            <p><%= id %></p>
+            <p><%= field.players[id] %></p>
             <div class="card" id="card<%= i+1 %>"> </div>
         </div>
         <% }) %>
@@ -22,7 +23,7 @@
         <div class="field" id="cemetryField">
                     <% for (let i = 0; i < 2 ; i++) { %>
         <div class="userArea">
-            <div class="card" id="card<%=parseInt(playerNum) + i + 1%>"> </div>
+            <div class="card" id="card<%=parseInt(field.playerNum) + i + 1%>"> </div>
         </div>
         <% } %>
         </div>
