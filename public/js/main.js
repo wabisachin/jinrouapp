@@ -151,6 +151,7 @@ $(function(){
     // roomページに遷移した時
     if (isRoomPage()) {
         let roomId = getRoomId();
+        // socketに部屋番号に応じたルームを作成
         socket.emit('joinRoom_from_client', roomId);
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
@@ -159,13 +160,14 @@ $(function(){
         
     }
     
-    // サーバーからの配信
+    
     socket.on('roles_from_server', roles => {
         for (var i = 0; i < roles.length; i++) {
             $(`#card${i+1}`).text(roles[i]);
         }
         
     })
+    
     socket.on('join_from_server', data => {
         // player名の変更
         $(`#name${data.num}`).text(data.name);
