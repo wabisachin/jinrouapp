@@ -138,10 +138,13 @@ console.log('Server running …');
 
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
       function userAdd(field, sessionId, userName){
-        let loadingFlag = 0; //新規プレイヤjoinによる自動リロードか、手動リロードかを判別するフラグ
-        field.currentPlayerNum++;
-        if (field.currentPlayerNum <= field.playerNum) {
-          field.players[sessionId] = [field.currentPlayerNum, userName, loadingFlag];
+        if (field.currentPlayerNum < field.playerNum) {
+          field.players[sessionId] = {
+            plyerNo:  field.currentPlayerNum, 
+            userName: userName,
+            flag: 0,
+          };
+          field.currentPlayerNum++;
         } else {
           //プレイヤー数以上のアクセスが有った場合の処理
           
@@ -185,9 +188,18 @@ console.log('Server running …');
   // field内のplayersディクショナリにroleを入れていく
   function roleAsign (field, roles) {
       Object.keys(field.players).forEach(key => {
-        field.players[key].push(roles.pop());
+        field.players[key].userRole = roles.pop() ;
       });
       console.log(field.players);
+  }
+  
+  function changeOthersFlag(players, sessionId) {
+    for (let key in players) {
+        if (key == sessionId) { 
+          continue
+        }
+        players[key]["flag"] = 1;
+      }
   }
 
  /*----------------------------------------------------------------------------
@@ -204,8 +216,11 @@ io.sockets.on('connection', socket => {
     
   // });
   
+  // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
-    io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
+    // io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
+    roleAsign(room[roomId],randomRole(room[roomId]));
+    io.to(roomId).emit('roles_asigned');
     
   });
   
@@ -222,24 +237,38 @@ io.sockets.on('connection', socket => {
     let roomId = data.roomId;
     let sessionId = data.sessionId;
     let players = room[roomId]["players"];
-    let myFlag = players[sessionId][2];
+    console.log("okkkkk");
+    console.log(players[sessionId]);
+    console.log(players[sessionId]["flag"]);
+    let myFlag = players[sessionId]["flag"];
     
     socket.join(data.roomId);
     if (myFlag == 0){
-      // 自分以外のプレイヤーのflagを０▶️️1に変更
-      for (let key in players) {
-        if (key == sessionId) { 
-          continue
-        }
-        players[key][2] = 1;
-      }
+      // 自分以外のプレイヤーのflagを０→１に変更
+      // for (let key in players) {
+      //   if (key == sessionId) { 
+      //     continue
+      //   }
+      //   players[key]["flag"] = 1;
+      // }
+      
+      // 自分以外のプレイヤーのflagを０→１に変更
+      changeOthersFlag(players, sessionId);
       
       socket.broadcast.to(data.roomId).emit('new_client_join');
     }
     
     else {
-      myFlag = 0
+      // flagをリセット
+      players[sessionId]["flag"] = 0
     }
   })
+  
+  socket.on("request_role", (roomId, sessionId) => {
+    socket.emit('give_role', room[roomId].players[sessionId]);
+  
+    // let role = room[roomId].players[sessionId][2];
+    // socket.emit('give_role', role);
+  });
 });
 

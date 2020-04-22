@@ -67,7 +67,8 @@ function getRoomId() {
     return result[1];
 }
 
-// 取得したcookie情報をハッシュに変換
+
+// Cookieをハッシュ形式に変換
 function getCookieArray(){
   var arr = new Array();
   if(document.cookie != ''){
@@ -198,7 +199,7 @@ $(function(){
     
     socket.on('roles_from_server', roles => {
         for (var i = 0; i < roles.length; i++) {
-            $(`#card${i+1}`).text(roles[i]);
+            // $(`#card${i+1}`).text(roles[i]);
         }
         
     })
@@ -212,7 +213,23 @@ $(function(){
     
     socket.on('new_client_join', () => {
         window.location.reload();
+    //   location.reload();
     });
     
+    // socket.on('roles_asigned', () => {
+        
+    // });
+    
+    socket.on('roles_asigned', ()=> {
+        let roomId = getRoomId();
+        let cookie = getCookieArray();
+        let sessionId = cookie["sessionId"];
+        // let sessionId = document.cookie.sessionId;
+        socket.emit('request_role', roomId, sessionId);
+    });
+    
+    socket.on('give_role', data => {
+        $(`#card${data.plyerNo}`).text(data.userRole);
+    }  )
 
 });
