@@ -67,6 +67,19 @@ function getRoomId() {
     return result[1];
 }
 
+// 取得したcookie情報をハッシュに変換
+function getCookieArray(){
+  var arr = new Array();
+  if(document.cookie != ''){
+    var tmp = document.cookie.split('; ');
+    for(var i=0;i<tmp.length;i++){
+      var data = tmp[i].split('=');
+      arr[data[0]] = decodeURIComponent(data[1]);
+    }
+  }
+  return arr;
+}
+
  /*----------------------------------------------------------------------------
  
                   Vue.js
@@ -166,9 +179,15 @@ $(function(){
     
     // roomページに遷移した場合の処理
     if (isRoomPage()) {
+        let cookie = getCookieArray();
         let roomId = getRoomId();
+        let sessionId = cookie["sessionId"];
         // socketに部屋番号に応じたルームを作成
-        socket.emit('joinRoom_from_client', roomId);
+        socket.emit('joinRoom_from_client', {
+            roomId: roomId, 
+            sessionId: sessionId
+        });
+        
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
             socket.emit('toNightClicked', roomId);
@@ -192,7 +211,7 @@ $(function(){
     })
     
     socket.on('new_client_join', () => {
-       window.location.reload();
+        window.location.reload();
     });
     
 

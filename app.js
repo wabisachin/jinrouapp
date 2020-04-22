@@ -138,9 +138,10 @@ console.log('Server running …');
 
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
       function userAdd(field, sessionId, userName){
+        let loadingFlag = 0; //新規プレイヤjoinによる自動リロードか、手動リロードかを判別するフラグ
         field.currentPlayerNum++;
         if (field.currentPlayerNum <= field.playerNum) {
-          field.players[sessionId] = [field.currentPlayerNum, userName];
+          field.players[sessionId] = [field.currentPlayerNum, userName, loadingFlag];
         } else {
           //プレイヤー数以上のアクセスが有った場合の処理
           
@@ -189,7 +190,6 @@ console.log('Server running …');
       console.log(field.players);
   }
 
-
  /*----------------------------------------------------------------------------
  
                   SocketIOの設定
@@ -215,14 +215,31 @@ io.sockets.on('connection', socket => {
   // });
 
   socket.on('join_from_player', data =>{
-    console.log(`${data.num}`);
-    console.log(`${data.name}`);
     io.emit(`join_from_server`, data);
   });
   
   socket.on("joinRoom_from_client", (data)=> {
-    socket.join(data);
-    socket.broadcast.to(data).emit('new_client_join');
+    let roomId = data.roomId;
+    let sessionId = data.sessionId;
+    let players = room[roomId]["players"];
+    let myFlag = players[sessionId][2];
+    
+    socket.join(data.roomId);
+    if (myFlag == 0){
+      // 自分以外のプレイヤーのflagを０▶️️1に変更
+      for (let key in players) {
+        if (key == sessionId) { 
+          continue
+        }
+        players[key][2] = 1;
+      }
+      
+      socket.broadcast.to(data.roomId).emit('new_client_join');
+    }
+    
+    else {
+      myFlag = 0
+    }
   })
 });
 
