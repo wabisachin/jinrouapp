@@ -12,8 +12,8 @@
         <% Object.keys(field.players).forEach( (id, i) => { %>
         <div class="userArea">
             <p><%= id %></p>
-            <p><%= field.players[id] %></p>
-            <div class="card" id="card<%= i+1 %>"> </div>
+            <p><%= field.players[id].userName %></p>
+            <div class="card" id="card<%= i %>"> </div>
         </div>
         <% }) %>
         

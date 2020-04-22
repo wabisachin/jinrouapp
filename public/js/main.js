@@ -221,9 +221,9 @@ $(function(){
         socket.emit('request_role', roomId, sessionId);
     });
     
-    socket.on('give_role', role =>{
+    socket.on('give_role', data => {
         
-        console.log(role);
+        $(`#card${data.plyerNo}`).text(data.userRole);
     }  )
 
 });

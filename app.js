@@ -138,9 +138,13 @@ console.log('Server running …');
 
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
       function userAdd(field, sessionId, userName){
-        field.currentPlayerNum++;
-        if (field.currentPlayerNum <= field.playerNum) {
-          field.players[sessionId] = [field.currentPlayerNum, userName];
+        
+        if (field.currentPlayerNum < field.playerNum) {
+          field.players[sessionId] = {
+            plyerNo:  field.currentPlayerNum, 
+            userName: userName
+          };
+          field.currentPlayerNum++;
         } else {
           //プレイヤー数以上のアクセスが有った場合の処理
           
@@ -184,7 +188,7 @@ console.log('Server running …');
   // field内のplayersディクショナリにroleを入れていく
   function roleAsign (field, roles) {
       Object.keys(field.players).forEach(key => {
-        field.players[key].push(roles.pop());
+        field.players[key].userRole = roles.pop() ;
       });
       console.log(field.players);
   }
@@ -229,8 +233,7 @@ io.sockets.on('connection', socket => {
   })
   
   socket.on("request_role", (roomId, sessionId) => {
-    console.log(sessionId);
-    socket.emit('give_role', room[roomId].players[sessionId][2]);
+    socket.emit('give_role', room[roomId].players[sessionId]);
   
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
