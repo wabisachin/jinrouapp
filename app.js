@@ -1,3 +1,9 @@
+ /*----------------------------------------------------------------------------
+ 
+                  Node.jsのrequire
+ 
+ ----------------------------------------------------------------------------*/
+
     let express = require("express"),
         app = express(),
         server = require("http").Server(app),
@@ -7,12 +13,22 @@
         // redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
         // client = redis.createClient();
-    
-    // roomの初期化
+ 
+ /*----------------------------------------------------------------------------
+ 
+                  グローバル変数定義
+ 
+ ----------------------------------------------------------------------------*/
+    // roomには
     
     let room = {}
  
 
+ /*----------------------------------------------------------------------------
+ 
+                  Expressの設定
+ 
+ ----------------------------------------------------------------------------*/
       server.listen(8080, 'localhost');
       
       //テンプレートはviewsフォルダに保存
@@ -43,7 +59,7 @@
       });
       
       // roomページへリダイレクト
-      app.post('/', function(req, res) {
+      app.post('/', function (req, res)  {
         
         let roomId = req.body.roomId;
         
@@ -112,6 +128,14 @@
 
 console.log('Server running …');
 
+ /*----------------------------------------------------------------------------
+ 
+                  関数定義
+ 
+ ----------------------------------------------------------------------------*/
+ 
+       
+
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
       function userAdd(field, sessionId, userName){
         field.currentPlayerNum++;
@@ -132,30 +156,45 @@ console.log('Server running …');
 
 
 
-// プレイ人数の役職の配列を作る
-function randomRole (field) {
-  let roles = [];
+// カードをシャッフルしする。
+  function randomRole (field) {
+    let roles = [];
+    
+    for (var i = 0; i < field.villager; i++) {
+      roles.push('villager');
+    }
+    for (var i = 0; i < field.wolfman; i++) {
+      roles.push('wolfman');
+    }
+    for (var i = 0; i < field.thief; i++) {
+      roles.push('thief');
+    }
+    for (var i = 0; i < field.fortune; i++) {
+      roles.push('fortune');
+    }
+    for(let i = roles.length - 1; i > 0; i--){
+      let r = Math.floor(Math.random() * (i + 1));
+      let tmp = roles[i];
+      roles[i] = roles[r];
+      roles[r] = tmp;
+    }
+    return roles;
+  }
   
-  for (var i = 0; i < field.villager; i++) {
-    roles.push('villager');
+  // field内のplayersディクショナリにroleを入れていく
+  function roleAsign (field, roles) {
+      Object.keys(field.players).forEach(key => {
+        field.players[key].push(roles.pop());
+      });
+      console.log(field.players);
   }
-  for (var i = 0; i < field.wolfman; i++) {
-    roles.push('wolfman');
-  }
-  for (var i = 0; i < field.thief; i++) {
-    roles.push('thief');
-  }
-  for (var i = 0; i < field.fortune; i++) {
-    roles.push('fortune');
-  }
-  for(let i = roles.length - 1; i > 0; i--){
-    let r = Math.floor(Math.random() * (i + 1));
-    let tmp = roles[i];
-    roles[i] = roles[r];
-    roles[r] = tmp;
-  }
-  return roles;
-}
+
+
+ /*----------------------------------------------------------------------------
+ 
+                  SocketIOの設定
+ 
+ ----------------------------------------------------------------------------*/
 
 io.sockets.on('connection', socket => {
 
@@ -166,7 +205,8 @@ io.sockets.on('connection', socket => {
   // });
   
   socket.on('toNightClicked', (roomId) => {
-    io.to(roomId).emit('roles_from_server',randomRole(room[roomId]));
+    io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
+    
   });
   
   // socket.on('joinRoom_from_client', data => {
@@ -182,6 +222,7 @@ io.sockets.on('connection', socket => {
   
   socket.on("joinRoom_from_client", (data)=> {
     socket.join(data);
+    socket.broadcast.to(data).emit('new_client_join');
   })
 });
 
