@@ -204,8 +204,11 @@ io.sockets.on('connection', socket => {
     
   // });
   
+  // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
-    io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
+    // io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
+    roleAsign(room[roomId],randomRole(room[roomId]));
+    io.to(roomId).emit('roles_asigned');
     
   });
   
@@ -224,5 +227,13 @@ io.sockets.on('connection', socket => {
     socket.join(data);
     socket.broadcast.to(data).emit('new_client_join');
   })
+  
+  socket.on("request_role", (roomId, sessionId) => {
+    console.log(sessionId);
+    socket.emit('give_role', room[roomId].players[sessionId][2]);
+  
+    // let role = room[roomId].players[sessionId][2];
+    // socket.emit('give_role', role);
+  });
 });
 
