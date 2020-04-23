@@ -236,7 +236,7 @@ $(function(){
         $(`#card${data.plyerNo}`).text(data.userRole);
         switch (data.userRole) {
             case 'wolfman':
-                socket.emit('i_am_wolfman');
+                socket.emit('i_am_wolfman', getRoomId());
                 break;
             case 'fortune':
                 socket.emit('i_am_fortune');

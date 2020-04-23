@@ -201,6 +201,13 @@
         players[key]["flag"] = 1;
       }
   }
+  
+  // 人狼メソッド：全人狼のplayer{}を返す
+  function wolfman(roomId) {
+    let wolfmanList = room[roomId].players.filter(x => x.userRole === 'wolfman');
+    console.log(wolfmanList);
+    return wolfmanList;
+  }
 
  /*----------------------------------------------------------------------------
  
@@ -273,6 +280,11 @@ io.sockets.on('connection', socket => {
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });
+  
+  // wolfmanのユーザーに他のwolfmanを教える
+  socket.on("i_am_wolfman", (roomId) => {
+    socket.emit('other_wolfman', wolfman(roomId) );
+  })
   
   
   
