@@ -136,21 +136,39 @@
  
        
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
-  function userAdd(field, sessionId, userName){
-    if (field.currentPlayerNum < field.playerNum) {
-      field.players[sessionId] = {
-        plyerNo:  field.currentPlayerNum, 
-        userName: userName,
-        flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
-      };
-      field.currentPlayerNum++;
-    } else {
-      //プレイヤー数以上のアクセスが有った場合の処理
-      
-    }
+      function userAdd(field, sessionId, userName){
+        if (field.currentPlayerNum < field.playerNum - 1) {
+          field.players[sessionId] = {
+            playerNo:  field.currentPlayerNum, 
+            userName: userName,
+            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+          };
+          field.currentPlayerNum++;
+        } else if (field.currentPlayerNum === field.playerNum - 1)
+        // 最後の一人が入った後に墓地ユーザ追加
+         {
+            field.players[sessionId] = {
+            playerNo:  field.currentPlayerNum, 
+            userName: userName,
+            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+          };
+          
+          //墓地ユーザ追加
+          for (var i = 1; i < 3; i++) {
+            field.players[`cemetary${i}`] = {
+              playerNo: -i,
+              userName: 'cemetary' + i,
+              flag: 0
+            };
+          }
+          console.log(field.players);
+         }
+           else {
+          //プレイヤー数以上のアクセスが有った場合の処理
+          
+        }
 
-  }
-
+      }
   //ユーザのブラウザにCookie保存する
   function setCookie(key, value, res) {
     const escapedValue = escape(value);
@@ -200,6 +218,24 @@
         }
         players[key]["flag"] = 1;
       }
+  }
+  
+  // 人狼メソッド：全人狼のplayer{}を返す
+  function wolfman(roomId) {
+    let wolfmanList = Object.values(room[roomId].players).filter(x => x.userRole === 'wolfman');
+    console.log(wolfmanList);
+    return wolfmanList;
+  }
+  
+  // 占い師メソッド：選択したカードの役職を通知、墓地カードの場合両方通知
+  function fortune(roomId, playerNo){
+    let fortuneResult = [];
+    if (playerNo >= 0) {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === playerNo);
+    } else {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo < 0);
+    }
+    return fortuneResult;
   }
 
  /*----------------------------------------------------------------------------
@@ -263,6 +299,16 @@ io.sockets.on('connection', socket => {
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });
+  
+  // wolfmanのユーザーに他のwolfmanを教える
+  socket.on("i_am_wolfman", (roomId) => {
+    socket.emit('all_wolfman', wolfman(roomId) );
+  })
+  
+  socket.on("i_am_fortune", (roomId, playerNo) => {
+    let fortuneResult = fortune(roomId, playerNo);
+    socket.emit('fortune_result', fortuneResult);
+  })
   
   
   

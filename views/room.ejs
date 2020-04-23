@@ -9,23 +9,33 @@
         <h1>room:<%= roomId %></h1>
         
         <div class="field">
+            
         <% Object.keys(field.players).forEach( (id, i) => { %>
+       <% if(field.players[id].playerNo >= 0) { %>
         <div class="userArea">
             <!--<p><%= id %></p>-->
+            
             <p><%= field.players[id].userName %></p>
-            <div class="card" id="card<%= i %>"> </div>
+            <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
         </div>
-        <% }) %>
+        
+        <% } } ) %>
         
         </div>
         
         <h2 class="field">墓地</h2>
+        
         <div class="field" id="cemetryField">
-                    <% for (let i = 0; i < 2 ; i++) { %>
+            
+        <% Object.keys(field.players).forEach( (id, i) => { %>
+        <% if(field.players[id].playerNo < 0) { %>
         <div class="userArea">
-            <div class="card" id="card<%=parseInt(field.playerNum) + i + 1%>"> </div>
+            <!--<p><%= id %></p>-->
+            <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
         </div>
-        <% } %>
+        
+        <% } }  ) %>
+            
         </div>
 
         <h2>操作ボタン</h2>

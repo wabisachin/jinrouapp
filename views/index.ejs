@@ -14,6 +14,8 @@
             <input type="hidden" name="makeRoom" value="true"> 
             <p>
                 プレイ人数:<select id="playerNum" v-model.number = "playerNum" name="playerNum">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
@@ -28,6 +30,7 @@
                     <option value="3">3</option>
                 </select>
                 人狼:<select id="wolfman" v-model.number="wolfman" name="wolfman">
+                    <option value="0">0</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -41,6 +44,8 @@
                 怪盗:<select id="thief" v-model.number="thief" name="thief">
                     <option value="0">0</option>
                     <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
                     </select>
             </p>
             <p>現在の合計枚数: {{total}}</p>
