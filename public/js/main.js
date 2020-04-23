@@ -228,6 +228,11 @@ $(function(){
         switch (data.userRole) {
             case 'wolfman':
                 socket.emit('i_am_wolfman', getRoomId());
+                socket.on('all_wolfman', wolfmanList => {
+                    wolfmanList.forEach( wolfmanInfo => {
+                        $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole)
+                    }  );
+                })
                 break;
             case 'fortune':
                 socket.emit('i_am_fortune');

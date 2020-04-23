@@ -137,14 +137,33 @@
        
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
       function userAdd(field, sessionId, userName){
-        if (field.currentPlayerNum < field.playerNum) {
+        if (field.currentPlayerNum < field.playerNum - 1) {
           field.players[sessionId] = {
-            plyerNo:  field.currentPlayerNum, 
+            playerNo:  field.currentPlayerNum, 
             userName: userName,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           field.currentPlayerNum++;
-        } else {
+        } else if (field.currentPlayerNum === field.playerNum - 1)
+        // 最後の一人が入った後に墓地ユーザ追加
+         {
+            field.players[sessionId] = {
+            playerNo:  field.currentPlayerNum, 
+            userName: userName,
+            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+          };
+          
+          //墓地ユーザ追加
+          for (var i = 1; i < 3; i++) {
+            field.players[`cemetary${i}`] = {
+              playerNo: -i,
+              userName: 'cemetary' + i,
+              flag: 0
+            };
+          }
+          console.log(field.players);
+         }
+           else {
           //プレイヤー数以上のアクセスが有った場合の処理
           
         }
@@ -205,7 +224,7 @@
   
   // 人狼メソッド：全人狼のplayer{}を返す
   function wolfman(roomId) {
-    let wolfmanList = room[roomId].players.filter(x => x.userRole === 'wolfman');
+    let wolfmanList = Object.values(room[roomId].players).filter(x => x.userRole === 'wolfman');
     console.log(wolfmanList);
     return wolfmanList;
   }
@@ -274,7 +293,7 @@ io.sockets.on('connection', socket => {
   
   // wolfmanのユーザーに他のwolfmanを教える
   socket.on("i_am_wolfman", (roomId) => {
-    socket.emit('other_wolfman', wolfman(roomId) );
+    socket.emit('all_wolfman', wolfman(roomId) );
   })
   
   
