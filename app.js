@@ -228,6 +228,17 @@
     console.log(wolfmanList);
     return wolfmanList;
   }
+  
+  // 占い師メソッド：選択したカードの役職を通知、墓地カードの場合両方通知
+  function fortune(roomId, playerNo){
+    let fortuneResult = [];
+    if (playerNo >= 0) {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === playerNo);
+    } else {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo < 0);
+    }
+    return fortuneResult;
+  }
 
  /*----------------------------------------------------------------------------
  
@@ -294,6 +305,11 @@ io.sockets.on('connection', socket => {
   // wolfmanのユーザーに他のwolfmanを教える
   socket.on("i_am_wolfman", (roomId) => {
     socket.emit('all_wolfman', wolfman(roomId) );
+  })
+  
+  socket.on("i_am_fortune", (roomId, playerNo) => {
+    let fortuneResult = fortune(roomId, playerNo);
+    socket.emit('fortune_result', fortuneResult);
   })
   
   

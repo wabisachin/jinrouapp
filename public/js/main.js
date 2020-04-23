@@ -224,18 +224,30 @@ $(function(){
     
     // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
-        $(`#card${data.plyerNo}`).text(data.userRole);
+        $(`#card${data.playerNo}`).text(data.userRole);
+        
         switch (data.userRole) {
             case 'wolfman':
                 socket.emit('i_am_wolfman', getRoomId());
                 socket.on('all_wolfman', wolfmanList => {
                     wolfmanList.forEach( wolfmanInfo => {
-                        $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole)
+                        $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole);
                     }  );
                 })
                 break;
             case 'fortune':
-                socket.emit('i_am_fortune');
+                $('.card').css('cursor', 'pointer');
+                $(`#card${data.playerNo}`).css('pointer-events',  'none');
+                $('.card').click( (e) => {
+                    let playerNo = parseInt(e.currentTarget.id.substr(4));
+                    $('.card').css('pointer-events',  'none');
+                    socket.emit('i_am_fortune', getRoomId() ,playerNo);
+                    socket.on('fortune_result', fortuneResult => {
+                        fortuneResult.forEach( result => {
+                            $(`#card${result.playerNo}`).text(result.userRole);
+                        } );
+                    })
+                })
                 break;
             case 'thief':
                 socket.emit('i_am_thief');
