@@ -85,14 +85,14 @@ function getCookieArray(){
 function startTimer(time) {
     let countDown = function() {
         
-        $('#restTime').text(`残り${Math.round(time/60)}分${time%60}秒`);
+        $('#restTime').text(`Time: ${Math.round(time/60)}分${time%60}秒`);
         time--;
         var id = setTimeout(countDown, 1000);
         if (time < 0) {
             clearTimeout(id);
             // 音声ファイルの再生
-            $( '#sound-file' ).get(0).play();
-            $('#restTime').text('timeUp！');
+            // $( '#sound-file' ).get(0).play();
+            $('#restTime').text('timeUp！人狼を選択！');
         }
     }
     countDown();
@@ -212,12 +212,8 @@ $(function(){
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
-            
-            socket.emit('day_begins', roomId);
-            // // タイマーの秒数を設定
-            // let setCount = 3;
-            // $('#restTime').removeClass('hidden');
-            // startTimer(setCount);
+            console.log("ok")
+            socket.emit("day_begins", roomId);
         })
         
     }
@@ -285,12 +281,30 @@ $(function(){
         }
     })
     
-    // タイマースタート
-    socket.on("startTimer", () => {
+    // 昼のスタート
+    socket.on("notice_day_started", () => {
         // タイマーの秒数を設定
-            let setCount = 3;
-            $('#restTime').removeClass('hidden');
-            startTimer(setCount);
+        let setCount = 5;
+        
+        $('#restTime').removeClass('hidden');
+        startTimer(setCount);
+        // プレイヤー名クリックで投票者を選択
+        $('.userArea').click(function(){
+            $('#modalArea').fadeIn();
+        });
+        // modalの閉じるボタンクリック時
+        $('#closeModal , #modalBg').click(function(){
+            $('#modalArea').fadeOut();
+        });
+        
+        // ホバー時の見た目変化
+        $('.userArea').hover(function() {
+            $(this).css('background',"darkgray");
+        }, function() {
+            $(this).css('background', '');
+        });
+        
+        
     })
 
 });

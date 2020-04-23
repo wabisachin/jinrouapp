@@ -309,9 +309,10 @@ io.sockets.on('connection', socket => {
     socket.emit('fortune_result', fortuneResult);
   });
   
-  // 同一ルームのプレイヤー全員に昼開始の通知とタイマースタート
+  // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
   socket.on("day_begins", (roomId) => {
-    io.to(roomId).emit("startTimer");
+    console.log("Pk")
+    io.to(roomId).emit("notice_day_started");
   });
   
 });
