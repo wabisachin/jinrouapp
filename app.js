@@ -135,28 +135,28 @@
  ----------------------------------------------------------------------------*/
  
        
+//  sessionと[セッション番号、ユーザー名]のディクショナリ追加
+      function userAdd(field, sessionId, userName){
+        if (field.currentPlayerNum < field.playerNum) {
+          field.players[sessionId] = {
+            plyerNo:  field.currentPlayerNum, 
+            userName: userName,
+            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+          };
+          field.currentPlayerNum++;
+        } else {
+          //プレイヤー数以上のアクセスが有った場合の処理
+          
+        }
 
-    //sessionと[セッション番号、ユーザー名]のディクショナリ追加
-    function userAdd(field, sessionId, userName){
-      if (field.currentPlayerNum < field.playerNum) {
-        field.players[sessionId] = {
-          plyerNo:  field.currentPlayerNum, 
-          userName: userName,
-          flag: 0,
-        };
-        field.currentPlayerNum++;
-      } else {
-        //プレイヤー数以上のアクセスが有った場合の処理
-        
       }
-    }
       
       
   //ユーザのブラウザにCookie保存する
   function setCookie(key, value, res) {
-            const escapedValue = escape(value);
-            res.setHeader('Set-Cookie', [`${key}=${escapedValue}`]);
-          }
+    const escapedValue = escape(value);
+    res.setHeader('Set-Cookie', [`${key}=${escapedValue}`]);
+  }
 
 
 
@@ -193,6 +193,7 @@
       console.log(field.players);
   }
   
+  // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動リロードチェック用)
   function changeOthersFlag(players, sessionId) {
     for (let key in players) {
         if (key == sessionId) { 
@@ -236,10 +237,10 @@ io.sockets.on('connection', socket => {
   //   io.join(data.room_id);
   // });
 
-  // いらなくなったかも->いらなければコメントアウトよろしく！りんせー不要
-  socket.on('join_from_player', data =>{
-    io.emit(`join_from_server`, data);
-  });
+  // わさび不要！いらなくなったかも->いらなければコメントアウトよろしく！りんせー不要
+  // socket.on('join_from_player', data =>{
+  //   io.emit(`join_from_server`, data);
+  // });
   
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
@@ -253,22 +254,12 @@ io.sockets.on('connection', socket => {
     
     socket.join(data.roomId);
     if (myFlag == 0){
-      // 自分以外のプレイヤーのflagを０→１に変更
-      // for (let key in players) {
-      //   if (key == sessionId) { 
-      //     continue
-      //   }
-      //   players[key]["flag"] = 1;
-      // }
-      
-      // 自分以外のプレイヤーのflagを０→１に変更
       changeOthersFlag(players, sessionId);
-      
       socket.broadcast.to(data.roomId).emit('new_client_join');
     }
     
     else {
-      // flagをリセット
+      // 自動リロードチェックflagをリセット
       players[sessionId]["flag"] = 0
     }
   })

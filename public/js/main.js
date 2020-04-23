@@ -203,15 +203,6 @@ $(function(){
     //     }
         
     // })
-    
-    // りんせー不要
-    socket.on('join_from_server', data => {
-        // player名の変更
-        $(`#name${data.num}`).text(data.name);
-        // フォームを非表示
-        $(`#userName${data.num}`).css("display", "none");
-    })
-    
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
