@@ -126,7 +126,7 @@
       //     console.log(reply);
       // });
 
-console.log('Server running …');
+  console.log('Server running …');
 
  /*----------------------------------------------------------------------------
  
@@ -136,20 +136,20 @@ console.log('Server running …');
  
        
 
-//  sessionと[セッション番号、ユーザー名]のディクショナリ追加
-      function userAdd(field, sessionId, userName){
-        if (field.currentPlayerNum < field.playerNum) {
-          field.players[sessionId] = {
-            plyerNo:  field.currentPlayerNum, 
-            userName: userName,
-            flag: 0,
-          };
-          field.currentPlayerNum++;
-        } else {
-          //プレイヤー数以上のアクセスが有った場合の処理
-          
-        }
+    //sessionと[セッション番号、ユーザー名]のディクショナリ追加
+    function userAdd(field, sessionId, userName){
+      if (field.currentPlayerNum < field.playerNum) {
+        field.players[sessionId] = {
+          plyerNo:  field.currentPlayerNum, 
+          userName: userName,
+          flag: 0,
+        };
+        field.currentPlayerNum++;
+      } else {
+        //プレイヤー数以上のアクセスが有った場合の処理
+        
       }
+    }
       
       
   //ユーザのブラウザにCookie保存する
@@ -160,7 +160,7 @@ console.log('Server running …');
 
 
 
-// カードをシャッフルしする。
+  // カードをシャッフルする。
   function randomRole (field) {
     let roles = [];
     
@@ -229,10 +229,12 @@ io.sockets.on('connection', socket => {
   //   io.join(data.room_id);
   // });
 
+  // いらなくなったかも->いらなければコメントアウトよろしく！りんせー不要
   socket.on('join_from_player', data =>{
     io.emit(`join_from_server`, data);
   });
   
+  // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
     let roomId = data.roomId;
     let sessionId = data.sessionId;
@@ -264,11 +266,16 @@ io.sockets.on('connection', socket => {
     }
   })
   
+  // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す
   socket.on("request_role", (roomId, sessionId) => {
     socket.emit('give_role', room[roomId].players[sessionId]);
   
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });
+  
+  
+  
+  
 });
 
