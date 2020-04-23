@@ -136,22 +136,21 @@
  
        
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
-      function userAdd(field, sessionId, userName){
-        if (field.currentPlayerNum < field.playerNum) {
-          field.players[sessionId] = {
-            plyerNo:  field.currentPlayerNum, 
-            userName: userName,
-            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
-          };
-          field.currentPlayerNum++;
-        } else {
-          //プレイヤー数以上のアクセスが有った場合の処理
-          
-        }
+  function userAdd(field, sessionId, userName){
+    if (field.currentPlayerNum < field.playerNum) {
+      field.players[sessionId] = {
+        plyerNo:  field.currentPlayerNum, 
+        userName: userName,
+        flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+      };
+      field.currentPlayerNum++;
+    } else {
+      //プレイヤー数以上のアクセスが有った場合の処理
+      
+    }
 
-      }
-      
-      
+  }
+
   //ユーザのブラウザにCookie保存する
   function setCookie(key, value, res) {
     const escapedValue = escape(value);
@@ -246,13 +245,13 @@ io.sockets.on('connection', socket => {
     let myFlag = players[sessionId]["flag"];
     
     socket.join(data.roomId);
+    
+    // 新規playerがjoinした時だけリロードされるように条件分岐
     if (myFlag == 0){
       changeOthersFlag(players, sessionId);
       socket.broadcast.to(data.roomId).emit('new_client_join');
     }
-    
     else {
-      // 自動リロードチェックflagをリセット
       players[sessionId]["flag"] = 0
     }
   })

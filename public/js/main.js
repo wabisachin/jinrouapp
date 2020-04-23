@@ -203,6 +203,7 @@ $(function(){
     //     }
         
     // })
+    
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
@@ -239,6 +240,6 @@ $(function(){
             default:
                 // code
         }
-    }  )
+    })
 
 });
