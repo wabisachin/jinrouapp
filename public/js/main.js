@@ -81,6 +81,23 @@ function getCookieArray(){
   return arr;
 }
 
+// タイマーをスタートし、残り時間を表示。
+function startTimer(time) {
+    let countDown = function() {
+        
+        $('#restTime').text(`残り${Math.round(time/60)}分${time%60}秒`);
+        time--;
+        var id = setTimeout(countDown, 1000);
+        if (time < 0) {
+            clearTimeout(id);
+            // 音声ファイルの再生
+            $( '#sound-file' ).get(0).play();
+            $('#restTime').text('timeUp！');
+        }
+    }
+    countDown();
+}
+
  /*----------------------------------------------------------------------------
  
                   Vue.js
@@ -193,6 +210,15 @@ $(function(){
         $('#toNight').on('click', () => {
             socket.emit('toNightClicked', roomId);
         });
+        // 昼へボタンを押した時
+        $('#toDate').on('click', () => {
+            
+            socket.emit('day_begins', roomId);
+            // // タイマーの秒数を設定
+            // let setCount = 3;
+            // $('#restTime').removeClass('hidden');
+            // startTimer(setCount);
+        })
         
     }
     
@@ -257,6 +283,14 @@ $(function(){
             default:
                 // code
         }
+    })
+    
+    // タイマースタート
+    socket.on("startTimer", () => {
+        // タイマーの秒数を設定
+            let setCount = 3;
+            $('#restTime').removeClass('hidden');
+            startTimer(setCount);
     })
 
 });

@@ -169,6 +169,8 @@
         }
 
       }
+      
+  
   //ユーザのブラウザにCookie保存する
   function setCookie(key, value, res) {
     const escapedValue = escape(value);
@@ -210,7 +212,7 @@
       console.log(field.players);
   }
   
-  // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動リロードチェック用)
+  // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動/手動リロードの判定)
   function changeOthersFlag(players, sessionId) {
     for (let key in players) {
         if (key == sessionId) { 
@@ -272,16 +274,13 @@ io.sockets.on('connection', socket => {
   
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
+    
     let roomId = data.roomId;
     let sessionId = data.sessionId;
     let players = room[roomId]["players"];
-    console.log("okkkkk");
-    console.log(players[sessionId]);
-    console.log(players[sessionId]["flag"]);
     let myFlag = players[sessionId]["flag"];
     
     socket.join(data.roomId);
-    
     // 新規playerがjoinした時だけリロードされるように条件分岐
     if (myFlag == 0){
       changeOthersFlag(players, sessionId);
@@ -303,15 +302,17 @@ io.sockets.on('connection', socket => {
   // wolfmanのユーザーに他のwolfmanを教える
   socket.on("i_am_wolfman", (roomId) => {
     socket.emit('all_wolfman', wolfman(roomId) );
-  })
+  });
   
   socket.on("i_am_fortune", (roomId, playerNo) => {
     let fortuneResult = fortune(roomId, playerNo);
     socket.emit('fortune_result', fortuneResult);
-  })
+  });
   
-  
-  
+  // 同一ルームのプレイヤー全員に昼開始の通知とタイマースタート
+  socket.on("day_begins", (roomId) => {
+    io.to(roomId).emit("startTimer");
+  });
   
 });
 
