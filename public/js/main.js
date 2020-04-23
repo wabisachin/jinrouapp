@@ -196,14 +196,15 @@ $(function(){
         
     }
     
-    
-    socket.on('roles_from_server', roles => {
-        for (var i = 0; i < roles.length; i++) {
-            // $(`#card${i+1}`).text(roles[i]);
-        }
+    // 不要になった
+    // socket.on('roles_from_server', roles => {
+    //     for (var i = 0; i < roles.length; i++) {
+    //         // $(`#card${i+1}`).text(roles[i]);
+    //     }
         
-    })
+    // })
     
+    // りんせー不要
     socket.on('join_from_server', data => {
         // player名の変更
         $(`#name${data.num}`).text(data.name);
@@ -211,6 +212,7 @@ $(function(){
         $(`#userName${data.num}`).css("display", "none");
     })
     
+    // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
     //   location.reload();
@@ -220,6 +222,7 @@ $(function(){
         
     // });
     
+    // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
     socket.on('roles_asigned', ()=> {
         let roomId = getRoomId();
         let cookie = getCookieArray();
@@ -228,8 +231,23 @@ $(function(){
         socket.emit('request_role', roomId, sessionId);
     });
     
+    // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
         $(`#card${data.plyerNo}`).text(data.userRole);
+        switch (data.userRole) {
+            case 'wolfman':
+                socket.emit('i_am_wolfman');
+                break;
+            case 'fortune':
+                socket.emit('i_am_fortune');
+                break;
+            case 'thief':
+                socket.emit('i_am_thief');
+                break;
+            
+            default:
+                // code
+        }
     }  )
 
 });
