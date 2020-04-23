@@ -142,7 +142,7 @@ console.log('Server running …');
           field.players[sessionId] = {
             plyerNo:  field.currentPlayerNum, 
             userName: userName,
-            flag: 0,
+            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           field.currentPlayerNum++;
         } else {
