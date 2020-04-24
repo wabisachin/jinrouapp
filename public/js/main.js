@@ -225,7 +225,7 @@ $(function(){
     // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
         $(`#card${data.playerNo}`).text(data.userRole);
-        
+        // 自分の役職のメソッドをサーバに要求する
         switch (data.userRole) {
             case 'wolfman':
                 socket.emit('i_am_wolfman', getRoomId());
@@ -233,24 +233,36 @@ $(function(){
                     wolfmanList.forEach( wolfmanInfo => {
                         $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole);
                     }  );
-                })
+                });
                 break;
             case 'fortune':
                 $('.card').css('cursor', 'pointer');
                 $(`#card${data.playerNo}`).css('pointer-events',  'none');
                 $('.card').click( (e) => {
-                    let playerNo = parseInt(e.currentTarget.id.substr(4));
+                    let targetNo = parseInt(e.currentTarget.id.substr(4));
                     $('.card').css('pointer-events',  'none');
-                    socket.emit('i_am_fortune', getRoomId() ,playerNo);
+                    socket.emit('i_am_fortune', getRoomId() ,targetNo);
                     socket.on('fortune_result', fortuneResult => {
                         fortuneResult.forEach( result => {
                             $(`#card${result.playerNo}`).text(result.userRole);
                         } );
-                    })
-                })
+                    });
+                });
                 break;
             case 'thief':
-                socket.emit('i_am_thief');
+                $('.card').css('cursor', 'pointer');
+                $(`#card${data.playerNo}, #card-1, #card-2`).css('pointer-events',  'none');
+                $('.card').click( (e) => {
+                    let thiefNo = data.playerNo;
+                    let targetNo = parseInt(e.currentTarget.id.substr(4));
+                    $('.card').css('pointer-events',  'none');
+                    socket.emit('i_am_thief', getRoomId() ,targetNo, thiefNo);
+                    socket.on('thief_result', thiefResult => {
+                        thiefResult.forEach( result => {
+                            $(`#card${result.playerNo}`).text(result.userRole);
+                        } );
+                    });
+                });
                 break;
             
             default:

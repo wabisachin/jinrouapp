@@ -230,14 +230,39 @@
   }
   
   // 占い師メソッド：選択したカードの役職を通知、墓地カードの場合両方通知
-  function fortune(roomId, playerNo){
+  function fortune(roomId, targetNo){
     let fortuneResult = [];
-    if (playerNo >= 0) {
-      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === playerNo);
+    if (targetNo >= 0) {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === targetNo);
     } else {
       fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo < 0);
     }
     return fortuneResult;
+  }
+  
+  function thiefBefore(roomId, targetNo, thiefNo) {
+    let players = room[roomId].players;
+    console.log(players);
+    let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
+    // let steal = Object.values(players).filter(v => v.playerNo === targetNo || v.playerNo === thiefNo );
+    // let stealId = Object.keys(players).filter(k => players[k].playerNo === targetNo || players[k].playerNo === thiefNo );
+    // let temp = players[stealId[0]].userRole;
+    // players[stealId[0]].userRole = players[stealId[1]].userRole;
+    // players[stealId[1]].userRole = temp;
+    // console.log(players);
+    return thiefResult;
+  }
+  function thiefAfter(roomId, targetNo, thiefNo) {
+    let players = room[roomId].players;
+    console.log(players);
+    // let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
+    // let steal = Object.values(players).filter(v => v.playerNo === targetNo || v.playerNo === thiefNo );
+    let stealId = Object.keys(players).filter(k => players[k].playerNo === targetNo || players[k].playerNo === thiefNo );
+    let temp = players[stealId[0]].userRole;
+    players[stealId[0]].userRole = players[stealId[1]].userRole;
+    players[stealId[1]].userRole = temp;
+    console.log(players);
+    // return thiefResult;
   }
 
  /*----------------------------------------------------------------------------
@@ -307,9 +332,13 @@ io.sockets.on('connection', socket => {
     socket.emit('all_wolfman', wolfman(roomId) );
   })
   
-  socket.on("i_am_fortune", (roomId, playerNo) => {
-    let fortuneResult = fortune(roomId, playerNo);
+  socket.on("i_am_fortune", (roomId, targetNo) => {
+    let fortuneResult = fortune(roomId, targetNo);
     socket.emit('fortune_result', fortuneResult);
+  })
+  socket.on("i_am_thief", (roomId, targetNo, thiefNo) => {
+    let thiefResult = thiefBefore(roomId, targetNo, thiefNo);
+     socket.emit('thief_result', thiefResult);
   })
   
   
