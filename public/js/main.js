@@ -326,6 +326,8 @@ $(function(){
         let setCount = 5;
         
         $('#restTime').removeClass('hidden');
+        $('#votedCount').removeClass('hidden');
+        $('#votedCount').text(`投票数: 0 / ${playerNum}`)
         // タイマースタート
         startTimer(setCount);
         // プレイヤー名クリックで投票者を選択
@@ -339,16 +341,9 @@ $(function(){
             });
             // 人狼の投票
             $(`#vote${id}`).click(function() {
-               socket.emit("voting_jinrou", id);
+               socket.emit("voting_jinrou", id, getRoomId());
             })
         }
-        // $('.userArea').click(function(){
-        //     $('#modalArea').fadeIn();
-        // });
-        // // modalの閉じるボタンクリック時
-        // $('#closeModal , #modalBg').click(function(){
-        //     $('#modalArea').fadeOut();
-        // });
         
         // ホバー時の見た目変化
         $('.userArea').hover(function() {
@@ -360,8 +355,14 @@ $(function(){
         
     })
     
+    // 追加投票の停止
     socket.on("prohibit_voting", () => {
         $('.modalContents').html("<h1>既に投票済みです</h1>")
+    })
+    
+    // 投票数の変更をプレイヤーに通知
+    socket.on("changeVotedCount", (current, total) => {
+        $("#votedCount").text(`投票数: ${current} / ${total}`)
     })
 
 });

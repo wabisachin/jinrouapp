@@ -13,7 +13,11 @@
             <!--	<source src="https://taira-komori.jpn.org/sound/anime01/Ikkyu_san.mp3" type="audio/mp3">-->
             <!--	<source src="" type="audio/wav">-->
             <!--</audio>-->
-            <p class=" hidden" id="restTime">残り時間</p>
+            <p class="hidden" id="restTime"></p>
+        </div>
+        
+        <div class ="voting">
+            <p class="hidden" id="votedCount"></p>
         </div>
         
         <div class="field">
@@ -28,8 +32,8 @@
                     <div class="card" id="card<%= playerNum %>"> </div>
                 </div>
                 <!-- モーダルエリアここから -->
-                <section id="modalArea<%= playerNum %>" class="modalArea">
-                  <div id="modalBg<%= playerNum %>" class="modalBg"></div>
+                <section  class="modalArea" id="modalArea<%= playerNum %>">
+                  <div class="modalBg" id="modalBg<%= playerNum %>"></div>
                   <div class="modalWrapper">
                     <div class="modalContents">
                       <h1><%= playerName %>を人狼に投票しますか？</h1>
@@ -69,20 +73,6 @@
                 <input type="submit" value="test">
             </form>
         </div>
-        
-        <!-- モーダルエリアここから -->
-        <!--<section id="modalArea" class="modalArea">-->
-        <!--  <div id="modalBg" class="modalBg"></div>-->
-        <!--  <div class="modalWrapper">-->
-        <!--    <div class="modalContents">-->
-        <!--      <h1>このプレイヤーを人狼に投票しますか？</h1>-->
-        <!--    </div>-->
-        <!--    <div id="closeModal" class="closeModal">-->
-        <!--      ×-->
-        <!--    </div>-->
-        <!--  </div>-->
-        <!--</section>-->
-        <!-- モーダルエリアここまで -->
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

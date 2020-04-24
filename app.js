@@ -69,6 +69,7 @@
           // fieldの初期化
               let field = { 
                   currentPlayerNum :0,
+                  currentVotedCount:0,
                   playerNum : 0,
                   villager : 0,
                   wolfman : 0,
@@ -141,6 +142,7 @@
           field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           field.currentPlayerNum++;
@@ -150,6 +152,7 @@
             field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           
@@ -259,6 +262,19 @@
     console.log("交換後");
     console.log(players);
   }
+  
+  // 投票メソッド：投票されたプレイヤーをデータベースに反映
+  function voteForWolfman(selected_id, room_id) {
+    let playerNum = room[room_id]["currentPlayerNum"];
+    let players = room[room_id]["players"];
+    // 投票数のカウント
+    room[room_id]["currentVotedCount"]++;
+    for (let key in players) {
+      if (players[key]["playerNum"] == selected_id) {
+        players[key]["votedCount"]++;
+      }
+    }
+  }
 
  /*----------------------------------------------------------------------------
  
@@ -344,17 +360,20 @@ io.sockets.on('connection', socket => {
   // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
-    let playerNum = room[roomId]["playerNum"];
+    let playerNum = room[roomId]["currentPlayerNum"];
     
     io.to(roomId).emit("are_you_thief");
     io.to(roomId).emit("notice_day_started", playerNum);
   });
   
   // 投票されたプレイヤーを受け取ってDBに保存
-  socket.on("voting_jinrou", (selected_id) => {
-    // 投票されたプレーヤーの集計
-    
-    // 一度投票したプレイヤーの追加投票を停止
+  socket.on("voting_jinrou", (selected_id, roomId) => {
+    let playerNum = room[roomId]["currentPlayerNum"];
+    // 選択されたプレイヤーに投票
+    voteForWolfman(selected_id, roomId);
+    // 投票数の変更を各プレイヤーに通知
+    io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
+    // 投票後の追加投票を停止
     socket.emit("prohibit_voting");
   });
   
