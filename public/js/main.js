@@ -373,13 +373,20 @@ $(function(){
     });
     
     socket.on("request_your_sessionId", () => {
+        let roomId =  getRoomId();
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
-        socket.emit("response_my_sessionId", sessionId);
+        socket.emit("response_my_sessionId", roomId, sessionId);
     })
+    
     // ゲーム結果を表示
-    socket.on("show_result", () => {
-        
+    socket.on("game_result", (result, details) => {
+        $('#modalArea').fadeIn();
+        $('result').text(result);
+        $('details').text(details)
+        $('#closeModal , #modalBg').on('click', () => {
+            $('#modalArea').fadeOut();
+        });
     })
 
 });
