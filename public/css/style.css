@@ -73,3 +73,7 @@
   right: 1rem;
   cursor: pointer;
 }
+
+.limitted {
+  opacity: 0.5;
+}

@@ -155,6 +155,8 @@ $(function(){
     
     socket.emit("getId_from_client");
     
+    // ↓わさび不要(リンセー不要なら消してね！)
+    
     // 村作成ボタンを押したとき
     // $('#settings').submit( e => {
     //     //設定値を取得
@@ -203,6 +205,8 @@ $(function(){
 
         
     // });
+    
+    // ↑わさび不要ここまで
 
     // socket.on('settings_from_server', data => {
     //     console.log(data.wolfman);
@@ -231,23 +235,18 @@ $(function(){
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
             socket.emit('toNightClicked', roomId);
+            $('#toNight').addClass("limitted");
+            $('#toDate').removeClass("limitted")
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
             date();
             console.log("ok")
+            $('#toDate').addClass("limitted");
             socket.emit("day_begins", roomId);
         })
         
     }
-    
-    // 不要になった
-    // socket.on('roles_from_server', roles => {
-    //     for (var i = 0; i < roles.length; i++) {
-    //         // $(`#card${i+1}`).text(roles[i]);
-    //     }
-        
-    // })
     
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
@@ -339,9 +338,9 @@ $(function(){
             $(`#closeModal${id} , #modalBg${id}, #vote${id}`).click(function(){
                 $(`#modalArea${id}`).fadeOut();
             });
-            // 人狼の投票
+            // 人狼へ投票
             $(`#vote${id}`).click(function() {
-               socket.emit("voting_jinrou", id, getRoomId());
+               socket.emit("vote_for_wolfman", id, getRoomId());
             })
         }
         
@@ -364,5 +363,9 @@ $(function(){
     socket.on("changeVotedCount", (current, total) => {
         $("#votedCount").text(`投票数: ${current} / ${total}`)
     })
+    
+    socket.on("finished_voting", () => { 
+        $('#result').removeClass("limitted")
+    });
 
 });

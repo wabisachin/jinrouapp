@@ -263,8 +263,8 @@
     console.log(players);
   }
   
-  // 投票メソッド：投票されたプレイヤーをデータベースに反映
-  function voteForWolfman(selected_id, room_id) {
+  // 投票メソッド：投票されたプレイヤーを受け取り,データベースに結果を反映
+  function voteForPlayers(selected_id, room_id) {
     let playerNum = room[room_id]["currentPlayerNum"];
     let players = room[room_id]["players"];
     // 投票数のカウント
@@ -366,15 +366,20 @@ io.sockets.on('connection', socket => {
     io.to(roomId).emit("notice_day_started", playerNum);
   });
   
-  // 投票されたプレイヤーを受け取ってDBに保存
-  socket.on("voting_jinrou", (selected_id, roomId) => {
+  // プレイヤーから投票先を受け取る
+  socket.on("vote_for_wolfman", (selected_id, roomId) => {
     let playerNum = room[roomId]["currentPlayerNum"];
-    // 選択されたプレイヤーに投票
-    voteForWolfman(selected_id, roomId);
+    // 選択されたプレイヤーへ投票
+    voteForPlayers(selected_id, roomId);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
     socket.emit("prohibit_voting");
+    
+    // 全ての投票が完了した時の処理
+    if (room[roomId]["currentVotedCount"] == playerNum) {
+      io.to(roomId).emit("finished_voting");
+    }
   });
   
 });
