@@ -155,69 +155,6 @@ $(function(){
     
     socket.emit("getId_from_client");
     
-    // ↓わさび不要(リンセー不要なら消してね！)
-    
-    // 村作成ボタンを押したとき
-    // $('#settings').submit( e => {
-    //     //設定値を取得
-    //     playerNum = parseInt($('#playerNum').val(), 10);
-    //     villager = parseInt($('#villager').val(), 10);
-    //     wolfman = parseInt($('#wolfman').val(), 10);
-    //     thief = parseInt($('#thief').val(), 10);
-    //     fortune = parseInt($('#fortune').val(), 10);
-    //     e.preventDefault();
-    //     if (playerNum + 2 === (villager + wolfman + thief + fortune)) {
-    //         //フィールド表示、カードが表示されていれば削除
-    //         $('.field').css('display', 'inline');
-    //         $('#villageField').children().remove();
-    //         $('#cemetryField').children().remove();
-            
-    //     socket.emit('settings_from_master', {
-    //         playerNum:  playerNum,
-    //         villager:   villager,
-    //         wolfman:    wolfman,
-    //         thief:  thief,
-    //         fortune:    fortune
-    //     });
-
-    //     } else {
-    //         alert('合計をプレイヤー人数+2枚にしてください。');
-    //     }
-    //     サーバーに設定情報を送信する。
-    //             socket.emit('settings_from_master', {  -->上のif文の中に移動
-    //         playerNum:  playerNum,
-    //         villager:   villager,
-    //         wolfman:    wolfman,
-    //         thief:  thief,
-    //         fortune:    fortune
-    //     });
-
-    //     // 参加ボタンを押した時のクリックアクション
-    //     for (let num = 0; num < playerNum; num++) {
-    //         $(document).on('submit', `#userName${num+1}`, (e) => {
-    //             e.preventDefault();
-    //             socket.emit('join_from_player', {
-    //                 name: $(this).find(`#nameSet${num+1}`).val(),
-    //                 num: $(this).find(`#playerNum${num+1}`).val()
-    //             });
-    //         });
-    //     }
-
-        
-    // });
-    
-    // ↑わさび不要ここまで
-
-    // socket.on('settings_from_server', data => {
-    //     console.log(data.wolfman);
-    //     playerNum = data.playerNum;
-    //     //人数分のフィールドを表示
-    //     for (let i = 1; i < playerNum + 1; i++) {
-    //         showForm(i);
-    //     }
-    //     //墓地に二枚カード表示
-    //     showCemetry(playerNum);
-    // });
     console.log("cookieの表示")
     console.log(document.cookie);
     

@@ -445,10 +445,6 @@
 io.sockets.on('connection', socket => {
 
   
-  // socket.on('toNightClicked', () => {
-  //   io.emit('roles_from_server',randomRole(field));
-    
-  // });
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
@@ -458,12 +454,6 @@ io.sockets.on('connection', socket => {
     
   });
   
-  // 同じのあるのでわさび不要。リンセー問題なければ削除で！
-  // socket.on('joinRoom_from_client', data => {
-  //   console.log(`socket_id: ${data.user_id}がroom: ${data.room_id}に入室しました`);
-  //   io.join(data.room_id);
-  // });
-
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
     
