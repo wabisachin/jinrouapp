@@ -98,6 +98,26 @@ function startTimer(time) {
     countDown();
 }
 
+// Initialフェーズ画面表示
+function initial () {
+    $('#toDate').prop('disabled', true);
+    $('#result').prop('disabled', true);
+}
+// 夜フェーズ画面表示
+function night () {
+    $('#toNight').prop('disabled', true);
+    $('#toDate').prop('disabled', false);
+    $('#result').prop('disabled', true);
+    $('body').addClass('night');
+    $('#plate').addClass('nightPlate');
+}
+function date () {
+    $('#toDate').prop('disabled', true);
+    $('#toNight').prop('disabled', true);
+    $('#result').prop('disabled', false);
+    $('body').css('background-color', 'none');
+}
+
  /*----------------------------------------------------------------------------
  
                   Vue.js
@@ -130,6 +150,8 @@ var app = new Vue({
 $(function(){
 
     let socket = io.connect();
+    
+    initial();
     
     socket.emit("getId_from_client");
     
@@ -212,6 +234,7 @@ $(function(){
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
+            date();
             console.log("ok")
             socket.emit("day_begins", roomId);
         })
@@ -242,6 +265,7 @@ $(function(){
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
         // let sessionId = document.cookie.sessionId;
+        night();
         socket.emit('request_role', roomId, sessionId);
     });
     
