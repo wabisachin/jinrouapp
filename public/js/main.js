@@ -310,10 +310,11 @@ $(function(){
     });
     
     socket.on("request_your_sessionId", () => {
+        
         let roomId =  getRoomId();
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
-        console.log("request_your_sessionId");
+        
         socket.emit("response_my_sessionId", roomId, sessionId);
     })
     
@@ -325,8 +326,6 @@ $(function(){
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
         $('#modalContents').append(`<p id="details">${details}</p>`);
-        // $('gameResult').text(result);
-        // $('details').text(details)
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
