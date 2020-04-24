@@ -287,6 +287,7 @@ $(function(){
         let setCount = 5;
         
         $('#restTime').removeClass('hidden');
+        // タイマースタート
         startTimer(setCount);
         // プレイヤー名クリックで投票者を選択
         $('.userArea').click(function(){

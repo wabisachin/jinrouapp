@@ -262,6 +262,7 @@ io.sockets.on('connection', socket => {
     
   });
   
+  // 同じのあるのでわさび不要。リンセー問題なければ削除で！
   // socket.on('joinRoom_from_client', data => {
   //   console.log(`socket_id: ${data.user_id}がroom: ${data.room_id}に入室しました`);
   //   io.join(data.room_id);
