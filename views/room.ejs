@@ -7,11 +7,19 @@
     </head>
     <body>
         <h1>room:<%= roomId %></h1>
+        <div class="timer">
+            <!--音声ファイルの読み込み-->
+            <!--<audio id="sound-file" preload="auto">-->
+            <!--	<source src="https://taira-komori.jpn.org/sound/anime01/Ikkyu_san.mp3" type="audio/mp3">-->
+            <!--	<source src="" type="audio/wav">-->
+            <!--</audio>-->
+            <p class=" hidden" id="restTime">残り時間</p>
+        </div>
         
         <div class="field">
             
         <% Object.keys(field.players).forEach( (id, i) => { %>
-       <% if(field.players[id].playerNo >= 0) { %>
+        <% if(field.players[id].playerNo >= 0) { %>
         <div class="userArea">
             <!--<p><%= id %></p>-->
             
@@ -47,6 +55,20 @@
                 <input type="submit" value="test">
             </form>
         </div>
+        
+        <!-- モーダルエリアここから -->
+        <section id="modalArea" class="modalArea">
+          <div id="modalBg" class="modalBg"></div>
+          <div class="modalWrapper">
+            <div class="modalContents">
+              <h1>このプレイヤーを人狼に投票しますか？</h1>
+            </div>
+            <div id="closeModal" class="closeModal">
+              ×
+            </div>
+          </div>
+        </section>
+        <!-- モーダルエリアここまで -->
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

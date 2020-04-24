@@ -170,7 +170,7 @@
 
       }
       
-      
+  
   //ユーザのブラウザにCookie保存する
   function setCookie(key, value, res) {
     const escapedValue = escape(value);
@@ -212,7 +212,7 @@
       console.log(field.players);
   }
   
-  // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動リロードチェック用)
+  // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動/手動リロードの判定)
   function changeOthersFlag(players, sessionId) {
     for (let key in players) {
         if (key == sessionId) { 
@@ -240,29 +240,24 @@
     return fortuneResult;
   }
   
+  // 怪盗メソッド1：選択したカードがなにかを教える
   function thiefBefore(roomId, targetNo, thiefNo) {
     let players = room[roomId].players;
-    console.log(players);
     let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
-    // let steal = Object.values(players).filter(v => v.playerNo === targetNo || v.playerNo === thiefNo );
-    // let stealId = Object.keys(players).filter(k => players[k].playerNo === targetNo || players[k].playerNo === thiefNo );
-    // let temp = players[stealId[0]].userRole;
-    // players[stealId[0]].userRole = players[stealId[1]].userRole;
-    // players[stealId[1]].userRole = temp;
-    // console.log(players);
     return thiefResult;
   }
+  
+  // 怪盗メソッド2：昼になったら役職を交換する
   function thiefAfter(roomId, targetNo, thiefNo) {
     let players = room[roomId].players;
+    console.log("交換前");
     console.log(players);
-    // let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
-    // let steal = Object.values(players).filter(v => v.playerNo === targetNo || v.playerNo === thiefNo );
     let stealId = Object.keys(players).filter(k => players[k].playerNo === targetNo || players[k].playerNo === thiefNo );
     let temp = players[stealId[0]].userRole;
     players[stealId[0]].userRole = players[stealId[1]].userRole;
     players[stealId[1]].userRole = temp;
+    console.log("交換後");
     console.log(players);
-    // return thiefResult;
   }
 
  /*----------------------------------------------------------------------------
@@ -299,22 +294,19 @@ io.sockets.on('connection', socket => {
   
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
+    
     let roomId = data.roomId;
     let sessionId = data.sessionId;
     let players = room[roomId]["players"];
-    console.log("okkkkk");
-    console.log(players[sessionId]);
-    console.log(players[sessionId]["flag"]);
     let myFlag = players[sessionId]["flag"];
     
     socket.join(data.roomId);
+    // 新規playerがjoinした時だけリロードされるように条件分岐
     if (myFlag == 0){
       changeOthersFlag(players, sessionId);
       socket.broadcast.to(data.roomId).emit('new_client_join');
     }
-    
     else {
-      // 自動リロードチェックflagをリセット
       players[sessionId]["flag"] = 0
     }
   })
@@ -330,19 +322,31 @@ io.sockets.on('connection', socket => {
   // wolfmanのユーザーに他のwolfmanを教える
   socket.on("i_am_wolfman", (roomId) => {
     socket.emit('all_wolfman', wolfman(roomId) );
-  })
+  });
   
+  // fortuneのユーザーに占い結果を教える
   socket.on("i_am_fortune", (roomId, targetNo) => {
     let fortuneResult = fortune(roomId, targetNo);
     socket.emit('fortune_result', fortuneResult);
-  })
+  });
+  
+  // 夜に怪盗に交換相手の役職を伝える
   socket.on("i_am_thief", (roomId, targetNo, thiefNo) => {
     let thiefResult = thiefBefore(roomId, targetNo, thiefNo);
      socket.emit('thief_result', thiefResult);
-  })
+  });
+  // 昼になった時に怪盗が役職交換実行
+  socket.on("thief_action", (roomId, targetNo, thiefNo) => {
+  thiefAfter(roomId, targetNo, thiefNo);
+  });
   
-  
-  
+  // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
+  socket.on("day_begins", (roomId) => {
+    // thiefがいたらthiefAfterの実行
+    io.to(roomId).emit("are_you_thief");
+    console.log("Pk")
+    io.to(roomId).emit("notice_day_started");
+  });
   
 });
 

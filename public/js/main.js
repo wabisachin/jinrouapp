@@ -81,6 +81,23 @@ function getCookieArray(){
   return arr;
 }
 
+// タイマーをスタートし、残り時間を表示。
+function startTimer(time) {
+    let countDown = function() {
+        
+        $('#restTime').text(`Time: ${Math.round(time/60)}分${time%60}秒`);
+        time--;
+        var id = setTimeout(countDown, 1000);
+        if (time < 0) {
+            clearTimeout(id);
+            // 音声ファイルの再生
+            // $( '#sound-file' ).get(0).play();
+            $('#restTime').text('timeUp！人狼を選択！');
+        }
+    }
+    countDown();
+}
+
  /*----------------------------------------------------------------------------
  
                   Vue.js
@@ -193,6 +210,11 @@ $(function(){
         $('#toNight').on('click', () => {
             socket.emit('toNightClicked', roomId);
         });
+        // 昼へボタンを押した時
+        $('#toDate').on('click', () => {
+            console.log("ok")
+            socket.emit("day_begins", roomId);
+        })
         
     }
     
@@ -203,6 +225,7 @@ $(function(){
     //     }
         
     // })
+    
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
@@ -262,12 +285,41 @@ $(function(){
                             $(`#card${result.playerNo}`).text(result.userRole);
                         } );
                     });
+                    socket.on("are_you_thief", () => {
+                       socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
+                    });
                 });
                 break;
             
             default:
                 // code
         }
-    }  )
+    })
+    
+    // 昼のスタート
+    socket.on("notice_day_started", () => {
+        // タイマーの秒数を設定
+        let setCount = 5;
+        
+        $('#restTime').removeClass('hidden');
+        startTimer(setCount);
+        // プレイヤー名クリックで投票者を選択
+        $('.userArea').click(function(){
+            $('#modalArea').fadeIn();
+        });
+        // modalの閉じるボタンクリック時
+        $('#closeModal , #modalBg').click(function(){
+            $('#modalArea').fadeOut();
+        });
+        
+        // ホバー時の見た目変化
+        $('.userArea').hover(function() {
+            $(this).css('background',"darkgray");
+        }, function() {
+            $(this).css('background', '');
+        });
+        
+        
+    })
 
 });
