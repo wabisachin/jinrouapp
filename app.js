@@ -275,6 +275,35 @@
       }
     }
   }
+  
+  // 最も多く投票されたユーザーのsessionIdを配列にして返す
+  function getMostVoted(roomId) {
+    
+    let players = room[roomId]["players"];
+    let max_voted_players = [];
+    let max_count = 0;
+    
+    // 投票された数が最も多かったプレイヤーをmax_voted_playersに格納
+    for (let key in players) {
+      if (players[key]["votedCount"] > max_count) {
+        max_count = players[key]["votedCount"];
+        max_voted_players = [];
+        max_voted_players.add(key);
+      }
+      else if (players[key]["votedCount"] == max_count) {
+        max_voted_players.add(key);
+      }
+      else {
+        continue;
+      }
+    }
+    return max_voted_players;
+  }
+  
+  //平和な村(人狼が一人もいない状態)かどうかの判定
+  function isPeaceVillage(roomId) {
+    let players = room[roomId]["players"];
+  }
 
  /*----------------------------------------------------------------------------
  
@@ -304,11 +333,6 @@ io.sockets.on('connection', socket => {
   //   io.join(data.room_id);
   // });
 
-  // わさび不要！いらなくなったかも->いらなければコメントアウトよろしく！りんせー不要
-  // socket.on('join_from_player', data =>{
-  //   io.emit(`join_from_server`, data);
-  // });
-  
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
     
@@ -382,5 +406,42 @@ io.sockets.on('connection', socket => {
     }
   });
   
+  // 結果を各プレイヤーに送信
+  socket.on("request_result", (roomId) => {
+    let players = room[roomId]["players"];
+    let mostVotedPlayers = [];
+    // //結果の送信
+    // let players = room[roomId]["players"];
+    // let max_voted_players = [];
+    // let max_count = 0;
+    // // 投票された数が最も多かったプレイヤーをmax_voted_playersに格納
+    // for (let key in players) {
+    //   if (players[key]["votedCount"] > max_count) {
+    //     max_count = players[key]["votedCount"];
+    //     max_voted_players = [];
+    //     max_voted_players.add(key);
+    //   }
+    //   else if (players[key]["votedCount"] == max_count) {
+    //     max_voted_players.add(key);
+    //   }
+    //   else {
+    //     continue;
+    //   }
+    // }
+    
+    // 最も投票されたプレイヤーのsessionIdを格納
+    mostVotedPlayers = getMostVoted(roomId);
+    
+    // 最多投票者の役職から勝敗の結果をdictionaryにして返す
+    for (let sessionId in mostVotedPlayers) {
+      
+    }
+    io.to(roomId).emit("request_your_sessionId");
+  })
+  
+  socket.on("response_my_sessionId", (sessionId) => {
+    // 各ユーザーに対してゲーム結果を返す
+  socket.on("show_result");
+  })
 });
 

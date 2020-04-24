@@ -364,8 +364,22 @@ $(function(){
         $("#votedCount").text(`投票数: ${current} / ${total}`)
     })
     
+    // 投票終了後、結果表示ボタンを押せるようにする
     socket.on("finished_voting", () => { 
         $('#result').removeClass("limitted")
+        $('#result').on("click", () => {
+            socket.emit("request_result", getRoomId());
+        })
     });
+    
+    socket.on("request_your_sessionId", () => {
+        let cookie = getCookieArray();
+        let sessionId = cookie["sessionId"];
+        socket.emit("response_my_sessionId", sessionId);
+    })
+    // ゲーム結果を表示
+    socket.on("show_result", () => {
+        
+    })
 
 });
