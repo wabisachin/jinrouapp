@@ -69,6 +69,7 @@
           // fieldの初期化
               let field = { 
                   currentPlayerNum :0,
+                  currentVotedCount:0,
                   playerNum : 0,
                   villager : 0,
                   wolfman : 0,
@@ -141,6 +142,7 @@
           field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           field.currentPlayerNum++;
@@ -150,6 +152,7 @@
             field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
           
@@ -259,6 +262,19 @@
     console.log("交換後");
     console.log(players);
   }
+  
+  // 投票メソッド：投票されたプレイヤーを受け取り,データベースに結果を反映
+  function voteForPlayers(selected_id, room_id) {
+    let playerNum = room[room_id]["currentPlayerNum"];
+    let players = room[room_id]["players"];
+    // 投票数のカウント
+    room[room_id]["currentVotedCount"]++;
+    for (let key in players) {
+      if (players[key]["playerNum"] == selected_id) {
+        players[key]["votedCount"]++;
+      }
+    }
+  }
 
  /*----------------------------------------------------------------------------
  
@@ -269,10 +285,6 @@
 io.sockets.on('connection', socket => {
 
   
-  // socket.on('toNightClicked', () => {
-  //   io.emit('roles_from_server',randomRole(field));
-    
-  // });
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
@@ -282,15 +294,7 @@ io.sockets.on('connection', socket => {
     
   });
   
-  // socket.on('joinRoom_from_client', data => {
-  //   console.log(`socket_id: ${data.user_id}がroom: ${data.room_id}に入室しました`);
-  //   io.join(data.room_id);
-  // });
 
-  // わさび不要！いらなくなったかも->いらなければコメントアウトよろしく！りんせー不要
-  // socket.on('join_from_player', data =>{
-  //   io.emit(`join_from_server`, data);
-  // });
   
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
   socket.on("joinRoom_from_client", (data)=> {
@@ -343,9 +347,26 @@ io.sockets.on('connection', socket => {
   // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
+    let playerNum = room[roomId]["currentPlayerNum"];
+    
     io.to(roomId).emit("are_you_thief");
-    console.log("Pk")
-    io.to(roomId).emit("notice_day_started");
+    io.to(roomId).emit("notice_day_started", playerNum);
+  });
+  
+  // プレイヤーから投票先を受け取る
+  socket.on("vote_for_wolfman", (selected_id, roomId) => {
+    let playerNum = room[roomId]["currentPlayerNum"];
+    // 選択されたプレイヤーへ投票
+    voteForPlayers(selected_id, roomId);
+    // 投票数の変更を各プレイヤーに通知
+    io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
+    // 投票後の追加投票を停止
+    socket.emit("prohibit_voting");
+    
+    // 全ての投票が完了した時の処理
+    if (room[roomId]["currentVotedCount"] == playerNum) {
+      io.to(roomId).emit("finished_voting");
+    }
   });
   
 });

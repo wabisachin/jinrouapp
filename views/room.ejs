@@ -3,78 +3,85 @@
     <head>
         <meta charset="utf-8">
         <title>Room<%= roomId %></title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
+<<<<<<< HEAD
         <div id="plate" class="plate">
-                <h1>room:<%= roomId %></h1>
-                <div class="timer">
-                    <!--音声ファイルの読み込み-->
-                    <!--<audio id="sound-file" preload="auto">-->
-                    <!--	<source src="https://taira-komori.jpn.org/sound/anime01/Ikkyu_san.mp3" type="audio/mp3">-->
-                    <!--	<source src="" type="audio/wav">-->
-                    <!--</audio>-->
-                    <p class=" hidden" id="restTime">残り時間</p>
-                </div>
-                
-                <div class="field">
-                    
-                <% Object.keys(field.players).forEach( (id, i) => { %>
-                <% if(field.players[id].playerNo >= 0) { %>
-                <div class="userArea">
-                    <!--<p><%= id %></p>-->
-                    
-                    <p><%= field.players[id].userName %></p>
-                    <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
-                </div>
-                
-                <% } } ) %>
-                
-                </div>
-                
-                <h2 class="field">墓地</h2>
-                
-                <div class="field" id="cemetryField">
-                    
-                <% Object.keys(field.players).forEach( (id, i) => { %>
-                <% if(field.players[id].playerNo < 0) { %>
-                <div class="userArea">
-                    <!--<p><%= id %></p>-->
-                    <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
-                </div>
-                
-                <% } }  ) %>
-                    
-                </div>
+        <h1>room:<%= roomId %></h1>
+        <div class="timer">
+            <!--音声ファイルの読み込み-->
+            <!--<audio id="sound-file" preload="auto">-->
+            <!--	<source src="https://taira-komori.jpn.org/sound/anime01/Ikkyu_san.mp3" type="audio/mp3">-->
+            <!--	<source src="" type="audio/wav">-->
+            <!--</audio>-->
+            <p class="hidden" id="restTime"></p>
+        </div>
         
-                <h2>操作ボタン</h2>
-                <button id="toNight" button type="button" class="btn btn-primary">夜へ</button>
-                <button id="toDate" button type="button" class="btn btn-primary">昼へ</button>
-                <button id="result" button type="button" class="btn btn-primary">結果発表</button>
-                <div class="test100">
-                    <form id="test">
-                        <input type="submit" value="test">
-                    </form>
+        <div class ="voting">
+            <p class="hidden" id="votedCount"></p>
+        </div>
+        
+        <div class="field">
+            <% Object.keys(field.players).forEach( (id, i) => { %>
+            <% let playerNum = field.players[id].playerNo %>
+            <% let playerName = field.players[id].userName %>
+            <% if(playerNum >= 0) { %>
+                <div class="userArea" id="userArea<%= playerNum %>">
+                    <!--<p><%= id %></p>-->
+                    
+                    <p id="name<%= playerNum %>"><%= playerName %></p>
+                    <div class="card" id="card<%= playerNum %>"> </div>
                 </div>
-                
                 <!-- モーダルエリアここから -->
-                <section id="modalArea" class="modalArea">
-                  <div id="modalBg" class="modalBg"></div>
+                <section  class="modalArea" id="modalArea<%= playerNum %>">
+                  <div class="modalBg" id="modalBg<%= playerNum %>"></div>
                   <div class="modalWrapper">
                     <div class="modalContents">
-                      <h1>このプレイヤーを人狼に投票しますか？</h1>
+                      <h1><%= playerName %>を人狼に投票しますか？</h1>
+                      <button id="vote<%= playerNum %>">はい</button>
                     </div>
-                    <div id="closeModal" class="closeModal">
-                      ×
+                    <div id="closeModal<%= playerNum %>" class="closeModal">
                     </div>
                   </div>
                 </section>
                 <!-- モーダルエリアここまで -->
-            </div>
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-            <script src="/socket.io/socket.io.js"></script>
-            <script src="js/main.js"></script>
+            <% } } ) %>
             
+            </div>
+        
+        <h2 class="field">墓地</h2>
+        
+        <div class="field" id="cemetryField">
+            
+        <% Object.keys(field.players).forEach( (id, i) => { %>
+        <% if(field.players[id].playerNo < 0) { %>
+        <div class="userArea">
+            <!--<p><%= id %></p>-->
+            <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
+        </div>
+        
+        <% } }  ) %>
+            
+        </div>
+
+        <h2>操作ボタン</h2>
+        <button id="toNight">夜へ</button>
+        <button id="toDate" class="limitted">昼へ</button>
+        <button id="result" class="limitted">結果発表</button>
+        <div class="test100">
+            <form id="test">
+                <input type="submit" value="test">
+            </form>
+        </div>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
