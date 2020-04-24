@@ -334,9 +334,13 @@ $(function(){
                 $(`#modalArea${id}`).fadeIn();
             });
             // modalの閉じるボタンクリック時
-            $(`#closeModal${id} , #modalBg${id}`).click(function(){
+            $(`#closeModal${id} , #modalBg${id}, #vote${id}`).click(function(){
                 $(`#modalArea${id}`).fadeOut();
             });
+            // 人狼の投票
+            $(`#vote${id}`).click(function() {
+               socket.emit("voting_jinrou", id);
+            })
         }
         // $('.userArea').click(function(){
         //     $('#modalArea').fadeIn();
@@ -354,6 +358,10 @@ $(function(){
         });
         
         
+    })
+    
+    socket.on("prohibit_voting", () => {
+        $('.modalContents').html("<h1>既に投票済みです</h1>")
     })
 
 });

@@ -350,5 +350,13 @@ io.sockets.on('connection', socket => {
     io.to(roomId).emit("notice_day_started", playerNum);
   });
   
+  // 投票されたプレイヤーを受け取ってDBに保存
+  socket.on("voting_jinrou", (selected_id) => {
+    // 投票されたプレーヤーの集計
+    
+    // 一度投票したプレイヤーの追加投票を停止
+    socket.emit("prohibit_voting");
+  });
+  
 });
 
