@@ -230,14 +230,34 @@
   }
   
   // 占い師メソッド：選択したカードの役職を通知、墓地カードの場合両方通知
-  function fortune(roomId, playerNo){
+  function fortune(roomId, targetNo){
     let fortuneResult = [];
-    if (playerNo >= 0) {
-      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === playerNo);
+    if (targetNo >= 0) {
+      fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo === targetNo);
     } else {
       fortuneResult = Object.values(room[roomId].players).filter(x => x.playerNo < 0);
     }
     return fortuneResult;
+  }
+  
+  // 怪盗メソッド1：選択したカードがなにかを教える
+  function thiefBefore(roomId, targetNo, thiefNo) {
+    let players = room[roomId].players;
+    let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
+    return thiefResult;
+  }
+  
+  // 怪盗メソッド2：昼になったら役職を交換する
+  function thiefAfter(roomId, targetNo, thiefNo) {
+    let players = room[roomId].players;
+    console.log("交換前");
+    console.log(players);
+    let stealId = Object.keys(players).filter(k => players[k].playerNo === targetNo || players[k].playerNo === thiefNo );
+    let temp = players[stealId[0]].userRole;
+    players[stealId[0]].userRole = players[stealId[1]].userRole;
+    players[stealId[1]].userRole = temp;
+    console.log("交換後");
+    console.log(players);
   }
 
  /*----------------------------------------------------------------------------
@@ -305,15 +325,29 @@ io.sockets.on('connection', socket => {
     socket.emit('all_wolfman', wolfman(roomId) );
   });
   
-  socket.on("i_am_fortune", (roomId, playerNo) => {
-    let fortuneResult = fortune(roomId, playerNo);
+  // fortuneのユーザーに占い結果を教える
+  socket.on("i_am_fortune", (roomId, targetNo) => {
+    let fortuneResult = fortune(roomId, targetNo);
     socket.emit('fortune_result', fortuneResult);
+  });
+  
+  // 夜に怪盗に交換相手の役職を伝える
+  socket.on("i_am_thief", (roomId, targetNo, thiefNo) => {
+    let thiefResult = thiefBefore(roomId, targetNo, thiefNo);
+     socket.emit('thief_result', thiefResult);
+  });
+  // 昼になった時に怪盗が役職交換実行
+  socket.on("thief_action", (roomId, targetNo, thiefNo) => {
+  thiefAfter(roomId, targetNo, thiefNo);
   });
   
   // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
   socket.on("day_begins", (roomId) => {
-    console.log("Pk")
-    io.to(roomId).emit("notice_day_started");
+    // thiefがいたらthiefAfterの実行
+    let playerNum = room[roomId]["playerNum"];
+    
+    io.to(roomId).emit("are_you_thief");
+    io.to(roomId).emit("notice_day_started", playerNum);
   });
   
 });

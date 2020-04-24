@@ -17,19 +17,32 @@
         </div>
         
         <div class="field">
+            <% Object.keys(field.players).forEach( (id, i) => { %>
+            <% let playerNum = field.players[id].playerNo %>
+            <% let playerName = field.players[id].userName %>
+            <% if(playerNum >= 0) { %>
+                <div class="userArea" id="userArea<%= playerNum %>">
+                    <!--<p><%= id %></p>-->
+                    
+                    <p id="name<%= playerNum %>"><%= playerName %></p>
+                    <div class="card" id="card<%= playerNum %>"> </div>
+                </div>
+                <!-- モーダルエリアここから -->
+                <section id="modalArea<%= playerNum %>" class="modalArea">
+                  <div id="modalBg<%= playerNum %>" class="modalBg"></div>
+                  <div class="modalWrapper">
+                    <div class="modalContents">
+                      <h1><%= playerName %>を人狼に投票しますか？</h1>
+                    </div>
+                    <div id="closeModal<%= playerNum %>" class="closeModal">
+                      ×
+                    </div>
+                  </div>
+                </section>
+                <!-- モーダルエリアここまで -->
+            <% } } ) %>
             
-        <% Object.keys(field.players).forEach( (id, i) => { %>
-        <% if(field.players[id].playerNo >= 0) { %>
-        <div class="userArea">
-            <!--<p><%= id %></p>-->
-            
-            <p><%= field.players[id].userName %></p>
-            <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
-        </div>
-        
-        <% } } ) %>
-        
-        </div>
+            </div>
         
         <h2 class="field">墓地</h2>
         
@@ -57,17 +70,17 @@
         </div>
         
         <!-- モーダルエリアここから -->
-        <section id="modalArea" class="modalArea">
-          <div id="modalBg" class="modalBg"></div>
-          <div class="modalWrapper">
-            <div class="modalContents">
-              <h1>このプレイヤーを人狼に投票しますか？</h1>
-            </div>
-            <div id="closeModal" class="closeModal">
-              ×
-            </div>
-          </div>
-        </section>
+        <!--<section id="modalArea" class="modalArea">-->
+        <!--  <div id="modalBg" class="modalBg"></div>-->
+        <!--  <div class="modalWrapper">-->
+        <!--    <div class="modalContents">-->
+        <!--      <h1>このプレイヤーを人狼に投票しますか？</h1>-->
+        <!--    </div>-->
+        <!--    <div id="closeModal" class="closeModal">-->
+        <!--      ×-->
+        <!--    </div>-->
+        <!--  </div>-->
+        <!--</section>-->
         <!-- モーダルエリアここまで -->
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

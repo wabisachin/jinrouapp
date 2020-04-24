@@ -98,6 +98,26 @@ function startTimer(time) {
     countDown();
 }
 
+// Initialフェーズ画面表示
+function initial () {
+    $('#toDate').prop('disabled', true);
+    $('#result').prop('disabled', true);
+}
+// 夜フェーズ画面表示
+function night () {
+    $('#toNight').prop('disabled', true);
+    $('#toDate').prop('disabled', false);
+    $('#result').prop('disabled', true);
+    $('body').addClass('night');
+    $('#plate').addClass('nightPlate');
+}
+function date () {
+    $('#toDate').prop('disabled', true);
+    $('#toNight').prop('disabled', true);
+    $('#result').prop('disabled', false);
+    $('body').css('background-color', 'none');
+}
+
  /*----------------------------------------------------------------------------
  
                   Vue.js
@@ -130,6 +150,8 @@ var app = new Vue({
 $(function(){
 
     let socket = io.connect();
+    
+    initial();
     
     socket.emit("getId_from_client");
     
@@ -212,6 +234,7 @@ $(function(){
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
+            date();
             console.log("ok")
             socket.emit("day_begins", roomId);
         })
@@ -242,13 +265,14 @@ $(function(){
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
         // let sessionId = document.cookie.sessionId;
+        night();
         socket.emit('request_role', roomId, sessionId);
     });
     
     // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
         $(`#card${data.playerNo}`).text(data.userRole);
-        
+        // 自分の役職のメソッドをサーバに要求する
         switch (data.userRole) {
             case 'wolfman':
                 socket.emit('i_am_wolfman', getRoomId());
@@ -256,24 +280,39 @@ $(function(){
                     wolfmanList.forEach( wolfmanInfo => {
                         $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole);
                     }  );
-                })
+                });
                 break;
             case 'fortune':
                 $('.card').css('cursor', 'pointer');
                 $(`#card${data.playerNo}`).css('pointer-events',  'none');
                 $('.card').click( (e) => {
-                    let playerNo = parseInt(e.currentTarget.id.substr(4));
+                    let targetNo = parseInt(e.currentTarget.id.substr(4));
                     $('.card').css('pointer-events',  'none');
-                    socket.emit('i_am_fortune', getRoomId() ,playerNo);
+                    socket.emit('i_am_fortune', getRoomId() ,targetNo);
                     socket.on('fortune_result', fortuneResult => {
                         fortuneResult.forEach( result => {
                             $(`#card${result.playerNo}`).text(result.userRole);
                         } );
-                    })
-                })
+                    });
+                });
                 break;
             case 'thief':
-                socket.emit('i_am_thief');
+                $('.card').css('cursor', 'pointer');
+                $(`#card${data.playerNo}, #card-1, #card-2`).css('pointer-events',  'none');
+                $('.card').click( (e) => {
+                    let thiefNo = data.playerNo;
+                    let targetNo = parseInt(e.currentTarget.id.substr(4));
+                    $('.card').css('pointer-events',  'none');
+                    socket.emit('i_am_thief', getRoomId() ,targetNo, thiefNo);
+                    socket.on('thief_result', thiefResult => {
+                        thiefResult.forEach( result => {
+                            $(`#card${result.playerNo}`).text(result.userRole);
+                        } );
+                    });
+                    socket.on("are_you_thief", () => {
+                       socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
+                    });
+                });
                 break;
             
             default:
@@ -282,7 +321,7 @@ $(function(){
     })
     
     // 昼のスタート
-    socket.on("notice_day_started", () => {
+    socket.on("notice_day_started", (playerNum) => {
         // タイマーの秒数を設定
         let setCount = 5;
         
@@ -290,13 +329,22 @@ $(function(){
         // タイマースタート
         startTimer(setCount);
         // プレイヤー名クリックで投票者を選択
-        $('.userArea').click(function(){
-            $('#modalArea').fadeIn();
-        });
-        // modalの閉じるボタンクリック時
-        $('#closeModal , #modalBg').click(function(){
-            $('#modalArea').fadeOut();
-        });
+        for (let id = 0; id < playerNum; id++) {
+            $(`#userArea${id}`).click(function(){
+                $(`#modalArea${id}`).fadeIn();
+            });
+            // modalの閉じるボタンクリック時
+            $(`#closeModal${id} , #modalBg${id}`).click(function(){
+                $(`#modalArea${id}`).fadeOut();
+            });
+        }
+        // $('.userArea').click(function(){
+        //     $('#modalArea').fadeIn();
+        // });
+        // // modalの閉じるボタンクリック時
+        // $('#closeModal , #modalBg').click(function(){
+        //     $('#modalArea').fadeOut();
+        // });
         
         // ホバー時の見た目変化
         $('.userArea').hover(function() {

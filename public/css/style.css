@@ -12,6 +12,10 @@
 
 }
 
+.plate{
+  padding: 10px;
+}
+
 .userArea{
     width:120px;
     display: flex;
@@ -21,6 +25,14 @@
     padding: 10px;
     margin: 5px;
 
+}
+
+.night {
+  background-image:  url("../images/night.jpg");
+}
+.nightPlate{
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 10px;
 }
 
 .hidden {
