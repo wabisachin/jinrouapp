@@ -549,14 +549,25 @@ io.sockets.on('connection', socket => {
     let details;
     console.log("response_my_sessionId");
     console.log(gameResult);
-    gameResult["win"].forEach((id) => {
+    result ="You lose...";
+    for (let i =0; i < gameResult["win"].length; i++) {
+      console.log(i);
+      console.log(sessionId);
+      let id = gameResult["win"][i];
       if (id == sessionId) {
+        console.log("win");
         result = " You win!!";
+        break;
       }
-      else {
-        result ="You lose...";
-      }
-    });
+    }
+    // gameResult["win"].forEach((id) => {
+    //   if (id == sessionId) {
+    //     result = " You win!!";
+    //   }
+    //   else {
+    //     result ="You lose...";
+    //   }
+    // });
     details =  gameResult["details"];
     console.log(`result: ${result}`);
     console.log(`details: ${details}`);
