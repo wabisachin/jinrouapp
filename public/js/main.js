@@ -100,22 +100,26 @@ function startTimer(time) {
 
 // Initialフェーズ画面表示
 function initial () {
-    $('#toDate').prop('disabled', true);
-    $('#result').prop('disabled', true);
+    $('body').addClass('initial');
+    $('#toDate').addClass('disabled');
+    $('#result').addClass('disabled');
 }
 // 夜フェーズ画面表示
 function night () {
-    $('#toNight').prop('disabled', true);
-    $('#toDate').prop('disabled', false);
-    $('#result').prop('disabled', true);
+    $('#toNight').addClass('disabled');
+    $('#toDate').removeClass('disabled');
+    $('#result').addClass('disabled');
+    $('body').removeClass('initial');
     $('body').addClass('night');
     $('#plate').addClass('nightPlate');
 }
 function date () {
-    $('#toDate').prop('disabled', true);
-    $('#toNight').prop('disabled', true);
-    $('#result').prop('disabled', false);
+    $('#toDate').addClass('disabled');
+    $('#toNight').addClass('disabled');
+    $('#result').removeClass('disabled');
     $('body').css('background-color', 'none');
+    $('body').removeClass('night');
+    $('body').addClass('date');
 }
 
  /*----------------------------------------------------------------------------
@@ -151,7 +155,6 @@ $(function(){
 
     let socket = io.connect();
     
-    initial();
     
     socket.emit("getId_from_client");
     
@@ -163,6 +166,7 @@ $(function(){
         let cookie = getCookieArray();
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
+        initial();
         // socketに部屋番号に応じたルームを作成
         socket.emit('joinRoom_from_client', {
             roomId: roomId, 
@@ -177,7 +181,6 @@ $(function(){
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
-            date();
             console.log("ok")
             $('#toDate').addClass("limitted");
             socket.emit("day_begins", roomId);
@@ -260,7 +263,7 @@ $(function(){
     socket.on("notice_day_started", (playerNum) => {
         // タイマーの秒数を設定
         let setCount = 5;
-        
+        date();
         $('#restTime').removeClass('hidden');
         $('#votedCount').removeClass('hidden');
         $('#votedCount').text(`投票数: 0 / ${playerNum}`)

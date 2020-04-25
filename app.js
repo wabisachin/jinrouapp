@@ -9,7 +9,9 @@
         server = require("http").Server(app),
         io  =   require('socket.io')(server),
         session = require("express-session"),
-        morgan = require("morgan");
+        morgan = require("morgan"),
+        favicon = require('serve-favicon'),
+        path = require('path');
         // redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
         // client = redis.createClient();
@@ -38,6 +40,7 @@
       //middleware
       app.use(express.json());
       app.use(morgan('dev'));
+      app.use(favicon(path.join(__dirname, 'public', './images/favicon.ico')));
       app.use(express.urlencoded({extended: true}));//postデータを受け取れるようにするため
       // express-sessionで1時間セッション情報保持
       app.use(session({ 
