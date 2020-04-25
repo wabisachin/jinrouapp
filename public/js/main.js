@@ -257,7 +257,7 @@ $(function(){
             default:
                 // code
         }
-    })
+    });
     
     // 昼のスタート
     socket.on("notice_day_started", (playerNum) => {
@@ -304,8 +304,34 @@ $(function(){
         $("#votedCount").text(`投票数: ${current} / ${total}`)
     })
     
+    // 投票終了後、結果表示ボタンを押せるようにする
     socket.on("finished_voting", () => { 
         $('#result').removeClass("limitted")
+        $('#result').on("click", () => {
+            socket.emit("request_result", getRoomId());
+        })
     });
+    
+    socket.on("request_your_sessionId", () => {
+        
+        let roomId =  getRoomId();
+        let cookie = getCookieArray();
+        let sessionId = cookie["sessionId"];
+        
+        socket.emit("response_my_sessionId", roomId, sessionId);
+    })
+    
+    // ゲーム結果を表示
+    socket.on("game_result", (result, details) => {
+        console.log(result);
+        console.log(details);
+        $('#modalArea').fadeIn();
+        $('#modalContents').empty();
+        $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
+        $('#modalContents').append(`<p id="details">${details}</p>`);
+        $('#closeModal , #modalBg').on('click', () => {
+            $('#modalArea').fadeOut();
+        });
+    })
 
 });
