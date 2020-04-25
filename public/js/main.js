@@ -175,12 +175,14 @@ $(function(){
         
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
+            $('#toNight').off();
             socket.emit('toNightClicked', roomId);
             $('#toNight').addClass("limitted");
             $('#toDate').removeClass("limitted")
         });
         // 昼へボタンを押した時
         $('#toDate').on('click', () => {
+            $('#toDate').off();
             console.log("ok")
             $('#toDate').addClass("limitted");
             socket.emit("day_begins", roomId);
@@ -296,21 +298,22 @@ $(function(){
     
     // 追加投票の停止
     socket.on("prohibit_voting", () => {
-        $('.modalContents').html("<h1>既に投票済みです</h1>")
+        $('.modalContents').html("<h1>既に投票済みです</h1>");
     })
     
     // 投票数の変更をプレイヤーに通知
     socket.on("changeVotedCount", (current, total) => {
-        $("#votedCount").text(`投票数: ${current} / ${total}`)
+        $("#votedCount").text(`投票数: ${current} / ${total}`);
     })
     
     // 投票終了後、結果表示ボタンを押せるようにする
     socket.on("finished_voting", () => { 
         $('#result').removeClass("limitted")
         $('#result').on("click", () => {
+            $('#result').off();
             socket.emit("request_result", getRoomId());
-        })
-    });
+        });
+    })
     
     socket.on("request_your_sessionId", () => {
         
@@ -329,9 +332,22 @@ $(function(){
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
         $('#modalContents').append(`<p id="details">${details}</p>`);
+        $('#replay').append('<button id="replay">Replay?</button> ');
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
+        
+        // リプレイの追加
+        $('#replay').on('click', () => {
+            $('#result').off();
+            $('#modalArea').fadeOut();
+            socket.emit("request_replay", getRoomId());
+            //htmlの初期化
+        })
     })
+    
+    // socket.on("initializeHTML" () => {
+        
+    // })
 
 });

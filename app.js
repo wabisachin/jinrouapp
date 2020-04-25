@@ -145,6 +145,7 @@
           field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            userRole: "",
             votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
@@ -213,7 +214,7 @@
   // field内のplayersディクショナリにroleを入れていく
   function roleAsign (field, roles) {
       Object.keys(field.players).forEach(key => {
-        field.players[key].userRole = roles.pop() ;
+        field.players[key]["userRole"] = roles.pop() ;
       });
       console.log(field.players);
   }
@@ -415,6 +416,20 @@
     }
     return result;
   }
+  
+  // Replay時の変数の初期化
+  // function initialize(roomId) {
+    
+  //   let room =  room[roomId];
+  //   let players =  room["players"];
+    
+  //   // 値の初期化
+  //   room["currentVotedCount"] = 0;
+  //   for (let player in players) {
+  //     player["userRole"] = "";
+  //     player["votedCount"] = 0;
+  //   }
+  // }
  /*----------------------------------------------------------------------------
  
                   SocketIOの設定
@@ -534,5 +549,11 @@ io.sockets.on('connection', socket => {
     console.log(`details: ${details}`);
     socket.emit("game_result", result, details);
   })
+  
+  // socket.on("request_replay",(roomId) => {
+  //   // 変数の初期化
+  //   initialize(roomId);
+  //   socket.emit("initializeHTML");
+  // })
 });
 
