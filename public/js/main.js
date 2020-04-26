@@ -186,7 +186,6 @@ $(function(){
             })
         
             socket.emit('toNightClicked', roomId);
-            
         });
     }
     
@@ -195,10 +194,6 @@ $(function(){
         window.location.reload();
     //   location.reload();
     });
-    
-    // socket.on('roles_asigned', () => {
-        
-    // });
     
     // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
     socket.on('roles_asigned', ()=> {
@@ -224,9 +219,12 @@ $(function(){
                 });
                 break;
             case 'fortune':
+                $('.card').css('pointer-events', 'auto');
                 $('.card').css('cursor', 'pointer');
                 $(`#card${data.playerNo}`).css('pointer-events',  'none');
+                console.log("fortune");
                 $('.card').click( (e) => {
+                    console.log("fortune ok!")
                     let targetNo = parseInt(e.currentTarget.id.substr(4));
                     $('.card').css('pointer-events',  'none');
                     socket.emit('i_am_fortune', getRoomId() ,targetNo);
@@ -239,6 +237,7 @@ $(function(){
                 break;
             case 'thief':
                 $('.card').css('cursor', 'pointer');
+                $('.card').css('pointer-events', 'auto');
                 $(`#card${data.playerNo}, #card-1, #card-2`).css('pointer-events',  'none');
                 $('.card').click( (e) => {
                     let thiefNo = data.playerNo;
@@ -298,7 +297,7 @@ $(function(){
         
     })
     
-    // 追加投票の停止
+    // 追加投票の禁止
     socket.on("prohibit_voting", () => {
         // $('.modalContents').html("<h1>既に投票済みです</h1>");
         $('.attention').removeClass('hidden');
@@ -356,21 +355,20 @@ $(function(){
     
     // 画面表示の初期化
     socket.on("initializeHTML", () => {
-        $('#result').off();
+        // 表示の初期化
         $('#modalArea').fadeOut();
         $('#restTime, #votedCount, .card').text("");
         $('.vote').removeClass("hidden");
         $('#toNight').removeClass("limitted");
-        
         $('.attention').addClass('hidden');
         $('.votedPlayer').removeClass("hidden");
-        
         $('#result').addClass("limitted");
         
-        // 夜へボタンのクリックアクションを再度有効化
+        // クリックアクションの初期化
+        $('#result').off();
         $('#toNight').on('click', () => {
+            
             $('#toNight').off();
-            socket.emit('toNightClicked', getRoomId());
             $('#toNight').addClass("limitted");
             $('#toDate').removeClass("limitted")
             
@@ -379,9 +377,7 @@ $(function(){
                 $('#toDate').addClass("limitted");
                 socket.emit("day_begins", getRoomId());
             })
-        
             socket.emit('toNightClicked', getRoomId());
-            
         });
     })
 });

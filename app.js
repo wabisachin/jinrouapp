@@ -559,8 +559,7 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
-    console.log("response_my_sessionId");
-    console.log(gameResult);
+    
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
       
