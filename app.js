@@ -81,7 +81,7 @@
                   players : {},
                 }
                 
-          console.log(req.session.id);
+          // console.log(req.session.id);
           
         field.playerNum = req.body.playerNum;
         field.villager = req.body.villager;
@@ -102,10 +102,10 @@
           
           
           //既存ルームに入室する場合
-          console.log(req.session.id);
+          // console.log(req.session.id);
           
           userAdd(room[req.body.roomId],req.session.id,req.body.name);
-          console.log(room[roomId].players);
+          // console.log(room[roomId].players);
           
           res.redirect(`/${req.body.roomId}`);
         }
@@ -145,6 +145,7 @@
           field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            userRole: "",
             votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
           };
@@ -167,7 +168,7 @@
               flag: 0
             };
           }
-          console.log(field.players);
+          // console.log(field.players);
          }
            else {
           //プレイヤー数以上のアクセスが有った場合の処理
@@ -213,7 +214,7 @@
   // field内のplayersディクショナリにroleを入れていく
   function roleAsign (field, roles) {
       Object.keys(field.players).forEach(key => {
-        field.players[key].userRole = roles.pop() ;
+        field.players[key]["userRole"] = roles.pop() ;
       });
       // console.log(field.players);
   }
@@ -275,6 +276,7 @@
     room[room_id]["currentVotedCount"]++;
     for (let key in players) {
       if (players[key]["playerNo"] == selectedNo) {
+        console.log("votedCount");
         players[key]["votedCount"]++;
       }
     }
@@ -342,13 +344,7 @@
         return true;
       }
     }
-    // sessionIds.forEach((id) => {
-    //   console.log(id);
-    //   if (players[id]["userRole"] ==  'wolfman') {
-    //     console.log("roopIN!!")
-    //     return true;
-    //   }
-    // });
+    
     return false;
   }
   
@@ -442,6 +438,21 @@
     }
     return result;
   }
+  
+  //変数の初期化(Replay時)
+  function initialize(roomId) {
+    
+    // console.log(room[roomId]);
+    // let room =  room[roomId];
+    let players =  room[roomId]["players"];
+    
+    // 値の初期化
+    room[roomId]["currentVotedCount"] = 0;
+    for (let id in players) {
+      players[id]["userRole"] = "";
+      players[id]["votedCount"] = 0;
+    }
+  }
  /*----------------------------------------------------------------------------
  
                   SocketIOの設定
@@ -513,7 +524,7 @@ io.sockets.on('connection', socket => {
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
     let playerNum = room[roomId]["currentPlayerNum"];
-    
+    console.log("days begins!!");
     io.to(roomId).emit("are_you_thief");
     io.to(roomId).emit("notice_day_started", playerNum);
   });
@@ -523,15 +534,21 @@ io.sockets.on('connection', socket => {
     
     let playerNum = room[roomId]["currentPlayerNum"];
     
+    console.log(`謎のループ${userNo}`)
+    console.log("投票前後のプレイヤー数の変化");
+    console.log("前")
+    console.log(room[roomId]["players"]);
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
+    console.log("後")
+    console.log(room[roomId]["players"]);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
     socket.emit("prohibit_voting");
     // 全ての投票が完了した時の処理
     if (room[roomId]["currentVotedCount"] == playerNum) {
-      io.to(roomId).emit("finished_voting");
+      io.to(roomId).emit("finished_voting", playerNum);
     }
   });
   
@@ -551,27 +568,22 @@ io.sockets.on('connection', socket => {
     console.log(gameResult);
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
-      console.log(i);
-      console.log(sessionId);
+      
       let id = gameResult["win"][i];
       if (id == sessionId) {
-        console.log("win");
         result = " You win!!";
         break;
       }
     }
-    // gameResult["win"].forEach((id) => {
-    //   if (id == sessionId) {
-    //     result = " You win!!";
-    //   }
-    //   else {
-    //     result ="You lose...";
-    //   }
-    // });
     details =  gameResult["details"];
-    console.log(`result: ${result}`);
-    console.log(`details: ${details}`);
     socket.emit("game_result", result, details);
+  })
+  
+  // リプレイ時に変数,画面表示の初期化
+  socket.on("request_replay",(roomId) => {
+    // 変数の初期化
+    initialize(roomId);
+    io.to(roomId).emit("initializeHTML");
   })
 });
 

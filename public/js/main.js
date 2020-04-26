@@ -175,17 +175,21 @@ $(function(){
         
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
-            socket.emit('toNightClicked', roomId);
+            console.log("toNightStart!!");
+            $('#toNight').off();
             $('#toNight').addClass("limitted");
-            $('#toDate').removeClass("limitted")
-        });
-        // 昼へボタンを押した時
-        $('#toDate').on('click', () => {
-            console.log("ok")
-            $('#toDate').addClass("limitted");
-            socket.emit("day_begins", roomId);
-        })
+            $('#toDate').removeClass("limitted");
+            // 昼へボタンのクリックアクションを有効化
+            $('#toDate').on('click', () => {
+                $('#toDate').off();
+                $('#toDate').addClass("limitted");
+                console.log("toDateClicked!!")
+                socket.emit("day_begins", roomId);
+            })
         
+            socket.emit('toNightClicked', roomId);
+            
+        });
     }
     
     // 新しいクライアント入室をトリガにページリロード
@@ -262,6 +266,7 @@ $(function(){
     // 昼のスタート
     socket.on("notice_day_started", (playerNum) => {
         // タイマーの秒数を設定
+        console.log("days start!")
         let setCount = 5;
         date();
         $('#restTime').removeClass('hidden');
@@ -296,21 +301,30 @@ $(function(){
     
     // 追加投票の停止
     socket.on("prohibit_voting", () => {
-        $('.modalContents').html("<h1>既に投票済みです</h1>")
+        // $('.modalContents').html("<h1>既に投票済みです</h1>");
+        $('.attention').removeClass('hidden');
+        $('.votedPlayer').addClass("hidden");
+        $('.vote').addClass("hidden");
     })
     
     // 投票数の変更をプレイヤーに通知
     socket.on("changeVotedCount", (current, total) => {
-        $("#votedCount").text(`投票数: ${current} / ${total}`)
+        $("#votedCount").text(`投票数: ${current} / ${total}`);
     })
     
     // 投票終了後、結果表示ボタンを押せるようにする
-    socket.on("finished_voting", () => { 
-        $('#result').removeClass("limitted")
+    socket.on("finished_voting", (playerNum) => { 
+        $('#result').removeClass("limitted");
+        // 各ユーザー投票ボタンのクリックアクションの停止
+        for(let id=0; id<playerNum;id++) {
+            $(`#userArea${id}`).off();
+        }
+        
         $('#result').on("click", () => {
+            $('#result').off();
             socket.emit("request_result", getRoomId());
-        })
-    });
+        });
+    })
     
     socket.on("request_your_sessionId", () => {
         
@@ -329,9 +343,44 @@ $(function(){
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
         $('#modalContents').append(`<p id="details">${details}</p>`);
+        $('#modalContents').append('<button id="replay">Replay?</button> ');
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
+        
+        // リプレイの追加
+        $('#replay').on('click', () => {
+            socket.emit("request_replay", getRoomId());
+        })
     })
-
+    
+    // 画面表示の初期化
+    socket.on("initializeHTML", () => {
+        $('#result').off();
+        $('#modalArea').fadeOut();
+        $('#restTime, #votedCount, .card').text("");
+        $('.vote').removeClass("hidden");
+        $('#toNight').removeClass("limitted");
+        $('#result').addClass("limitted");
+        
+        // 夜へボタンのクリックアクションを再度有効化
+        $('#toNight').on('click', () => {
+            $('#toNight').off();
+            socket.emit('toNightClicked', getRoomId());
+            $('#toNight').addClass("limitted");
+            $('#toDate').removeClass("limitted")
+            
+            $('#toDate').on('click', () => {
+                $('#toDate').off();
+                $('#toDate').addClass("limitted");
+                $('.attention').addClass('hidden');
+                $('.votedPlayer').removeClass("hidden");
+                console.log("toDateClicked!!")
+                socket.emit("day_begins", getRoomId());
+            })
+        
+            socket.emit('toNightClicked', getRoomId());
+            
+        });
+    })
 });

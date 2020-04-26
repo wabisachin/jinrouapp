@@ -32,15 +32,16 @@
                     <!--<p><%= id %></p>-->
                     
                     <p id="name<%= playerNum %>"><%= playerName %></p>
-                    <div class="card" id="card<%= playerNum %>"> </div>
+                    <div class="card" id="card<%= playerNum %>"></div>
                 </div>
                 <!-- モーダルエリアここから -->
                 <section  class="modalArea" id="modalArea<%= playerNum %>">
                   <div class="modalBg" id="modalBg<%= playerNum %>"></div>
                   <div class="modalWrapper">
                     <div class="modalContents">
-                      <h1><%= playerName %>を人狼に投票しますか？</h1>
-                      <button id="vote<%= playerNum %>">はい</button>
+                      <h1 class="votedPlayer"><%= playerName %>を人狼に投票しますか？</h1>
+                      <h1 class="attention hidden">既に投票済みです</h1>
+                      <button class ="vote" id="vote<%= playerNum %>">はい</button>
                     </div>
                     <div id="closeModal<%= playerNum %>" class="closeModal">
                     </div>
@@ -70,7 +71,8 @@
         <button id="toNight" type="button" class="btn btn-secondary">夜へ</button>
         <button id="toDate" class="btn btn-secondary">昼へ</button>
         <button id="result" class="btn btn-secondary">結果発表</button>
-        <div class="test100">
+
+        <div>
             <a class ="toTop" href="/">トップページへ戻る</a>
         </div>
         
