@@ -175,7 +175,6 @@ $(function(){
         
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
-            console.log("toNightStart!!");
             $('#toNight').off();
             $('#toNight').addClass("limitted");
             $('#toDate').removeClass("limitted");
@@ -183,7 +182,6 @@ $(function(){
             $('#toDate').on('click', () => {
                 $('#toDate').off();
                 $('#toDate').addClass("limitted");
-                console.log("toDateClicked!!")
                 socket.emit("day_begins", roomId);
             })
         
@@ -284,8 +282,9 @@ $(function(){
                 $(`#modalArea${id}`).fadeOut();
             });
             // 人狼へ投票
-            $(`#vote${id}`).click(function() {
+            $(`#vote${id}`).on('click', () => {
                socket.emit("vote_for_wolfman", id, getRoomId());
+            //   $(`#vote${id}`).off();
             })
         }
         
@@ -305,6 +304,7 @@ $(function(){
         $('.attention').removeClass('hidden');
         $('.votedPlayer').addClass("hidden");
         $('.vote').addClass("hidden");
+        $(".vote").off();
     })
     
     // 投票数の変更をプレイヤーに通知
@@ -361,6 +361,10 @@ $(function(){
         $('#restTime, #votedCount, .card').text("");
         $('.vote').removeClass("hidden");
         $('#toNight').removeClass("limitted");
+        
+        $('.attention').addClass('hidden');
+        $('.votedPlayer').removeClass("hidden");
+        
         $('#result').addClass("limitted");
         
         // 夜へボタンのクリックアクションを再度有効化
@@ -373,9 +377,6 @@ $(function(){
             $('#toDate').on('click', () => {
                 $('#toDate').off();
                 $('#toDate').addClass("limitted");
-                $('.attention').addClass('hidden');
-                $('.votedPlayer').removeClass("hidden");
-                console.log("toDateClicked!!")
                 socket.emit("day_begins", getRoomId());
             })
         

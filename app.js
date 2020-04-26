@@ -278,6 +278,7 @@
       if (players[key]["playerNo"] == selectedNo) {
         console.log("votedCount");
         players[key]["votedCount"]++;
+        console.log(players[key]["votedCount"]);
       }
     }
   }
@@ -340,7 +341,7 @@
     for (let i= 0; i < sessionIds.length; i++) {
       let id =  sessionIds[i];
       if (players[id]["userRole"] ==  'wolfman') {
-        console.log("roopIN!!")
+        // console.log("roopIN!!")
         return true;
       }
     }
@@ -387,51 +388,51 @@
     let mostVotedPlayers = [];
     let result = {};
     
-    console.log(room[roomId]["players"]);
+    // console.log(room[roomId]["players"]);
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
-    console.log("mostVoterPlayers");
-    console.log(mostVotedPlayers);
+    // console.log("mostVoterPlayers");
+    // console.log(mostVotedPlayers);
     // 平和村の場合の処理
     if (isPeaceVillage(roomId)) {
       switch (isOneVoted(roomId)) {
         // 村人全員勝利
         case true:
           result = setWinner(players, 0);
-          console.log("setWinner");
-          console.log(result);
-          console.log("村人全員生存");
+          // console.log("setWinner");
+          // console.log(result);
+          // console.log("村人全員生存");
           result["details"] = "村人全員生存";
           break;
         // 村人全員敗北
         case false:
           result = setWinner(players, 1);
-          console.log("setWinner");
-          console.log(result);
-          console.log("村人全員処刑");
+          // console.log("setWinner");
+          // console.log(result);
+          // console.log("村人全員処刑");
           result["details"] = "村人全員処刑";
           break;
       }
     }
     // 平和村でない場合の処理
     else {
-      console.log("IncludeWolf");
-      console.log(IncludeWolf(roomId, mostVotedPlayers));
+      // console.log("IncludeWolf");
+      // console.log(IncludeWolf(roomId, mostVotedPlayers));
       switch (IncludeWolf(roomId, mostVotedPlayers)) {
         // 村人サイドの勝利
         case true:
           result = setWinner(players, 0);
-          console.log("setWinner");
-          console.log(result);
-          console.log("村人サイドの勝利");
+          // console.log("setWinner");
+          // console.log(result);
+          // console.log("村人サイドの勝利");
           result["details"] = "村人サイドの勝利";
           break;
         // 人狼サイドの勝利
         case false:
           result = setWinner(players, 1);
-          console.log("setWinner");
-          console.log(result);
-          console.log("人狼サイドの勝利");
+          // console.log("setWinner");
+          // console.log(result);
+          // console.log("人狼サイドの勝利");
           result["details"] = "人狼サイドの勝利";
           break;
       }
@@ -534,14 +535,8 @@ io.sockets.on('connection', socket => {
     
     let playerNum = room[roomId]["currentPlayerNum"];
     
-    console.log(`謎のループ${userNo}`)
-    console.log("投票前後のプレイヤー数の変化");
-    console.log("前")
-    console.log(room[roomId]["players"]);
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
-    console.log("後")
-    console.log(room[roomId]["players"]);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
