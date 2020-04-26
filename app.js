@@ -215,7 +215,7 @@
       Object.keys(field.players).forEach(key => {
         field.players[key].userRole = roles.pop() ;
       });
-      console.log(field.players);
+      // console.log(field.players);
   }
   
   // 自分以外のプレイヤーのflagを０→１に変更。(flagは自動/手動リロードの判定)
@@ -231,7 +231,7 @@
   // 人狼メソッド：全人狼のplayer{}を返す
   function wolfman(roomId) {
     let wolfmanList = Object.values(room[roomId].players).filter(x => x.userRole === 'wolfman');
-    console.log(wolfmanList);
+    // console.log(wolfmanList);
     return wolfmanList;
   }
   
@@ -323,7 +323,7 @@
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["currentVotedCount"] != 1) {
+      if (players[key]["votedCount"] != 1) {
         return false;
       }
     }
@@ -335,11 +335,20 @@
     
     let players =  room[roomId]["players"];
     
-    sessionIds.forEach((id) => {
-      if (players[id]["userRole"] ==  "wolfman") {
+    for (let i= 0; i < sessionIds.length; i++) {
+      let id =  sessionIds[i];
+      if (players[id]["userRole"] ==  'wolfman') {
+        console.log("roopIN!!")
         return true;
       }
-    });
+    }
+    // sessionIds.forEach((id) => {
+    //   console.log(id);
+    //   if (players[id]["userRole"] ==  'wolfman') {
+    //     console.log("roopIN!!")
+    //     return true;
+    //   }
+    // });
     return false;
   }
   
@@ -359,6 +368,7 @@
             result["win"].push(key);
           }
         }
+        break;
       // 人狼勝利
       case 1:
         for (let key in players) {
@@ -369,6 +379,7 @@
             result["lose"].push(key);
           }
         }
+        break;
     }
     return result;
   }
@@ -380,37 +391,53 @@
     let mostVotedPlayers = [];
     let result = {};
     
+    console.log(room[roomId]["players"]);
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
-    
+    console.log("mostVoterPlayers");
+    console.log(mostVotedPlayers);
     // 平和村の場合の処理
     if (isPeaceVillage(roomId)) {
       switch (isOneVoted(roomId)) {
         // 村人全員勝利
         case true:
           result = setWinner(players, 0);
+          console.log("setWinner");
+          console.log(result);
           console.log("村人全員生存");
           result["details"] = "村人全員生存";
+          break;
         // 村人全員敗北
         case false:
           result = setWinner(players, 1);
+          console.log("setWinner");
+          console.log(result);
           console.log("村人全員処刑");
           result["details"] = "村人全員処刑";
+          break;
       }
     }
     // 平和村でない場合の処理
     else {
+      console.log("IncludeWolf");
+      console.log(IncludeWolf(roomId, mostVotedPlayers));
       switch (IncludeWolf(roomId, mostVotedPlayers)) {
         // 村人サイドの勝利
         case true:
           result = setWinner(players, 0);
+          console.log("setWinner");
+          console.log(result);
           console.log("村人サイドの勝利");
           result["details"] = "村人サイドの勝利";
+          break;
         // 人狼サイドの勝利
         case false:
           result = setWinner(players, 1);
+          console.log("setWinner");
+          console.log(result);
           console.log("人狼サイドの勝利");
           result["details"] = "人狼サイドの勝利";
+          break;
       }
     }
     return result;
@@ -520,15 +547,27 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
-    
-    gameResult["win"].forEach((id) => {
+    console.log("response_my_sessionId");
+    console.log(gameResult);
+    result ="You lose...";
+    for (let i =0; i < gameResult["win"].length; i++) {
+      console.log(i);
+      console.log(sessionId);
+      let id = gameResult["win"][i];
       if (id == sessionId) {
+        console.log("win");
         result = " You win!!";
+        break;
       }
-      else {
-        result ="You lose...";
-      }
-    });
+    }
+    // gameResult["win"].forEach((id) => {
+    //   if (id == sessionId) {
+    //     result = " You win!!";
+    //   }
+    //   else {
+    //     result ="You lose...";
+    //   }
+    // });
     details =  gameResult["details"];
     console.log(`result: ${result}`);
     console.log(`details: ${details}`);
