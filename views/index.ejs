@@ -121,11 +121,11 @@
             
               
               </div>
-              <input class="btn btn-primary" v-if="total == playerNum + 2" type="submit" value="ルーム作成" >
-              <div v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</div>
               
-              </div>
             </div>
+          </div>
+          <input class="btn btn-primary" v-if="total == playerNum + 2" type="submit" value="ルーム作成" >
+          <div v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</div>
           </div>
             
         </form>
@@ -152,7 +152,7 @@
               <div class="col-auto">
             <div class="input-group">
               <div class="input-group-prepend" id="roomId">
-                <span class="input-group-text">プレイヤー名</span>
+                <span class="input-group-text">ルーム番号</span>
               </div>
             <input  class="form-control" type="text" name="roomId" aria-describedby="roomId">
                 </div>

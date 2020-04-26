@@ -21,11 +21,10 @@ body{
     background: url("../images/title.png") center center / cover no-repeat;
 }
 .card {
-    height: 100px;
-    width: 100px;
-    background: skyblue;
-    margin:5px;
+    width: 100%;
+    height: auto;
     display: flexbox;
+    border-radius: 10px;
 }
 .field{
     display: flex;
@@ -35,14 +34,29 @@ body{
 }
 
 .userArea{
-    width:120px;
+    width:150px;
+    height: 250px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgb(190, 190, 190);
+    background-color: rgba(255,255,255,0.6);
     padding: 10px;
     margin: 5px;
+}
 
+.cemetaryArea{
+  width:150px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255,255,255,0.6);
+  padding: 10px;
+  margin: 5px;
+}
+
+.userName{
+  margin: 5px;
 }
 
 .night {
@@ -101,8 +115,6 @@ body{
   cursor: pointer;
 }
 
-.limitted {
-  opacity: 0.5;
-}
+
 
 

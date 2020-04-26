@@ -28,11 +28,10 @@
             <% let playerNum = field.players[id].playerNo %>
             <% let playerName = field.players[id].userName %>
             <% if(playerNum >= 0) { %>
-                <div class="userArea" id="userArea<%= playerNum %>">
+                <div class="userArea shadow" id="userArea<%= playerNum %>">
                     <!--<p><%= id %></p>-->
-                    
-                    <p id="name<%= playerNum %>"><%= playerName %></p>
-                    <div class="card" id="card<%= playerNum %>"></div>
+                    <div class="userName" id="name<%= playerNum %>"><%= playerName %></div>
+                    <img src="./images/card.png" class="shadow-sm card" id="card<%= playerNum %>">
                 </div>
                 <!-- モーダルエリアここから -->
                 <section  class="modalArea" id="modalArea<%= playerNum %>">
@@ -58,9 +57,9 @@
             
         <% Object.keys(field.players).forEach( (id, i) => { %>
         <% if(field.players[id].playerNo < 0) { %>
-        <div class="userArea">
+        <div class="cemetaryArea shadow">
             <!--<p><%= id %></p>-->
-            <div class="card" id="card<%= field.players[id].playerNo %>"> </div>
+            <img src="./images/card.png" class="card shadow" id="card<%= field.players[id].playerNo %>">
         </div>
         
         <% } }  ) %>
