@@ -120,6 +120,11 @@ function date () {
     $('body').css('background-color', 'none');
     $('body').removeClass('night');
     $('body').addClass('date');
+    
+        // ポインターイベントの変更処理
+    $('.userArea').css('pointer-events', 'auto');
+    $('.userArea, .cemetaryArea').children('img').attr('src', './images/cards/card.png');
+    
 }
 
  /*----------------------------------------------------------------------------
@@ -219,11 +224,24 @@ $(function(){
                     }  );
                 });
                 break;
+                
             case 'fortune':
-                $('.card').css('pointer-events', 'auto');
-                $('.card').css('cursor', 'pointer');
-                $(`#card${data.playerNo}`).css('pointer-events',  'none');
+                
                 console.log("fortune");
+                // ポインターイベントの変更処理
+                $('.userArea').css('pointer-events', 'auto');
+                
+                // ホバー時の見た目変化
+                $('.userArea, .cemetaryArea').hover(function() {
+                    $(this).css('background',"darkgray");
+                    $(this).css('cursor',"pointer");
+                }, function() {
+                    $(this).css('background', '');
+                    $(this).css('cursor',"none");
+                });
+                $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
+                
+                // fortuneメソッドの実行
                 $('.card').click( (e) => {
                     console.log("fortune ok!")
                     let targetNo = parseInt(e.currentTarget.id.substr(4));
@@ -234,12 +252,27 @@ $(function(){
                             $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
+                    // ポインター解除
+                    $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
                 break;
+                
+                
             case 'thief':
-                $('.card').css('cursor', 'pointer');
-                $('.card').css('pointer-events', 'auto');
-                $(`#card${data.playerNo}, #card-1, #card-2`).css('pointer-events',  'none');
+                // ポインターイベントの変更処理
+                $('.userArea').css('pointer-events', 'auto');
+                
+                // ホバー時の見た目変化
+                $('.userArea, .cemetaryArea').hover(function() {
+                    $(this).css('background',"darkgray");
+                    $(this).css('cursor',"pointer");
+                }, function() {
+                    $(this).css('background', '');
+                    $(this).css('cursor',"none");
+                });
+                $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
+                
+                // thiefメソッドの実行
                 $('.card').click( (e) => {
                     let thiefNo = data.playerNo;
                     let targetNo = parseInt(e.currentTarget.id.substr(4));
@@ -253,6 +286,8 @@ $(function(){
                     socket.on("are_you_thief", () => {
                        socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
                     });
+                    // ポインター解除
+                    $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
                 break;
             
@@ -293,6 +328,7 @@ $(function(){
             $(this).css('background',"darkgray");
         }, function() {
             $(this).css('background', '');
+            
         });
         
         
