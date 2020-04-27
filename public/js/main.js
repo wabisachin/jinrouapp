@@ -360,9 +360,9 @@ $(function(){
         $('#modalArea').fadeOut();
         $('#restTime, #votedCount, .card').text("");
         $('.vote').removeClass("hidden");
+        $('.votedPlayer').removeClass("hidden");
         $('#toNight').removeClass("limitted");
         $('.attention').addClass('hidden');
-        $('.votedPlayer').removeClass("hidden");
         $('#result').addClass("limitted");
         
         // クリックアクションの初期化
