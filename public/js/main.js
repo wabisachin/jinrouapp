@@ -108,6 +108,7 @@ function startTimer(time) {
 
 // Initialフェーズ画面表示
 function initial () {
+    $('.userArea').css('cursor', '');
     $('body').removeClass('date');
     $('body').removeClass('night');
     $('body').addClass('initial');
