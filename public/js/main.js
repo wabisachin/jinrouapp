@@ -1,5 +1,7 @@
  /*----------------------------------------------------------------------------
  バグ修正ログ
+ 
+ *thief/fortune実行時にポインタが消えるバグ修正　line 239,247
                   
  
  ----------------------------------------------------------------------------*/
@@ -187,12 +189,12 @@ $(function(){
         
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
-            // $('#toNight').off();
+            $('#toNight').off();
             // $('#toNight').addClass("limitted");
             // $('#toDate').removeClass("limitted");
             // 昼へボタンのクリックアクションを有効化
             $('#toDate').on('click', () => {
-                // $('#toDate').off();
+                $('#toDate').off();
                 // $('#toDate').addClass("limitted");
                 socket.emit("day_begins", roomId);
             })
@@ -246,7 +248,7 @@ $(function(){
                     $(this).css('cursor',"pointer");
                 }, function() {
                     $(this).css('background', '');
-                    $(this).css('cursor',"none");
+                    $(this).css('cursor',"");
                 });
                 $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
                 
@@ -277,7 +279,7 @@ $(function(){
                     $(this).css('cursor',"pointer");
                 }, function() {
                     $(this).css('background', '');
-                    $(this).css('cursor',"none");
+                    $(this).css('cursor',"");
                 });
                 $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
                 
@@ -294,7 +296,7 @@ $(function(){
                     });
                     socket.on("are_you_thief", () => {
                        socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
-                    });
+                    });ほん
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });

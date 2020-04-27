@@ -199,6 +199,7 @@
             };
           }
           // console.log(field.players);
+          field.currentPlayerNum++;
          }
            else {
           //プレイヤー数以上のアクセスが有った場合の処理
@@ -556,8 +557,9 @@ io.sockets.on('connection', socket => {
   // 同一ルームのプレイヤー全員に昼開始の通知、タイマースタート
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
-    let playerNum = room[roomId]["currentPlayerNum"];
+    let playerNum = room[roomId]["playerNum"];
     console.log("days begins!!");
+    console.log(room[roomId]["currentPlayerNum"]);
     io.to(roomId).emit("are_you_thief");
     io.to(roomId).emit("notice_day_started", playerNum);
   });
