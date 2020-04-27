@@ -124,7 +124,6 @@ function night () {
 function date () {
     $('#toDate').addClass('disabled');
     $('#toNight').addClass('disabled');
-    $('#result').removeClass('disabled');
     $('body').css('background-color', 'none');
     $('body').removeClass('night');
     $('body').addClass('date');
@@ -312,7 +311,7 @@ $(function(){
         // タイマーの秒数を設定
         console.log("days start!")
         let setCount = 5;
-        // 状態を昼に変更
+        // 画面状態を昼に変更
         date();
         $('#restTime').removeClass('hidden');
         $('#votedCount').removeClass('hidden');
@@ -362,7 +361,7 @@ $(function(){
     
     // 投票終了後、結果表示ボタンを押せるようにする
     socket.on("finished_voting", (playerNum) => { 
-        $('#result').removeClass("limitted");
+         $('#result').removeClass("disabled");
         // 各ユーザー投票ボタンのクリックアクションの停止
         for(let id=0; id<playerNum;id++) {
             $(`#userArea${id}`).off();
@@ -409,21 +408,28 @@ $(function(){
         $('#restTime, #votedCount, .card').text("");
         $('.vote').removeClass("hidden");
         $('.votedPlayer').removeClass("hidden");
-        $('#toNight').removeClass("limitted");
+        // $('#toNight').removeClass("limitted");
+        $('#toNight').removeClass("disabled");
         $('.attention').addClass('hidden');
-        $('#result').addClass("limitted");
+        // $('#result').addClass("limitted");
+        $('#result').addClass("disabled");
+        // 画面をinitialに戻す
+        initial();
         
         // クリックアクションの初期化
         $('#result').off();
         $('#toNight').on('click', () => {
             
             $('#toNight').off();
-            $('#toNight').addClass("limitted");
-            $('#toDate').removeClass("limitted")
+            // $('#toNight').addClass("limitted");
+            $('#toNight').addClass("disabled");
+            // $('#toDate').removeClass("limitted")
+            $('#toDate').removeClass("disabled")
             
             $('#toDate').on('click', () => {
                 $('#toDate').off();
-                $('#toDate').addClass("limitted");
+                // $('#toDate').addClass("limitted");
+                $('#toDate').addClass("disabled");
                 socket.emit("day_begins", getRoomId());
             })
             socket.emit('toNightClicked', getRoomId());

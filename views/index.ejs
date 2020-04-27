@@ -103,7 +103,7 @@
               <div class="input-group-prepend" id="playerName">
                 <span class="input-group-text">プレイヤー名</span>
               </div>
-            <input  class="form-control" type="text" name="name" aria-describedby="playerName">
+            <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内">
                 </div>
               </div>
           </div>
@@ -116,7 +116,7 @@
               <div class="input-group-prepend" id="roomId">
                 <span class="input-group-text">ルーム番号</span>
               </div>
-                              <input class="form-control" type="text" name="roomId">
+                              <input class="form-control" type="number" name="roomId" required pattern="^[0-9]+$">
 
             
               
@@ -142,7 +142,7 @@
               <div class="input-group-prepend" id="playerName">
                 <span class="input-group-text">プレイヤー名</span>
               </div>
-            <input  class="form-control" type="text" name="name" aria-describedby="playerName">
+            <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内"  >
                 </div>
               </div>
           </div>
@@ -154,7 +154,7 @@
               <div class="input-group-prepend" id="roomId">
                 <span class="input-group-text">ルーム番号</span>
               </div>
-            <input  class="form-control" type="text" name="roomId" aria-describedby="roomId">
+            <input  class="form-control" type="number" name="roomId" aria-describedby="roomId" required pattern="^[0-9]+$">
                 </div>
               </div>
           </div>

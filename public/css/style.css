@@ -38,8 +38,8 @@ body{
 }
 
 .userArea{
-    width:150px;
-    height: 250px;
+    width:160px;
+    height: calc(160px * 5 / 3);
     display: flex;
     flex-direction: column;
     align-items: center;
