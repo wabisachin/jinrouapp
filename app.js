@@ -65,7 +65,7 @@
       app.post('/', function (req, res)  {
         
         let roomId = req.body.roomId;
-        
+
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
           
@@ -102,29 +102,45 @@
           
           
           //既存ルームに入室する場合
-          // console.log(req.session.id);
+
+          // 建てられてない部屋にアクセスした場合
+          if (!checkRoomExisting(roomId)) {
+            res.redirect('/');
+          }
+          // 入室
+          else {
+            userAdd(room[req.body.roomId],req.session.id,req.body.name);
+            res.redirect(`/${req.body.roomId}`);
+          }
           
-          userAdd(room[req.body.roomId],req.session.id,req.body.name);
-          // console.log(room[roomId].players);
-          
-          res.redirect(`/${req.body.roomId}`);
+          // userAdd(room[req.body.roomId],req.session.id,req.body.name);
+          // res.redirect(`/${req.body.roomId}`);
         }
       })
       
       // roomページにfieldを渡す
       app.get('/:room_id', function(req, res){
         
-        console.log(getCookie("sessionId", req))
+        let roomId = req.params.room_id;
+
+        // アクセス制限
+
         // sessionIdがないのにルームページにアクセスした場合
         if (getCookie("sessionId", req) == '') {
           console.log("redirect!")
           res.redirect('/');
         }
-        // console.log(req.headers.cookie);
-        res.render('room', {
-          roomId: req.params.room_id,
-          field: room[req.params.room_id],
-        });
+        // 建てられてない部屋にアクセスした場合
+        else if (!checkRoomExisting(roomId)) {
+          res.redirect('/');
+        }
+        // 入室許可
+        else {
+          res.render('room', {
+            roomId: req.params.room_id,
+            field: room[req.params.room_id],
+          });
+        }
       });
       
       // redisのテストコード
@@ -201,7 +217,15 @@
     const msgValue = msgKeyValue.replace(`${key}=`, '');
     return unescape(msgValue);
 }
-
+  // ルームが存在するかどうかのcheck
+  function checkRoomExisting(roomId) {
+    for (let id in room) {
+      if (id == roomId) {
+        return true;
+      }
+    }
+    return false;
+  }
 
 
   // カードをシャッフルする。
