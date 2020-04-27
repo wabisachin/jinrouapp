@@ -31,7 +31,7 @@
                 <div class="userArea shadow" id="userArea<%= playerNum %>">
                     <!--<p><%= id %></p>-->
                     <div class="userName" id="name<%= playerNum %>"><%= playerName %></div>
-                    <img src="./images/card.png" class="shadow-sm card" id="card<%= playerNum %>">
+                    <img src="./images/cards/card.png" class="card" id="card<%= playerNum %>">
                 </div>
                 <!-- モーダルエリアここから -->
                 <section  class="modalArea" id="modalArea<%= playerNum %>">
@@ -59,7 +59,7 @@
         <% if(field.players[id].playerNo < 0) { %>
         <div class="cemetaryArea shadow">
             <!--<p><%= id %></p>-->
-            <img src="./images/card.png" class="card shadow" id="card<%= field.players[id].playerNo %>">
+            <img src="./images/cards/card.png" class="card shadow" id="card<%= field.players[id].playerNo %>">
         </div>
         
         <% } }  ) %>

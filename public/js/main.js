@@ -207,14 +207,15 @@ $(function(){
     
     // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
-        $(`#card${data.playerNo}`).text(data.userRole);
+        $(`#card${data.playerNo}`).attr('src', `./images/cards/${data.userRole}.png`);
+
         // 自分の役職のメソッドをサーバに要求する
         switch (data.userRole) {
             case 'wolfman':
                 socket.emit('i_am_wolfman', getRoomId());
                 socket.on('all_wolfman', wolfmanList => {
                     wolfmanList.forEach( wolfmanInfo => {
-                        $(`#card${wolfmanInfo.playerNo}`).text(wolfmanInfo.userRole);
+                        $(`#card${wolfmanInfo.playerNo}`).attr('src', './images/cards/wolfman.png');
                     }  );
                 });
                 break;
@@ -230,7 +231,7 @@ $(function(){
                     socket.emit('i_am_fortune', getRoomId() ,targetNo);
                     socket.on('fortune_result', fortuneResult => {
                         fortuneResult.forEach( result => {
-                            $(`#card${result.playerNo}`).text(result.userRole);
+                            $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
                 });
@@ -246,7 +247,7 @@ $(function(){
                     socket.emit('i_am_thief', getRoomId() ,targetNo, thiefNo);
                     socket.on('thief_result', thiefResult => {
                         thiefResult.forEach( result => {
-                            $(`#card${result.playerNo}`).text(result.userRole);
+                            $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
                     socket.on("are_you_thief", () => {

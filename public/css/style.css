@@ -25,6 +25,7 @@ body{
     height: auto;
     display: flexbox;
     border-radius: 10px;
+    filter: drop-shadow(10px 10px 10px rgba(0,0,0,0.6));
 }
 .field{
     display: flex;
