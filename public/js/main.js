@@ -108,6 +108,8 @@ function startTimer(time) {
 
 // Initialフェーズ画面表示
 function initial () {
+    $('body').removeClass('date');
+    $('body').removeClass('night');
     $('body').addClass('initial');
     $('#toDate').addClass('disabled');
     $('#result').addClass('disabled');
