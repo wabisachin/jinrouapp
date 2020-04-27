@@ -1,6 +1,8 @@
  /*----------------------------------------------------------------------------
  バグ修正ログ
-                  
+isOneVoted関数のif分条件に"players[key]["playerNo"] > 0"を追加。平和村の時に正しい結果出ないバグは
+playersの中の墓地フィールドの投票数もカウントしてたのが原因だったわ！
+
  
  ----------------------------------------------------------------------------*/
 
@@ -375,7 +377,7 @@
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["votedCount"] != 1) {
+      if (players[key]["votedCount"] != 1 && players[key]["playerNo"] > 0) {
         return false;
       }
     }
@@ -440,6 +442,8 @@
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
     // 平和村の場合の処理
+    console.log("isOneVoted?");
+    console.log(isOneVoted(roomId));
     if (isPeaceVillage(roomId)) {
       switch (isOneVoted(roomId)) {
         // 村人全員勝利
@@ -450,6 +454,8 @@
         // 村人全員敗北
         case false:
           result = setWinner(players, 1);
+          console.log("setWinner");
+          console.log(result);
           
           result["details"] = "村人全員処刑";
           break;
@@ -571,6 +577,7 @@ io.sockets.on('connection', socket => {
     
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
+    console.log(room[roomId]);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
@@ -593,7 +600,8 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
-    
+    console.log("game結果");
+    console.log(gameResult);
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
       
