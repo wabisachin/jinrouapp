@@ -2,7 +2,9 @@
  バグ修正ログ
  
  *thief/fortune実行時にポインタが消えるバグ修正　line 239,247
-                  
+ リプレイ時にtheif/fortuneのアクションボタンが機能しなくなるバグの修正
+ lin2 246, 277に"$('.card').css('pointer-events',  'auto');"の追加
+ ↑問題あれば教えて欲しい！
  
  ----------------------------------------------------------------------------*/
 
@@ -242,7 +244,7 @@ $(function(){
                 console.log("fortune");
                 // ポインターイベントの変更処理
                 $('.userArea').css('pointer-events', 'auto');
-                
+                $('.card').css('pointer-events',  'auto');
                 // ホバー時の見た目変化
                 $('.userArea, .cemetaryArea').hover(function() {
                     $(this).css('background',"darkgray");
@@ -273,7 +275,7 @@ $(function(){
             case 'thief':
                 // ポインターイベントの変更処理
                 $('.userArea').css('pointer-events', 'auto');
-                
+                $('.card').css('pointer-events',  'auto');
                 // ホバー時の見た目変化
                 $('.userArea, .cemetaryArea').hover(function() {
                     $(this).css('background',"darkgray");
@@ -297,7 +299,7 @@ $(function(){
                     });
                     socket.on("are_you_thief", () => {
                        socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
-                    });ほん
+                    });
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });

@@ -364,7 +364,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["userRole"] == "wolfman") {
+      if (players[key]["userRole"] == "wolfman" && players[key]["playerNo"] >= 0) {
         return false;
       }
     }
@@ -377,7 +377,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["votedCount"] != 1 && players[key]["playerNo"] > 0) {
+      if (players[key]["votedCount"] != 1 && players[key]["playerNo"] >= 0) {
         return false;
       }
     }
@@ -391,7 +391,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     
     for (let i= 0; i < sessionIds.length; i++) {
       let id =  sessionIds[i];
-      if (players[id]["userRole"] ==  'wolfman') {
+      if (players[id]["userRole"] ==  'wolfman'  && players[id]["playerNo"] >= 0) {
         // console.log("roopIN!!")
         return true;
       }
@@ -409,10 +409,10 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       // 村人勝利
       case 0:
         for (let key in players) {
-          if (players[key]["userRole"] == "wolfman") {
+          if (players[key]["userRole"] == "wolfman"  && players[key]["playerNo"] >= 0) {
             result["lose"].push(key);
           }
-          else {
+          else if (players[key]["playerNo"] >= 0){
             result["win"].push(key);
           }
         }
@@ -420,10 +420,10 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       // 人狼勝利
       case 1:
         for (let key in players) {
-          if (players[key]["userRole"] == "wolfman") {
+          if (players[key]["userRole"] == "wolfman"  && players[key]["playerNo"] >= 0) {
             result["win"].push(key);
           }
-          else {
+          else if (players[key]["playerNo"] >= 0){
             result["lose"].push(key);
           }
         }
