@@ -123,6 +123,7 @@ function date () {
     
         // ポインターイベントの変更処理
     $('.userArea').css('pointer-events', 'auto');
+    $('.userArea').css('cursor', 'pointer');
     $('.userArea, .cemetaryArea').children('img').attr('src', './images/cards/card.png');
     
 }
@@ -180,13 +181,13 @@ $(function(){
         
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
-            $('#toNight').off();
-            $('#toNight').addClass("limitted");
-            $('#toDate').removeClass("limitted");
+            // $('#toNight').off();
+            // $('#toNight').addClass("limitted");
+            // $('#toDate').removeClass("limitted");
             // 昼へボタンのクリックアクションを有効化
             $('#toDate').on('click', () => {
-                $('#toDate').off();
-                $('#toDate').addClass("limitted");
+                // $('#toDate').off();
+                // $('#toDate').addClass("limitted");
                 socket.emit("day_begins", roomId);
             })
         
@@ -206,6 +207,8 @@ $(function(){
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
         // let sessionId = document.cookie.sessionId;
+        
+        // 状態を夜に変更
         night();
         socket.emit('request_role', roomId, sessionId);
     });
@@ -301,6 +304,7 @@ $(function(){
         // タイマーの秒数を設定
         console.log("days start!")
         let setCount = 5;
+        // 状態を昼に変更
         date();
         $('#restTime').removeClass('hidden');
         $('#votedCount').removeClass('hidden');
