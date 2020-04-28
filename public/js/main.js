@@ -66,7 +66,7 @@ function showCemetry(playerNum) {
 function isRoomPage() {
     let page = location.pathname;
     let result = page.split('/');
-    return (result[1] != "") ? true :false;
+    return (result[1] != "") ? true : false;
 }
 
 // URLから部屋番号を抽出
@@ -189,16 +189,15 @@ var app = new Vue({
 $(function(){
 
     let socket = io.connect();
+    let cookie = getCookieArray();
+    let accessRight;
     
+    accessRight = cookie["accessRight"]
     
-    socket.emit("getId_from_client");
-    
-    console.log("cookieの表示")
-    console.log(document.cookie);
-    
-    // roomページに遷移した場合の処理
-    if (isRoomPage()) {
-        let cookie = getCookieArray();
+    // roomページへのアクセス権がある時だけ以下の処理
+    // if (isRoomPage()) {
+    if (accessRight == 1) {
+        // let cookie = getCookieArray();
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();

@@ -20,6 +20,9 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         morgan = require("morgan"),
         favicon = require('serve-favicon'),
         path = require('path');
+        
+        // room.jsにまとめられたルームページの実行ファイルを読み込み
+        // roomModule = require('./room.js');
         // redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
         // client = redis.createClient();
@@ -130,6 +133,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
           }
           // 入室
           else {
+            
             userAdd(room[req.body.roomId],req.session.id,req.body.name);
             res.redirect(`/${req.body.roomId}`);
           }
@@ -146,6 +150,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
         // sessionIdがないのにルームページにアクセスした場合
         if (getCookie("sessionId", req) == '') {
+          setCookie("accessRight", 0 , res);
           // indexページをレンダリング
           console.log("indexをrender,,,,,,")
           res.render('index', {
@@ -155,23 +160,18 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         }
         // 建てられてない部屋にアクセスした場合
         else if (!checkRoomExisting(roomId)) {
+          setCookie("accessRight", 0 , res);
           console.log("indexをrender")
           res.render('index', {
             alert_title: "Error", 
             alert_message: "ルームが存在しませんでした"
-            
           });
         }
         // 入室許可
         else {
-          
-          
-          
-          
-          
-          
-          
-          
+          setCookie("accessRight", 1 , res);
+          // room.jsに分割された実行ファイルを読み込み
+          // roomModule();
           console.log("ルームをrender")
           res.render('room', {
             roomId: req.params.room_id,
@@ -536,8 +536,8 @@ io.sockets.on('connection', socket => {
 
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
-     let flag =  room[roomId]["players"][sessionId]["master"];
-     socket.emit("master_or_not", flag);
+    let flag =  room[roomId]["players"][sessionId]["master"];
+    socket.emit("master_or_not", flag);
   })
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
@@ -596,7 +596,7 @@ io.sockets.on('connection', socket => {
   // 夜に怪盗に交換相手の役職を伝える
   socket.on("i_am_thief", (roomId, targetNo, thiefNo) => {
     let thiefResult = thiefBefore(roomId, targetNo, thiefNo);
-     socket.emit('thief_result', thiefResult);
+    socket.emit('thief_result', thiefResult);
   });
   
   // 昼になった時に怪盗が役職交換実行
