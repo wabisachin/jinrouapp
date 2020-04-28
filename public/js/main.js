@@ -285,7 +285,7 @@ $(function(){
                             $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
-                        $('.userArea, .cemetaryArea').off();
+                        $('.userArea, .cemetaryArea').off('click');
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
@@ -314,19 +314,20 @@ $(function(){
                     let numPosition = e.currentTarget.id.indexOf("Area") + 4;
                     let targetNo = parseInt(e.currentTarget.id.substr(numPosition));
                     // $('.card').css('pointer-events',  'none');
+                    console.log(`${data.userName}の怪盗アクション発火されてます`);
                     $('.userArea').css('pointer-events',  'none');
+                    
                     socket.emit('i_am_thief', getRoomId() ,targetNo, thiefNo);
                     socket.on('thief_result', thiefResult => {
                         thiefResult.forEach( result => {
                             $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
-                    socket.on("are_you_thief", () => {
+                    socket.once("are_you_thief", () => {
                        socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
                     });
                     
-                    $('.userArea, .cemetaryArea').off();
-
+                    $('.userArea, .cemetaryArea').off('click');
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
@@ -452,8 +453,8 @@ $(function(){
         initial();
         
         // クリックアクションの初期化
-        $('#result').off();
-        // $('.userArea, .cemetaryArea').off();
+        $('#result').off('click');
+        $('.userArea, .cemetaryArea').off('click');
         $('#toNight').on('click', () => {
             
             $('#toNight').off();
@@ -471,4 +472,5 @@ $(function(){
             socket.emit('toNightClicked', getRoomId());
         });
     })
+    
 });
