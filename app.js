@@ -178,9 +178,14 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
             playerNo:  field.currentPlayerNum, 
             userName: userName,
             userRole: "",
+            master: 0,
             votedCount: 0,
-            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+            flag: 0, //直近の更新が手動or自動リロードかを判別するフラグ
           };
+          // 最初にroomに入室したユーザーにmasterを付与
+          if (field.currentPlayerNum == 0) {
+            field.players[sessionId].master = 1;
+          } 
           field.currentPlayerNum++;
         } else if (field.currentPlayerNum === field.playerNum - 1)
         // 最後の一人が入った後に墓地ユーザ追加
@@ -188,8 +193,10 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
             field.players[sessionId] = {
             playerNo:  field.currentPlayerNum, 
             userName: userName,
+            userRole: "",
+            master: 0,
             votedCount: 0,
-            flag: 0, //直近の更新が手動or自動リロードかを判別するためのフラグ
+            flag: 0, //直近の更新が手動or自動リロードかを判別するフラグ
           };
           
           //墓地ユーザ追加
