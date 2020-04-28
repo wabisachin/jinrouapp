@@ -186,6 +186,9 @@ $(function(){
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();
+        // 自分がmasterかどうかをサーバーに問い合わせ
+        socket.emit("i_am_master?", roomId, sessionId);
+        
         // socketに部屋番号に応じたルームを作成
         socket.emit('joinRoom_from_client', {
             roomId: roomId, 
@@ -207,7 +210,14 @@ $(function(){
             socket.emit('toNightClicked', roomId);
         });
     }
-    
+    // master出ない場合、フェーズボタンを非表示
+    socket.on("master_or_not", (flag) => {
+        if (flag == 0) {
+            // $('#toNight, #toDate, #result').addClass("hidden");
+            $('.operation').addClass("hidden");
+        }
+    });
+
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
@@ -247,7 +257,7 @@ $(function(){
                 // ポインターイベントの変更処理
                 // $('.userArea').css('pointer-events', 'auto');
                 $('.userArea, .cemetaryArea').css('pointer-events', 'auto');
-                // 役職持ちのボタンがリプレイ以降使えるようにするbyわさび
+                // 役職持ちのボタンがリプレイ以降使えるようにする
                 // $('.card').css('pointer-events',  'auto');
 
                 // ホバー時の見た目変化
@@ -285,7 +295,7 @@ $(function(){
             case 'thief':
                 // ポインターイベントの変更処理
                 $('.userArea').css('pointer-events', 'auto');
-                // 役職持ちのボタンがリプレイ以降使えるようにするbyわさび
+                // 役職持ちのボタンがリプレイ以降使えるようにする
                 // $('.card').css('pointer-events',  'auto');
                 // ホバー時の見た目変化
                 $('.userArea').hover(function() {

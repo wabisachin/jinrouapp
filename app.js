@@ -399,7 +399,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     for (let i= 0; i < sessionIds.length; i++) {
       let id =  sessionIds[i];
       if (players[id]["userRole"] ==  'wolfman'  && players[id]["playerNo"] >= 0) {
-        // console.log("roopIN!!")
         return true;
       }
     }
@@ -489,8 +488,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
   //変数の初期化(Replay時)
   function initialize(roomId) {
     
-    // console.log(room[roomId]);
-    // let room =  room[roomId];
     let players =  room[roomId]["players"];
     
     // 値の初期化
@@ -508,7 +505,11 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
 io.sockets.on('connection', socket => {
 
-  
+  // 入室したプレイヤーがmasterであれば1を返す
+  socket.on("i_am_master?", (roomId, sessionId) => {
+     let flag =  room[roomId]["players"][sessionId]["master"];
+     socket.emit("master_or_not", flag);
+  })
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
