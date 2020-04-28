@@ -64,7 +64,10 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       // トップページ ->アクセスしたときクライアントCookieにセッション保存
       app.get('/', function(req, res){
         setCookie("sessionId", req.session.id, res);
-        res.render('index');
+        res.render('index', {
+          alert_title: "", 
+          alert_message: ""
+        });
         console.log(`session: ${req.session.id}`);
 
       });
@@ -79,13 +82,15 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
           
           // もし同じ部屋番号のルームが既にある場合はTopPageへリダイレクト
           if (checkRoomExisting(roomId)) {
-            res.redirect('/');
-            console.log("リダイレクト")
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "そのルームは既に存在します！"
+              
+            });
           }
           
           // 同じ部屋番号のルームがない場合は新規作成
           else {
-            console.log("ルームいん")
             // fieldの初期化
             let field = { 
                 currentPlayerNum :0,
@@ -117,7 +122,11 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         else {
           // 建てられてない部屋にアクセスした場合
           if (!checkRoomExisting(roomId)) {
-            res.redirect('/');
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "ルームが存在しませんでした。"
+              
+            });
           }
           // 入室
           else {
@@ -137,15 +146,33 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
         // sessionIdがないのにルームページにアクセスした場合
         if (getCookie("sessionId", req) == '') {
-          console.log("redirect!")
-          res.redirect('/');
+          // indexページをレンダリング
+          console.log("indexをrender,,,,,,")
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "入室フォームから入室して下さい"
+          });
         }
         // 建てられてない部屋にアクセスした場合
         else if (!checkRoomExisting(roomId)) {
-          res.redirect('/');
+          console.log("indexをrender")
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "ルームが存在しませんでした"
+            
+          });
         }
         // 入室許可
         else {
+          
+          
+          
+          
+          
+          
+          
+          
+          console.log("ルームをrender")
           res.render('room', {
             roomId: req.params.room_id,
             field: room[req.params.room_id],
@@ -605,6 +632,7 @@ io.sockets.on('connection', socket => {
     }
   });
   
+
   // 結果を各プレイヤーに送信
   socket.on("request_result", (roomId) => {
     // 勝敗の結果を返すためにsessionIdを要求
