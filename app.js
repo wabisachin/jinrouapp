@@ -69,7 +69,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
       });
       
-      // roomページへリダイレクト
+      // 条件をパスすればroomページへリダイレクト
       app.post('/', function (req, res)  {
         
         let roomId = req.body.roomId;
@@ -77,40 +77,44 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
           
-          // fieldの初期化
-              let field = { 
-                  currentPlayerNum :0,
-                  currentVotedCount:0,
-                  playerNum : 0,
-                  villager : 0,
-                  wolfman : 0,
-                  fortune : 0,
-                  thief : 0,
-                  players : {},
-                }
-                
-          // console.log(req.session.id);
+          // もし同じ部屋番号のルームが既にある場合はTopPageへリダイレクト
+          if (checkRoomExisting(roomId)) {
+            res.redirect('/');
+            console.log("リダイレクト")
+          }
           
-        field.playerNum = req.body.playerNum;
-        field.villager = req.body.villager;
-        field.wolfman = req.body.wolfman;
-        field.fortune = req.body.fortune;
-        field.thief = req.body.thief;
-        
-        userAdd(field, req.session.id,req.body.name);
-        
-        //新規room作成し、fieldを入れる
-        room[roomId] = field;
-        
-        res.redirect(`/${roomId}`);
-        // res.location('/${id}')
-        
-        
-        } else {
+          // 同じ部屋番号のルームがない場合は新規作成
+          else {
+            console.log("ルームいん")
+            // fieldの初期化
+            let field = { 
+                currentPlayerNum :0,
+                currentVotedCount:0,
+                playerNum : 0,
+                villager : 0,
+                wolfman : 0,
+                fortune : 0,
+                thief : 0,
+                players : {},
+              }
+              
+            field.playerNum = req.body.playerNum;
+            field.villager = req.body.villager;
+            field.wolfman = req.body.wolfman;
+            field.fortune = req.body.fortune;
+            field.thief = req.body.thief;
+            
+            userAdd(field, req.session.id,req.body.name);
+            
+            //新規room作成し、fieldを入れる
+            room[roomId] = field;
+            
+            res.redirect(`/${roomId}`);
+          }
           
-          
-          //既存ルームに入室する場合
-
+        } 
+        //既存ルームに入室する場合
+        else {
           // 建てられてない部屋にアクセスした場合
           if (!checkRoomExisting(roomId)) {
             res.redirect('/');
@@ -121,8 +125,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
             res.redirect(`/${req.body.roomId}`);
           }
           
-          // userAdd(room[req.body.roomId],req.session.id,req.body.name);
-          // res.redirect(`/${req.body.roomId}`);
         }
       })
       
