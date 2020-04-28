@@ -607,6 +607,8 @@ io.sockets.on('connection', socket => {
   socket.on("request_result", (roomId) => {
     // 勝敗の結果を返すためにsessionIdを要求
     io.to(roomId).emit("request_your_sessionId");
+    
+    // 最初と最後のユーザ役職状態表示
     console.log("-------------最初の役割配布状態-------------");
     console.log(room[roomId].initialRoles);
     console.log("-------------最後の役割配布状態-------------");
@@ -620,7 +622,7 @@ io.sockets.on('connection', socket => {
     let result;
     let details;
 
-    // 最初と最後のユーザ役職状態表示
+    
 
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
