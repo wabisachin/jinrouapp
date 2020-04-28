@@ -421,8 +421,16 @@ $(function(){
         $('#modalArea').fadeIn();
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
-        $('#modalContents').append(`<p>${ initialRoles}</h1>`);
-        $('#modalContents').append(`<p>${ finalRoles}</h1>`);
+        $('#modalContents').append(`<p>${ initialRoles}</p>`);
+        $('#modalContents').append(`<p>${ finalRoles}</p>`);
+        
+        $('#modalContents').append(`<h2>最初のカード</h2>`);
+        for (var i = 0; i < Things.length; i++) {
+            Things[i]
+        }
+        $('#modalContents').append(`<h2>最後のカード</h2>`);
+        $('#modalContents').append(`<h2>墓地</h2>`);
+        
         $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
