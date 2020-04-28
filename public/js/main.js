@@ -274,7 +274,6 @@ $(function(){
                 // fortuneメソッドの実行
                 // $('.card').click( (e) => {
                 $('.userArea, .cemetaryArea').one('click', (e) => {
-                    console.log("fortune ok!")
                     let numPosition = e.currentTarget.id.indexOf("Area") + 4;
                     let targetNo = parseInt(e.currentTarget.id.substr(numPosition));
                     // $('.card').css('pointer-events',  'none');
@@ -415,22 +414,24 @@ $(function(){
     })
     
     // ゲーム結果を表示
-    socket.on("game_result", (result, details) => {
+    socket.on("game_result", (result, details, flag) => {
         console.log(result);
         console.log(details);
         $('#modalArea').fadeIn();
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
         $('#modalContents').append(`<p id="details">${details}</p>`);
-        $('#modalContents').append('<button id="replay">Replay?</button> ');
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
         
-        // リプレイの追加
-        $('#replay').on('click', () => {
-            socket.emit("request_replay", getRoomId());
-        })
+        // masterユーザーの場合Replayボタンの設置
+        if (flag == 1) {
+            $('#modalContents').append('<button id="replay">Replay?</button> ');
+            $('#replay').on('click', () => {
+                socket.emit("request_replay", getRoomId());
+            })
+        }
     })
     
     // 画面表示の初期化
@@ -450,6 +451,7 @@ $(function(){
         
         // クリックアクションの初期化
         $('#result').off();
+        // $('.userArea, .cemetaryArea').off();
         $('#toNight').on('click', () => {
             
             $('#toNight').off();

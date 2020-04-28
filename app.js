@@ -619,7 +619,10 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
+    let masterFlag;
 
+    masterFlag =  room[roomId]["players"][sessionId]["master"];
+    
     // 最初と最後のユーザ役職状態表示
 
     result ="You lose...";
@@ -632,7 +635,7 @@ io.sockets.on('connection', socket => {
       }
     }
     details =  gameResult["details"];
-    socket.emit("game_result", result, details);
+    socket.emit("game_result", result, details, masterFlag);
   })
   
   // リプレイ時に変数,画面表示の初期化
