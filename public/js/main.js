@@ -128,6 +128,7 @@ function night () {
     $('#plate').addClass('nightPlate');
 }
 function date () {
+    $('.userArea, .cemetaryArea').off();
     $('#toDate').addClass('disabled');
     $('#toNight').addClass('disabled');
     $('body').css('background-color', 'none');
