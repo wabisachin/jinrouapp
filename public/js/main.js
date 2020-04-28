@@ -423,6 +423,9 @@ $(function(){
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
+        $('#result').on('click', () => {
+            $('#modalArea').fadeIn();
+        })
         
         // masterユーザーの場合Replayボタンの設置
         if (flag == 1) {
