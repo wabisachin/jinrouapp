@@ -516,6 +516,13 @@ io.sockets.on('connection', socket => {
     roleAsign(room[roomId],randomRole(room[roomId]));
     io.to(roomId).emit('roles_asigned');
     
+    // 初期の役割配布状況を保存する。
+    let initialRoles = Object.values(room[roomId].players).map( player => player.userRole);
+    room[roomId]['initialRoles'] = initialRoles;
+    
+    console.log("-------------最初の役割配布状態-------------");
+    console.log(room[roomId].initialRoles);
+    
   });
   
   // 新しいクライアントが入室したときに部屋の中の他のクライアントのページ更新、roomにjoin
@@ -599,6 +606,10 @@ io.sockets.on('connection', socket => {
   socket.on("request_result", (roomId) => {
     // 勝敗の結果を返すためにsessionIdを要求
     io.to(roomId).emit("request_your_sessionId");
+    console.log("-------------最初の役割配布状態-------------");
+    console.log(room[roomId].initialRoles);
+    console.log("-------------最後の役割配布状態-------------");
+    console.log(Object.values(room[roomId].players).map( player => player.userRole));
   })
   
   // 各ユーザーに対してゲーム結果を返す
@@ -607,8 +618,9 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
-    console.log("game結果");
-    console.log(gameResult);
+
+    // 最初と最後のユーザ役職状態表示
+
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
       

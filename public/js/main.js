@@ -110,6 +110,7 @@ function startTimer(time) {
 
 // Initialフェーズ画面表示
 function initial () {
+    $('.userArea').css('cursor', '');
     $('body').removeClass('date');
     $('body').removeClass('night');
     $('body').addClass('initial');
@@ -118,6 +119,7 @@ function initial () {
 }
 // 夜フェーズ画面表示
 function night () {
+    $('.userArea').css('pointer-events', 'auto');
     $('#toNight').addClass('disabled');
     $('#toDate').removeClass('disabled');
     $('#result').addClass('disabled');
@@ -243,8 +245,11 @@ $(function(){
                 
                 console.log("fortune");
                 // ポインターイベントの変更処理
-                $('.userArea').css('pointer-events', 'auto');
-                $('.card').css('pointer-events',  'auto');
+                // $('.userArea').css('pointer-events', 'auto');
+                $('.userArea, .cemetaryArea').css('pointer-events', 'auto');
+                // 役職持ちのボタンがリプレイ以降使えるようにするbyわさび
+                // $('.card').css('pointer-events',  'auto');
+
                 // ホバー時の見た目変化
                 $('.userArea, .cemetaryArea').hover(function() {
                     $(this).css('background',"darkgray");
@@ -256,16 +261,21 @@ $(function(){
                 $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
                 
                 // fortuneメソッドの実行
-                $('.card').click( (e) => {
+                // $('.card').click( (e) => {
+                $('.userArea, .cemetaryArea').one('click', (e) => {
                     console.log("fortune ok!")
-                    let targetNo = parseInt(e.currentTarget.id.substr(4));
-                    $('.card').css('pointer-events',  'none');
+                    let numPosition = e.currentTarget.id.indexOf("Area") + 4;
+                    let targetNo = parseInt(e.currentTarget.id.substr(numPosition));
+                    // $('.card').css('pointer-events',  'none');
+                    $('.userArea, .cemetaryArea').css('pointer-events',  'none');
+                    console.log(targetNo);
                     socket.emit('i_am_fortune', getRoomId() ,targetNo);
                     socket.on('fortune_result', fortuneResult => {
                         fortuneResult.forEach( result => {
                             $(`#card${result.playerNo}`).attr('src', `./images/cards/${result.userRole}.png`);
                         } );
                     });
+                        $('.userArea, .cemetaryArea').off();
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
@@ -275,9 +285,10 @@ $(function(){
             case 'thief':
                 // ポインターイベントの変更処理
                 $('.userArea').css('pointer-events', 'auto');
-                $('.card').css('pointer-events',  'auto');
+                // 役職持ちのボタンがリプレイ以降使えるようにするbyわさび
+                // $('.card').css('pointer-events',  'auto');
                 // ホバー時の見た目変化
-                $('.userArea, .cemetaryArea').hover(function() {
+                $('.userArea').hover(function() {
                     $(this).css('background',"darkgray");
                     $(this).css('cursor',"pointer");
                 }, function() {
@@ -287,10 +298,13 @@ $(function(){
                 $(`#userArea${data.playerNo}`).css('pointer-events',  'none');
                 
                 // thiefメソッドの実行
-                $('.card').click( (e) => {
+                // $('.card').click( (e) => {
+                $('.userArea').one('click', (e) => {
                     let thiefNo = data.playerNo;
-                    let targetNo = parseInt(e.currentTarget.id.substr(4));
-                    $('.card').css('pointer-events',  'none');
+                    let numPosition = e.currentTarget.id.indexOf("Area") + 4;
+                    let targetNo = parseInt(e.currentTarget.id.substr(numPosition));
+                    // $('.card').css('pointer-events',  'none');
+                    $('.userArea').css('pointer-events',  'none');
                     socket.emit('i_am_thief', getRoomId() ,targetNo, thiefNo);
                     socket.on('thief_result', thiefResult => {
                         thiefResult.forEach( result => {
@@ -300,6 +314,9 @@ $(function(){
                     socket.on("are_you_thief", () => {
                        socket.emit("thief_action", getRoomId(), targetNo, thiefNo); 
                     });
+                    
+                    $('.userArea, .cemetaryArea').off();
+
                     // ポインター解除
                     $(`.userArea, .cemetaryArea`).css('pointer-events',  'none');
                 });
