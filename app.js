@@ -621,8 +621,13 @@ io.sockets.on('connection', socket => {
     let gameResult = getGameResult(roomId);
     let result;
     let details;
+    let masterFlag;
+    let initialRoles = room[roomId].initialRoles;
+    let finalRoles = Object.values(room[roomId].players).map( player => player.userRole);
 
+    masterFlag =  room[roomId]["players"][sessionId]["master"];
     
+    // 最初と最後のユーザ役職状態表示
 
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
@@ -634,7 +639,7 @@ io.sockets.on('connection', socket => {
       }
     }
     details =  gameResult["details"];
-    socket.emit("game_result", result, details);
+    socket.emit("game_result", result, details, masterFlag, initialRoles, finalRoles);
   })
   
   // リプレイ時に変数,画面表示の初期化
