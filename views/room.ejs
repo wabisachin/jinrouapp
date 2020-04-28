@@ -57,7 +57,7 @@
             
         <% Object.keys(field.players).forEach( (id, i) => { %>
         <% if(field.players[id].playerNo < 0) { %>
-        <div class="cemetaryArea shadow">
+        <div class="cemetaryArea shadow" id="cemetaryArea<%= field.players[id].playerNo %>">
             <!--<p><%= id %></p>-->
             <img src="./images/cards/card.png" class="card shadow" id="card<%= field.players[id].playerNo %>">
         </div>
