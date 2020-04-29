@@ -421,15 +421,21 @@ $(function(){
         $('#modalArea').fadeIn();
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
-        $('#modalContents').append(`<p>${ initialRoles}</p>`);
-        $('#modalContents').append(`<p>${ finalRoles}</p>`);
-        
-        $('#modalContents').append(`<h2>最初のカード</h2>`);
-        for (var i = 0; i < Things.length; i++) {
-            Things[i]
+        $('#modalContents').append(`<div>開始時のカード状態</div>`);
+        $('#modalContents').append(`<div class="field" id="initialModalField"></div>`);
+        for (var i = 0; i < initialRoles.length - 2; i++) {
+            $('#initialModalField').append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
-        $('#modalContents').append(`<h2>最後のカード</h2>`);
-        $('#modalContents').append(`<h2>墓地</h2>`);
+        $('#modalContents').append(`<div>終了時のカード状態</div>`);
+        $('#modalContents').append(`<div class="field" id="finalModalField"></div>`);
+        for (var i = 0; i < finalRoles.length - 2; i++) {
+        $('#finalModalField').append(`<img src=./images/cards/${finalRoles[i]}.png class="modalCard"></img>`);
+        }
+        $('#modalContents').append(`<div>墓地</div>`);
+        $('#modalContents').append(`<div class="field" id="cemetaryModalField"></div>`);
+        for (var i = initialRoles.length - 2; i < initialRoles.length ; i++) {
+        $('#cemetaryModalField').append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
+        }
         
         $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#closeModal , #modalBg').on('click', () => {

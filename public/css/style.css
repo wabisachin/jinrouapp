@@ -115,6 +115,13 @@ body{
   cursor: pointer;
 }
 
+.modalCard {
+    width: 50px;
+    height: auto;
+    display: flexbox;
+    border-radius: 3px;
+    margin: 3px;
+}
 
 
 
