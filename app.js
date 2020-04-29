@@ -1,7 +1,5 @@
  /*----------------------------------------------------------------------------
  バグ修正ログ
-isOneVoted関数のif分条件に"players[key]["playerNo"] > 0"を追加。平和村の時に正しい結果出ないバグは
-playersの中の墓地フィールドの投票数もカウントしてたのが原因だったわ！
 
  
  ----------------------------------------------------------------------------*/
@@ -17,6 +15,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         server = require("http").Server(app),
         io  =   require('socket.io')(server),
         session = require("express-session"),
+        cookieParser = require('cookie-parser'),
         morgan = require("morgan"),
         favicon = require('serve-favicon'),
         path = require('path');
@@ -49,6 +48,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       app.set('view engine', 'ejs');
       
       //middleware
+      app.use(cookieParser())
       app.use(express.json());
       app.use(morgan('dev'));
       app.use(favicon(path.join(__dirname, 'public', './images/favicon.ico')));
@@ -71,13 +71,11 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
           alert_title: "", 
           alert_message: ""
         });
-        console.log(`session: ${req.session.id}`);
-
       });
       
       // 条件をパスすればroomページへリダイレクト
       app.post('/', function (req, res)  {
-        
+        setCookie("sessionId", req.session.id, res);
         let roomId = req.body.roomId;
 
         //部屋作成の場合
@@ -113,7 +111,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
             field.thief = req.body.thief;
             
             userAdd(field, req.session.id,req.body.name);
-            
             //新規room作成し、fieldを入れる
             room[roomId] = field;
             
@@ -145,28 +142,34 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       app.get('/:room_id', function(req, res){
         
         let roomId = req.params.room_id;
+        let sessionId =  getCookie("sessionId", req);
 
         // アクセス制限
-
-        // sessionIdがないのにルームページにアクセスした場合
-        if (getCookie("sessionId", req) == '') {
-          // roomページへのアクセス権限がない場合の値は０
-          setCookie("accessRight", 0 , res);
-          res.render('index', {
-            alert_title: "Error", 
-            alert_message: "入室フォームから入室して下さい"
-          });
-        }
         // 建てられてない部屋にアクセスした場合
-        else if (!checkRoomExisting(roomId)) {
+        if (!checkRoomExisting(roomId)) {
+          console.log("ルームがないのにアクセスしたよ")
           setCookie("accessRight", 0 , res);
           res.render('index', {
             alert_title: "Error", 
             alert_message: "ルームが存在しませんでした"
           });
         }
+        // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
+        else if (!verificateSessionId(sessionId, roomId, req)) {
+          // roomページへのアクセス権限がない場合の値は０
+          // console.log("verificate");
+          // console.log(verificateSessionId(sessionId, roomId, req))
+          // console.log(sessionId);
+          console.log("sessionIdないのにアクセスしたよ")
+          setCookie("accessRight", 0 , res);
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "入室フォームから入室して下さい"
+          });
+        }
         // 入室許可
         else {
+          console.log("アクセスを許可したよ")
           // roomページへのアクセス権限がない場合の値は１
           setCookie("accessRight", 1 , res);
           res.render('room', {
@@ -247,6 +250,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
   function setCookie(key, value, res) {
     const escapedValue = escape(value);
     res.setHeader('Set-Cookie', [`${key}=${escapedValue}`]);
+    // res.cookie(key, value);
   }
   
   // cookieに保存されたキーから値を取得
@@ -258,6 +262,16 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     const msgValue = msgKeyValue.replace(`${key}=`, '');
     return unescape(msgValue);
 }
+
+  // 遷移先のroomページに参加者としてsessionIdが登録されているか
+  function verificateSessionId(sessionId , roomId, request) {
+    for (let id in room[roomId]["players"]) {
+      if (id == sessionId) {
+        return true;
+      }
+    }
+    return false;
+  }
   // ルームが存在するかどうかのcheck
   function checkRoomExisting(roomId) {
     for (let id in room) {
@@ -525,6 +539,8 @@ io.sockets.on('connection', socket => {
 
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
+    console.log("ok");
+    console.log(room);
     let flag =  room[roomId]["players"][sessionId]["master"];
     socket.emit("master_or_not", flag);
   })

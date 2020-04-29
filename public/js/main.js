@@ -1,11 +1,6 @@
  /*----------------------------------------------------------------------------
  バグ修正ログ
  
- *thief/fortune実行時にポインタが消えるバグ修正　line 239,247
- リプレイ時にtheif/fortuneのアクションボタンが機能しなくなるがあったから
- line 246, 277に"$('.card').css('pointer-events',  'auto');"追加したよ
- ↑問題あれば言ってね！
- 
  ----------------------------------------------------------------------------*/
 
 'use strict';
@@ -198,6 +193,7 @@ $(function(){
     // if (isRoomPage()) {
     if (isRoomPage() && accessRight == 1) {
         // let cookie = getCookieArray();
+        console.log("ok");
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();
