@@ -420,12 +420,13 @@ $(function(){
         $('#modalArea').fadeIn();
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
+        $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#modalContents').append(`<div>開始時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="initialModalField"></div>`);
         for (var i = 0; i < initialRoles.length - 2; i++) {
             $('#initialModalField').append(`<div class="modalUserArea" id="initialModalUserArea${i}"></div>`)
             $(`#initialModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
-            $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
+            $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
         $('#modalContents').append(`<div>終了時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="finalModalField"></div>`);
@@ -443,7 +444,7 @@ $(function(){
         $('#cemetaryModalField').append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
         
-        $('#modalContents').append(`<p id="details">${details}</p>`);
+        // $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
