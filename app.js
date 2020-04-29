@@ -623,7 +623,7 @@ io.sockets.on('connection', socket => {
     let details;
     let masterFlag;
     let initialRoles = room[roomId].initialRoles;
-    let finalRoles = Object.values(room[roomId].players).map( player => player.userRole);
+    let finalState = Object.values(room[roomId].players);
 
     masterFlag =  room[roomId]["players"][sessionId]["master"];
     
@@ -639,7 +639,7 @@ io.sockets.on('connection', socket => {
       }
     }
     details =  gameResult["details"];
-    socket.emit("game_result", result, details, masterFlag, initialRoles, finalRoles);
+    socket.emit("game_result", result, details, masterFlag, initialRoles, finalState);
   })
   
   // リプレイ時に変数,画面表示の初期化

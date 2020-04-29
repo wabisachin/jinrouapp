@@ -415,7 +415,7 @@ $(function(){
     })
     
     // ゲーム結果を表示
-    socket.on("game_result", (result, details, flag, initialRoles, finalRoles) => {
+    socket.on("game_result", (result, details, flag, initialRoles, finalState) => {
         console.log(result);
         console.log(details);
         $('#modalArea').fadeIn();
@@ -424,12 +424,16 @@ $(function(){
         $('#modalContents').append(`<div>開始時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="initialModalField"></div>`);
         for (var i = 0; i < initialRoles.length - 2; i++) {
-            $('#initialModalField').append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
+            $('#initialModalField').append(`<div class="modalUserArea" id="initialModalUserArea${i}"></div>`)
+            $(`#initialModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
+            $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
         }
         $('#modalContents').append(`<div>終了時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="finalModalField"></div>`);
-        for (var i = 0; i < finalRoles.length - 2; i++) {
-        $('#finalModalField').append(`<img src=./images/cards/${finalRoles[i]}.png class="modalCard"></img>`);
+        for (var i = 0; i < finalState.length - 2; i++) {
+            $('#finalModalField').append(`<div class="modalUserArea" id="finalModalUserArea${i}"></div>`)
+            $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
+            $(`#finalModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
         }
         $('#modalContents').append(`<div>墓地</div>`);
         $('#modalContents').append(`<div class="field" id="cemetaryModalField"></div>`);
