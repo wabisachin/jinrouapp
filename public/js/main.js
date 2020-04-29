@@ -196,7 +196,7 @@ $(function(){
     
     // roomページへのアクセス権がある時だけ以下の処理
     // if (isRoomPage()) {
-    if (accessRight == 1) {
+    if (isRoomPage() && accessRight == 1) {
         // let cookie = getCookieArray();
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];

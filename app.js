@@ -150,9 +150,8 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
         // sessionIdがないのにルームページにアクセスした場合
         if (getCookie("sessionId", req) == '') {
+          // roomページへのアクセス権限がない場合の値は０
           setCookie("accessRight", 0 , res);
-          // indexページをレンダリング
-          console.log("indexをrender,,,,,,")
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい"
@@ -161,7 +160,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         // 建てられてない部屋にアクセスした場合
         else if (!checkRoomExisting(roomId)) {
           setCookie("accessRight", 0 , res);
-          console.log("indexをrender")
           res.render('index', {
             alert_title: "Error", 
             alert_message: "ルームが存在しませんでした"
@@ -169,10 +167,8 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         }
         // 入室許可
         else {
+          // roomページへのアクセス権限がない場合の値は１
           setCookie("accessRight", 1 , res);
-          // room.jsに分割された実行ファイルを読み込み
-          // roomModule();
-          console.log("ルームをrender")
           res.render('room', {
             roomId: req.params.room_id,
             field: room[req.params.room_id],
@@ -363,9 +359,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     room[room_id]["currentVotedCount"]++;
     for (let key in players) {
       if (players[key]["playerNo"] == selectedNo) {
-        console.log("votedCount");
         players[key]["votedCount"]++;
-        console.log(players[key]["votedCount"]);
       }
     }
   }
@@ -477,8 +471,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
     // 平和村の場合の処理
-    console.log("isOneVoted?");
-    console.log(isOneVoted(roomId));
     if (isPeaceVillage(roomId)) {
       switch (isOneVoted(roomId)) {
         // 村人全員勝利
@@ -489,9 +481,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         // 村人全員敗北
         case false:
           result = setWinner(players, 1);
-          console.log("setWinner");
-          console.log(result);
-          
           result["details"] = "村人全員処刑";
           break;
       }
@@ -608,8 +597,7 @@ io.sockets.on('connection', socket => {
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
     let playerNum = room[roomId]["playerNum"];
-    console.log("days begins!!");
-    console.log(room[roomId]["currentPlayerNum"]);
+    
     io.to(roomId).emit("are_you_thief");
     io.to(roomId).emit("notice_day_started", playerNum);
   });
@@ -621,7 +609,6 @@ io.sockets.on('connection', socket => {
     
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
-    console.log(room[roomId]);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
