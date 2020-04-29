@@ -348,6 +348,7 @@ $(function(){
         // タイマーの秒数を設定
         console.log("days start!")
         let setCount = 5;
+        let sessionId = cookie["sessionId"];
         // 画面状態を昼に変更
         date();
         $('#votedCount').text(`投票数: 0 / ${playerNum}`)
@@ -364,7 +365,7 @@ $(function(){
             });
             // 人狼へ投票
             $(`#vote${id}`).on('click', () => {
-               socket.emit("vote_for_wolfman", id, getRoomId());
+               socket.emit("vote_for_wolfman", id, getRoomId(), sessionId );
             //   $(`#vote${id}`).off();
             })
         }
@@ -411,15 +412,17 @@ $(function(){
     socket.on("game_result", (result, details, flag, initialRoles, finalState) => {
         console.log(result);
         console.log(details);
+        console.log(finalState);
         $('#modalArea').fadeIn();
         $('#modalContents').empty();
         $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
+        $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#modalContents').append(`<div>開始時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="initialModalField"></div>`);
         for (var i = 0; i < initialRoles.length - 2; i++) {
             $('#initialModalField').append(`<div class="modalUserArea" id="initialModalUserArea${i}"></div>`)
             $(`#initialModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
-            $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
+            $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
         $('#modalContents').append(`<div>終了時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="finalModalField"></div>`);
@@ -427,6 +430,9 @@ $(function(){
             $('#finalModalField').append(`<div class="modalUserArea" id="finalModalUserArea${i}"></div>`)
             $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
             $(`#finalModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
+            $(`#finalModalUserArea${i}`).append('<div class="modalUserName">投票先</div>');
+            $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${finalState[finalState[i].voteTo].userName}</div>`);
+            
         }
         $('#modalContents').append(`<div>墓地</div>`);
         $('#modalContents').append(`<div class="field" id="cemetaryModalField"></div>`);
@@ -434,7 +440,7 @@ $(function(){
         $('#cemetaryModalField').append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
         
-        $('#modalContents').append(`<p id="details">${details}</p>`);
+        // $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });

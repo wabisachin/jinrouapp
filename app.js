@@ -619,10 +619,12 @@ io.sockets.on('connection', socket => {
   });
   
   // プレイヤーから投票先を受け取る
-  socket.on("vote_for_wolfman", (userNo, roomId) => {
+  socket.on("vote_for_wolfman", (userNo, roomId, sessionId) => {
     
     let playerNum = room[roomId]["currentPlayerNum"];
     
+    // 投票先を投票者に保存
+    room[roomId].players[sessionId]['voteTo'] = userNo
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
     // 投票数の変更を各プレイヤーに通知
