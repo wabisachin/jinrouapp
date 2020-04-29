@@ -448,7 +448,7 @@ $(function(){
         
         // masterユーザーの場合Replayボタンの設置
         if (flag == 1) {
-            $('#modalContents').append('<button id="replay">Replay?</button> ');
+            $('#modalContents').append('<button id="replay" type="button" class="btn btn-success">もう一度遊ぶ</button> ');
             $('#replay').on('click', () => {
                 socket.emit("request_replay", getRoomId());
             })
