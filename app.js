@@ -20,6 +20,9 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         morgan = require("morgan"),
         favicon = require('serve-favicon'),
         path = require('path');
+        
+        // room.jsにまとめられたルームページの実行ファイルを読み込み
+        // roomModule = require('./room.js');
         // redis = require("redis"), 
         // client = redis.createClient(6379, 'redis');
         // client = redis.createClient();
@@ -64,12 +67,15 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
       // トップページ ->アクセスしたときクライアントCookieにセッション保存
       app.get('/', function(req, res){
         setCookie("sessionId", req.session.id, res);
-        res.render('index');
+        res.render('index', {
+          alert_title: "", 
+          alert_message: ""
+        });
         console.log(`session: ${req.session.id}`);
 
       });
       
-      // roomページへリダイレクト
+      // 条件をパスすればroomページへリダイレクト
       app.post('/', function (req, res)  {
         
         let roomId = req.body.roomId;
@@ -77,52 +83,61 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
           
-          // fieldの初期化
-              let field = { 
-                  currentPlayerNum :0,
-                  currentVotedCount:0,
-                  playerNum : 0,
-                  villager : 0,
-                  wolfman : 0,
-                  fortune : 0,
-                  thief : 0,
-                  players : {},
-                }
-                
-          // console.log(req.session.id);
+          // もし同じ部屋番号のルームが既にある場合はTopPageへリダイレクト
+          if (checkRoomExisting(roomId)) {
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "そのルームは既に存在します！"
+              
+            });
+          }
           
-        field.playerNum = req.body.playerNum;
-        field.villager = req.body.villager;
-        field.wolfman = req.body.wolfman;
-        field.fortune = req.body.fortune;
-        field.thief = req.body.thief;
-        
-        userAdd(field, req.session.id,req.body.name);
-        
-        //新規room作成し、fieldを入れる
-        room[roomId] = field;
-        
-        res.redirect(`/${roomId}`);
-        // res.location('/${id}')
-        
-        
-        } else {
+          // 同じ部屋番号のルームがない場合は新規作成
+          else {
+            // fieldの初期化
+            let field = { 
+                currentPlayerNum :0,
+                currentVotedCount:0,
+                playerNum : 0,
+                villager : 0,
+                wolfman : 0,
+                fortune : 0,
+                thief : 0,
+                players : {},
+              }
+              
+            field.playerNum = req.body.playerNum;
+            field.villager = req.body.villager;
+            field.wolfman = req.body.wolfman;
+            field.fortune = req.body.fortune;
+            field.thief = req.body.thief;
+            
+            userAdd(field, req.session.id,req.body.name);
+            
+            //新規room作成し、fieldを入れる
+            room[roomId] = field;
+            
+            res.redirect(`/${roomId}`);
+          }
           
-          
-          //既存ルームに入室する場合
-
+        } 
+        //既存ルームに入室する場合
+        else {
           // 建てられてない部屋にアクセスした場合
           if (!checkRoomExisting(roomId)) {
-            res.redirect('/');
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "ルームが存在しませんでした。"
+              
+            });
           }
           // 入室
           else {
+            
             userAdd(room[req.body.roomId],req.session.id,req.body.name);
             res.redirect(`/${req.body.roomId}`);
           }
           
-          // userAdd(room[req.body.roomId],req.session.id,req.body.name);
-          // res.redirect(`/${req.body.roomId}`);
         }
       })
       
@@ -135,15 +150,25 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
 
         // sessionIdがないのにルームページにアクセスした場合
         if (getCookie("sessionId", req) == '') {
-          console.log("redirect!")
-          res.redirect('/');
+          // roomページへのアクセス権限がない場合の値は０
+          setCookie("accessRight", 0 , res);
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "入室フォームから入室して下さい"
+          });
         }
         // 建てられてない部屋にアクセスした場合
         else if (!checkRoomExisting(roomId)) {
-          res.redirect('/');
+          setCookie("accessRight", 0 , res);
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "ルームが存在しませんでした"
+          });
         }
         // 入室許可
         else {
+          // roomページへのアクセス権限がない場合の値は１
+          setCookie("accessRight", 1 , res);
           res.render('room', {
             roomId: req.params.room_id,
             field: room[req.params.room_id],
@@ -334,9 +359,7 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     room[room_id]["currentVotedCount"]++;
     for (let key in players) {
       if (players[key]["playerNo"] == selectedNo) {
-        console.log("votedCount");
         players[key]["votedCount"]++;
-        console.log(players[key]["votedCount"]);
       }
     }
   }
@@ -448,8 +471,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
     // 平和村の場合の処理
-    console.log("isOneVoted?");
-    console.log(isOneVoted(roomId));
     if (isPeaceVillage(roomId)) {
       switch (isOneVoted(roomId)) {
         // 村人全員勝利
@@ -460,9 +481,6 @@ playersの中の墓地フィールドの投票数もカウントしてたのが�
         // 村人全員敗北
         case false:
           result = setWinner(players, 1);
-          console.log("setWinner");
-          console.log(result);
-          
           result["details"] = "村人全員処刑";
           break;
       }
@@ -507,8 +525,8 @@ io.sockets.on('connection', socket => {
 
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
-     let flag =  room[roomId]["players"][sessionId]["master"];
-     socket.emit("master_or_not", flag);
+    let flag =  room[roomId]["players"][sessionId]["master"];
+    socket.emit("master_or_not", flag);
   })
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
@@ -567,7 +585,7 @@ io.sockets.on('connection', socket => {
   // 夜に怪盗に交換相手の役職を伝える
   socket.on("i_am_thief", (roomId, targetNo, thiefNo) => {
     let thiefResult = thiefBefore(roomId, targetNo, thiefNo);
-     socket.emit('thief_result', thiefResult);
+    socket.emit('thief_result', thiefResult);
   });
   
   // 昼になった時に怪盗が役職交換実行
@@ -579,8 +597,7 @@ io.sockets.on('connection', socket => {
   socket.on("day_begins", (roomId) => {
     // thiefがいたらthiefAfterの実行
     let playerNum = room[roomId]["playerNum"];
-    console.log("days begins!!");
-    console.log(room[roomId]["currentPlayerNum"]);
+    
     io.to(roomId).emit("are_you_thief");
     io.to(roomId).emit("notice_day_started", playerNum);
   });
@@ -592,7 +609,6 @@ io.sockets.on('connection', socket => {
     
     // 選択されたプレイヤーへ投票
     voteForPlayers(userNo, roomId);
-    console.log(room[roomId]);
     // 投票数の変更を各プレイヤーに通知
     io.to(roomId).emit("changeVotedCount", room[roomId]["currentVotedCount"], playerNum);
     // 投票後の追加投票を停止
@@ -603,6 +619,7 @@ io.sockets.on('connection', socket => {
     }
   });
   
+
   // 結果を各プレイヤーに送信
   socket.on("request_result", (roomId) => {
     // 勝敗の結果を返すためにsessionIdを要求

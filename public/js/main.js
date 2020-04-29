@@ -66,7 +66,7 @@ function showCemetry(playerNum) {
 function isRoomPage() {
     let page = location.pathname;
     let result = page.split('/');
-    return (result[1] != "") ? true :false;
+    return (result[1] != "") ? true : false;
 }
 
 // URLから部屋番号を抽出
@@ -110,12 +110,18 @@ function startTimer(time) {
 
 // Initialフェーズ画面表示
 function initial () {
-    $('.userArea').css('cursor', '');
     $('body').removeClass('date');
     $('body').removeClass('night');
     $('body').addClass('initial');
+    $('.userArea').css('cursor', '');
+    $('#toNight').removeClass("disabled");
     $('#toDate').addClass('disabled');
     $('#result').addClass('disabled');
+    $('#modalArea').fadeOut();
+    $('#restTime, #votedCount, .card').text("");
+    $('.vote').removeClass("hidden");
+    $('.votedPlayer').removeClass("hidden");
+    $('.attention').addClass('hidden');
 }
 // 夜フェーズ画面表示
 function night () {
@@ -128,17 +134,26 @@ function night () {
     $('#plate').addClass('nightPlate');
 }
 function date () {
-    $('.userArea, .cemetaryArea').off();
-    $('#toDate').addClass('disabled');
-    $('#toNight').addClass('disabled');
     $('body').css('background-color', 'none');
     $('body').removeClass('night');
     $('body').addClass('date');
+    $('.userArea, .cemetaryArea').off();
+    $('#toDate').addClass('disabled');
+    $('#toNight').addClass('disabled');
+    $('#restTime').removeClass('hidden');
+    $('#votedCount').removeClass('hidden');
     
         // ポインターイベントの変更処理
     $('.userArea').css('pointer-events', 'auto');
     $('.userArea').css('cursor', 'pointer');
     $('.userArea, .cemetaryArea').children('img').attr('src', './images/cards/card.png');
+    
+    // ホバー時の見た目変化
+    $('.userArea').hover(function() {
+        $(this).css('background',"darkgray");
+    }, function() {
+        $(this).css('background', '');
+    });
     
 }
 
@@ -174,16 +189,15 @@ var app = new Vue({
 $(function(){
 
     let socket = io.connect();
+    let cookie = getCookieArray();
+    let accessRight;
     
+    accessRight = cookie["accessRight"]
     
-    socket.emit("getId_from_client");
-    
-    console.log("cookieの表示")
-    console.log(document.cookie);
-    
-    // roomページに遷移した場合の処理
-    if (isRoomPage()) {
-        let cookie = getCookieArray();
+    // roomページへのアクセス権がある時だけ以下の処理
+    // if (isRoomPage()) {
+    if (isRoomPage() && accessRight == 1) {
+        // let cookie = getCookieArray();
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();
@@ -199,19 +213,16 @@ $(function(){
         // 夜へボタンを押した時
         $('#toNight').on('click', () => {
             $('#toNight').off();
-            // $('#toNight').addClass("limitted");
-            // $('#toDate').removeClass("limitted");
             // 昼へボタンのクリックアクションを有効化
             $('#toDate').on('click', () => {
                 $('#toDate').off();
-                // $('#toDate').addClass("limitted");
                 socket.emit("day_begins", roomId);
             })
         
             socket.emit('toNightClicked', roomId);
         });
     }
-    // master出ない場合、フェーズボタンを非表示
+    // masterではない場合、フェーズボタンを非表示
     socket.on("master_or_not", (flag) => {
         if (flag == 0) {
             // $('#toNight, #toDate, #result').addClass("hidden");
@@ -222,7 +233,6 @@ $(function(){
     // 新しいクライアント入室をトリガにページリロード
     socket.on('new_client_join', () => {
         window.location.reload();
-    //   location.reload();
     });
     
     // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
@@ -230,7 +240,6 @@ $(function(){
         let roomId = getRoomId();
         let cookie = getCookieArray();
         let sessionId = cookie["sessionId"];
-        // let sessionId = document.cookie.sessionId;
         
         // 状態を夜に変更
         night();
@@ -345,8 +354,6 @@ $(function(){
         let setCount = 5;
         // 画面状態を昼に変更
         date();
-        $('#restTime').removeClass('hidden');
-        $('#votedCount').removeClass('hidden');
         $('#votedCount').text(`投票数: 0 / ${playerNum}`)
         // タイマースタート
         startTimer(setCount);
@@ -366,20 +373,10 @@ $(function(){
             })
         }
         
-        // ホバー時の見た目変化
-        $('.userArea').hover(function() {
-            $(this).css('background',"darkgray");
-        }, function() {
-            $(this).css('background', '');
-            
-        });
-        
-        
     })
     
     // 追加投票の禁止
     socket.on("prohibit_voting", () => {
-        // $('.modalContents').html("<h1>既に投票済みです</h1>");
         $('.attention').removeClass('hidden');
         $('.votedPlayer').addClass("hidden");
         $('.vote').addClass("hidden");
@@ -445,6 +442,9 @@ $(function(){
         $('#closeModal , #modalBg').on('click', () => {
             $('#modalArea').fadeOut();
         });
+        $('#result').on('click', () => {
+            $('#modalArea').fadeIn();
+        })
         
         // masterユーザーの場合Replayボタンの設置
         if (flag == 1) {
@@ -457,16 +457,7 @@ $(function(){
     
     // 画面表示の初期化
     socket.on("initializeHTML", () => {
-        // 表示の初期化
-        $('#modalArea').fadeOut();
-        $('#restTime, #votedCount, .card').text("");
-        $('.vote').removeClass("hidden");
-        $('.votedPlayer').removeClass("hidden");
-        // $('#toNight').removeClass("limitted");
-        $('#toNight').removeClass("disabled");
-        $('.attention').addClass('hidden');
-        // $('#result').addClass("limitted");
-        $('#result').addClass("disabled");
+        
         // 画面をinitialに戻す
         initial();
         
@@ -476,14 +467,10 @@ $(function(){
         $('#toNight').on('click', () => {
             
             $('#toNight').off();
-            // $('#toNight').addClass("limitted");
             $('#toNight').addClass("disabled");
-            // $('#toDate').removeClass("limitted")
             $('#toDate').removeClass("disabled")
-            
             $('#toDate').on('click', () => {
                 $('#toDate').off();
-                // $('#toDate').addClass("limitted");
                 $('#toDate').addClass("disabled");
                 socket.emit("day_begins", getRoomId());
             })
