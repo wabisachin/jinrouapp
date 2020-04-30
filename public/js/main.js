@@ -112,7 +112,8 @@ function initial () {
     $('#toNight').removeClass("disabled");
     $('#toDate').addClass('disabled');
     $('#result').addClass('disabled');
-    $('#modalArea').fadeOut();
+    // $('#modalArea').fadeOut();
+    $('#modalArea').modal('hide');
     $('#restTime, #votedCount, .card').text("");
     $('.vote').removeClass("hidden");
     $('.votedPlayer').removeClass("hidden");
@@ -357,12 +358,14 @@ $(function(){
         // プレイヤー名クリックで投票者を選択
         for (let id = 0; id < playerNum; id++) {
             $(`#userArea${id}`).click(function(){
-                $(`#modalArea${id}`).fadeIn();
+                // $(`#modalArea${id}`).fadeIn();
+                $(`#modalArea${id}`).modal('toggle');
             });
             // modalの閉じるボタンクリック時
-            $(`#closeModal${id} , #modalBg${id}, #vote${id}`).click(function(){
-                $(`#modalArea${id}`).fadeOut();
-            });
+            // $(`#closeModal${id} , #modalBg${id}, #vote${id}`).click(function(){
+            //     // $(`#modalArea${id}`).fadeOut();
+            //     $(`#modalArea${id}`).modal('hide');
+            // });
             // 人狼へ投票
             $(`#vote${id}`).on('click', () => {
                socket.emit("vote_for_wolfman", id, getRoomId(), sessionId );
@@ -413,14 +416,16 @@ $(function(){
         console.log(result);
         console.log(details);
         console.log(finalState);
-        $('#modalArea').fadeIn();
+        // $('#modalArea').fadeIn();
+        $('#modalArea').modal('toggle');
         $('#modalContents').empty();
-        $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
+        // $('#modalContents').append(`<h1 id="gameResult">${result}</h1>`);
+        $('#modalTitle').text(result);
         $('#modalContents').append(`<p id="details">${details}</p>`);
         $('#modalContents').append(`<div>開始時のカード状態</div>`);
         $('#modalContents').append(`<div class="field" id="initialModalField"></div>`);
         for (var i = 0; i < initialRoles.length - 2; i++) {
-            $('#initialModalField').append(`<div class="modalUserArea" id="initialModalUserArea${i}"></div>`)
+            $('#initialModalField').append(`<div class="modalInitialUserArea" id="initialModalUserArea${i}"></div>`)
             $(`#initialModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
             $(`#initialModalUserArea${i}`).append(`<img src=./images/cards/${initialRoles[i]}.png class="modalCard"></img>`);
         }
@@ -441,11 +446,13 @@ $(function(){
         }
         
         // $('#modalContents').append(`<p id="details">${details}</p>`);
-        $('#closeModal , #modalBg').on('click', () => {
-            $('#modalArea').fadeOut();
-        });
+        // $('#closeModal , #modalBg').on('click', () => {
+        //     // $('#modalArea').fadeOut();
+        //     $('#modalArea').modal('hide');
+        // });
         $('#result').on('click', () => {
-            $('#modalArea').fadeIn();
+            // $('#modalArea').fadeIn();
+            $('#modalArea').modal('toggle');
         })
         
         // masterユーザーの場合Replayボタンの設置
