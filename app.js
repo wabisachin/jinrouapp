@@ -43,12 +43,14 @@
  
  ----------------------------------------------------------------------------*/
       // server.listen(8080, 'localhost');
-      server.listen('port', 'localhost');
+      const PORT = process.env.PORT || 5000
       
       //テンプレートはviewsフォルダに保存
       app.set('views', __dirname + '/views');
       app.set('view engine', 'ejs');
-      app.set('port', (process.env.PORT || 8080));
+      // app.set('port', (process.env.PORT || 8080));
+      
+      server.listen(PORT, 'localhost');
       
       //middleware
       // app.use(cookieParser())
