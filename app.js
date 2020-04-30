@@ -131,12 +131,10 @@
             res.render('index', {
               alert_title: "Error", 
               alert_message: "ルームが存在しませんでした。"
-              
             });
           }
           // 入室
           else {
-            
             userAdd(room[req.body.roomId],req.session.id,req.body.name);
             res.redirect(`/${req.body.roomId}`);
           }
@@ -151,9 +149,9 @@
         let sessionId =  getCookie("sessionId", req);
 
         // アクセス制限
+        
         // 建てられてない部屋にアクセスした場合
         if (!checkRoomExisting(roomId)) {
-          console.log("ルームがないのにアクセスしたよ")
           setCookie("accessRight", 0 , res);
           res.render('index', {
             alert_title: "Error", 
@@ -162,12 +160,7 @@
         }
         // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!verificateSessionId(sessionId, roomId, req)) {
-          // roomページへのアクセス権限がない場合の値は０
-          // console.log("verificate");
-          // console.log(verificateSessionId(sessionId, roomId, req))
-          // console.log(sessionId);
-          console.log("sessionIdないのにアクセスしたよ")
-          setCookie("accessRight", 0 , res);
+          setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい"
@@ -175,9 +168,7 @@
         }
         // 入室許可
         else {
-          console.log("アクセスを許可したよ")
-          // roomページへのアクセス権限がない場合の値は１
-          setCookie("accessRight", 1 , res);
+          setCookie("accessRight", 1 , res); // roomページへのアクセス権限がない場合の値は１
           res.render('room', {
             roomId: req.params.room_id,
             field: room[req.params.room_id],
@@ -545,10 +536,15 @@ io.sockets.on('connection', socket => {
 
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
-    console.log("ok");
+    console.log("----room----")
     console.log(room);
-    let flag =  room[roomId]["players"][sessionId]["master"];
-    socket.emit("master_or_not", flag);
+    
+    let currentPlayerNum = room[roomId]["currentPlayerNum"];
+    let playerNum =  room[roomId]["playerNum"];
+    let startFlag = currentPlayerNum == playerNum ? 1 : 0; //プレイヤー人数が揃ったかどうか
+    let masterFlag =  room[roomId]["players"][sessionId]["master"]; //入室プレイヤーがmasterかどうか
+    
+    socket.emit("master_or_not", startFlag, masterFlag);
   })
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
@@ -588,7 +584,6 @@ io.sockets.on('connection', socket => {
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す
   socket.on("request_role", (roomId, sessionId) => {
     socket.emit('give_role', room[roomId].players[sessionId]);
-  
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });

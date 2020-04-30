@@ -193,8 +193,6 @@ $(function(){
     // roomページへのアクセス権がある時だけ以下の処理
     // if (isRoomPage()) {
     if (isRoomPage() && accessRight == 1) {
-        // let cookie = getCookieArray();
-        console.log("ok");
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();
@@ -207,23 +205,38 @@ $(function(){
             sessionId: sessionId
         });
         
-        // 夜へボタンを押した時
-        $('#toNight').on('click', () => {
-            $('#toNight').off();
-            // 昼へボタンのクリックアクションを有効化
-            $('#toDate').on('click', () => {
-                $('#toDate').off();
-                socket.emit("day_begins", roomId);
-            })
+        // // 夜へボタンを押した時
+        // $('#toNight').on('click', () => {
+        //     $('#toNight').off();
+        //     // 昼へボタンのクリックアクションを有効化
+        //     $('#toDate').on('click', () => {
+        //         $('#toDate').off();
+        //         socket.emit("day_begins", roomId);
+        //     })
         
-            socket.emit('toNightClicked', roomId);
-        });
+        //     socket.emit('toNightClicked', roomId);
+        // });
     }
     // masterではない場合、フェーズボタンを非表示
-    socket.on("master_or_not", (flag) => {
-        if (flag == 0) {
+    socket.on("master_or_not", (startFlag, masterFlag) => {
+        
+        let roomId = getRoomId();
+        if (masterFlag == 0) {
             // $('#toNight, #toDate, #result').addClass("hidden");
             $('.operation').addClass("hidden");
+        }
+        else if (startFlag ==  1 && masterFlag ==  1 ) {
+            // プレイ人数が上限に達したら夜へボタンを有効か
+            $('#toNight').on('click', () => {
+                $('#toNight').off();
+                // 昼へボタンのクリックアクションを有効化
+                $('#toDate').on('click', () => {
+                    $('#toDate').off();
+                    socket.emit("day_begins", roomId);
+                })
+            
+                socket.emit('toNightClicked', roomId);
+            });
         }
     });
 
