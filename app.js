@@ -83,7 +83,6 @@
       app.post('/', function (req, res)  {
         setCookie("sessionId", req.session.id, res);
         let roomId = req.body.roomId;
-
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
           
@@ -133,6 +132,15 @@
               alert_message: "ルームが存在しませんでした。"
             });
           }
+          
+          // 参加枠に空きがなかった場合
+          else if (!canIRoomIn(roomId, "post")) {
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "参加人数が上限に達しました。"
+            });
+          }
+          
           // 入室
           else {
             userAdd(room[req.body.roomId],req.session.id,req.body.name);
@@ -164,6 +172,13 @@
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい"
+          });
+        }
+        // 参加枠に空きがなかった場合
+        else if (!canIRoomIn(roomId, "get")) {
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "参加人数が上限に達しました。"
           });
         }
         // 入室許可
@@ -277,6 +292,14 @@
       }
     }
     return false;
+  }
+  
+  // ルームの参加人数に空きがあるかどうか
+  function canIRoomIn(roomId, HTTP_method) {
+    let num = (HTTP_method == "get") ? 1 : 0;
+    let currentPlayerNum =  room[roomId]["currentPlayerNum"];
+    let playerNum =  room[roomId]["playerNum"];
+    return (currentPlayerNum >= playerNum + num) ? false : true;
   }
 
 
