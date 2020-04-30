@@ -223,11 +223,7 @@
       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz",
       "version": "1.1.1"
     },
-    "ejs": {
-      "integrity": "sha512-IncmUpn1yN84hy2shb0POJ80FWrfGNY0cxO9f4v+/sG7qcBvAtVWUA1IdzY/8EYUmOVhoKJVdJjNd3AZcnxOjA==",
-      "resolved": "https://registry.npmjs.org/ejs/-/ejs-3.0.2.tgz",
-      "version": "3.0.2"
-    },
+    "ejs": "^3.1.2",
     "encodeurl": {
       "integrity": "sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=",
       "resolved": "https://registry.npmjs.org/encodeurl/-/encodeurl-1.0.2.tgz",
