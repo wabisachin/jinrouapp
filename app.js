@@ -15,10 +15,11 @@
         server = require("http").Server(app),
         io  =   require('socket.io')(server),
         session = require("express-session"),
-        cookieParser = require('cookie-parser'),
         morgan = require("morgan"),
         favicon = require('serve-favicon'),
         path = require('path');
+        
+        // cookieParser = require('cookie-parser'),
         
         // room.jsにまとめられたルームページの実行ファイルを読み込み
         // roomModule = require('./room.js');
@@ -41,14 +42,16 @@
                   Expressの設定
  
  ----------------------------------------------------------------------------*/
-      server.listen(8080, 'localhost');
+      // server.listen(8080, 'localhost');
+      server.listen('port', 'localhost');
       
       //テンプレートはviewsフォルダに保存
       app.set('views', __dirname + '/views');
       app.set('view engine', 'ejs');
+      app.set('port', (process.env.PORT || 8080));
       
       //middleware
-      app.use(cookieParser())
+      // app.use(cookieParser())
       app.use(express.json());
       app.use(morgan('dev'));
       app.use(favicon(path.join(__dirname, 'public', './images/favicon.ico')));
