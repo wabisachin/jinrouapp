@@ -221,6 +221,7 @@ $(function(){
     socket.on("master_or_not", (startFlag, masterFlag) => {
         
         let roomId = getRoomId();
+        
         if (masterFlag == 0) {
             // $('#toNight, #toDate, #result').addClass("hidden");
             $('.operation').addClass("hidden");
