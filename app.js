@@ -50,7 +50,8 @@
       app.set('view engine', 'ejs');
       // app.set('port', (process.env.PORT || 8080));
       
-      server.listen(PORT, 'localhost');
+      // server.listen(PORT, 'localhost');
+      server.listen(PORT);
       
       //middleware
       // app.use(cookieParser())
