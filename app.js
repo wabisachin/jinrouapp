@@ -35,6 +35,7 @@
     // roomには
     
     let room = {}
+
  
 
  /*----------------------------------------------------------------------------
@@ -74,15 +75,16 @@
       app.get('/', function(req, res){
         setCookie("sessionId", req.session.id, res);
         // indexに現在存在するルーム一覧とmasterを取得
-        let rooms = Object.keys(room);
-        let masters = {};
-        rooms.forEach(roomId => {
-          let roomInfo = {}
-          roomInfo['masterName'] = Object.values(room[roomId].players)[0].userName;
-          roomInfo['playerNum'] = room[roomId].playerNum;
-          roomInfo['currentPlayerNum'] = room[roomId].currentPlayerNum;
-          masters[roomId] = roomInfo;
-        });
+        let masters = setMasterInfo();
+        // let rooms = Object.keys(room);
+        // let masters = {};
+        // rooms.forEach(roomId => {
+        //   let roomInfo = {}
+        //   roomInfo['masterName'] = Object.values(room[roomId].players)[0].userName;
+        //   roomInfo['playerNum'] = room[roomId].playerNum;
+        //   roomInfo['currentPlayerNum'] = room[roomId].currentPlayerNum;
+        //   masters[roomId] = roomInfo;
+        // });
         res.render('index', {
           alert_title: "", 
           alert_message: "",
@@ -93,6 +95,7 @@
       // 条件をパスすればroomページへリダイレクト
       app.post('/', function (req, res)  {
         setCookie("sessionId", req.session.id, res);
+        let masters = setMasterInfo();
         let roomId = req.body.roomId;
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
@@ -101,7 +104,8 @@
           if (checkRoomExisting(roomId)) {
             res.render('index', {
               alert_title: "Error", 
-              alert_message: "そのルームは既に存在します！"
+              alert_message: "そのルームは既に存在します！",
+              masters: masters
               
             });
           }
@@ -140,7 +144,8 @@
           if (!checkRoomExisting(roomId)) {
             res.render('index', {
               alert_title: "Error", 
-              alert_message: "ルームが存在しませんでした。"
+              alert_message: "ルームが存在しませんでした。",
+              masters: masters
             });
           }
           
@@ -148,7 +153,8 @@
           else if (!canIRoomIn(roomId, "post")) {
             res.render('index', {
               alert_title: "Error", 
-              alert_message: "参加人数が上限に達しました。"
+              alert_message: "参加人数が上限に達しました。",
+              masters: masters
             });
           }
           
@@ -559,6 +565,20 @@
       players[id]["userRole"] = "";
       players[id]["votedCount"] = 0;
     }
+  }
+  
+  function setMasterInfo(){
+        let rooms = Object.keys(room);
+        let masters = {};
+          
+          rooms.forEach(roomId => {
+          let roomInfo = {}
+          roomInfo['masterName'] = Object.values(room[roomId].players)[0].userName;
+          roomInfo['playerNum'] = room[roomId].playerNum;
+          roomInfo['currentPlayerNum'] = room[roomId].currentPlayerNum;
+          masters[roomId] = roomInfo;
+        });
+        return masters;
   }
  /*----------------------------------------------------------------------------
  
