@@ -15,10 +15,11 @@
         server = require("http").Server(app),
         io  =   require('socket.io')(server),
         session = require("express-session"),
-        cookieParser = require('cookie-parser'),
         morgan = require("morgan"),
         favicon = require('serve-favicon'),
         path = require('path');
+        
+        // cookieParser = require('cookie-parser'),
         
         // room.jsにまとめられたルームページの実行ファイルを読み込み
         // roomModule = require('./room.js');
@@ -41,14 +42,19 @@
                   Expressの設定
  
  ----------------------------------------------------------------------------*/
-      server.listen(8080, 'localhost');
+      // server.listen(8080, 'localhost');
+      const PORT = process.env.PORT || 5000
       
       //テンプレートはviewsフォルダに保存
       app.set('views', __dirname + '/views');
       app.set('view engine', 'ejs');
+      // app.set('port', (process.env.PORT || 8080));
+      
+      // server.listen(PORT, 'localhost');
+      server.listen(PORT);
       
       //middleware
-      app.use(cookieParser())
+      // app.use(cookieParser())
       app.use(express.json());
       app.use(morgan('dev'));
       app.use(favicon(path.join(__dirname, 'public', './images/favicon.ico')));
@@ -85,7 +91,6 @@
       app.post('/', function (req, res)  {
         setCookie("sessionId", req.session.id, res);
         let roomId = req.body.roomId;
-
         //部屋作成の場合
         if(req.body.makeRoom === 'true'){
           
@@ -133,12 +138,19 @@
             res.render('index', {
               alert_title: "Error", 
               alert_message: "ルームが存在しませんでした。"
-              
             });
           }
+          
+          // 参加枠に空きがなかった場合
+          else if (!canIRoomIn(roomId, "post")) {
+            res.render('index', {
+              alert_title: "Error", 
+              alert_message: "参加人数が上限に達しました。"
+            });
+          }
+          
           // 入室
           else {
-            
             userAdd(room[req.body.roomId],req.session.id,req.body.name);
             res.redirect(`/${req.body.roomId}`);
           }
@@ -153,9 +165,9 @@
         let sessionId =  getCookie("sessionId", req);
 
         // アクセス制限
+        
         // 建てられてない部屋にアクセスした場合
         if (!checkRoomExisting(roomId)) {
-          console.log("ルームがないのにアクセスしたよ")
           setCookie("accessRight", 0 , res);
           res.render('index', {
             alert_title: "Error", 
@@ -164,22 +176,22 @@
         }
         // ルー��内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!verificateSessionId(sessionId, roomId, req)) {
-          // roomページへのアクセス権限がない場合の値は０
-          // console.log("verificate");
-          // console.log(verificateSessionId(sessionId, roomId, req))
-          // console.log(sessionId);
-          console.log("sessionIdないのにアクセスしたよ")
-          setCookie("accessRight", 0 , res);
+          setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい"
           });
         }
+        // 参加枠に空きがなかった場合
+        else if (!canIRoomIn(roomId, "get")) {
+          res.render('index', {
+            alert_title: "Error", 
+            alert_message: "参加人数が上限に達しました。"
+          });
+        }
         // 入室許可
         else {
-          console.log("アクセスを許可したよ")
-          // roomページへのアクセス権限がない場合の値は１
-          setCookie("accessRight", 1 , res);
+          setCookie("accessRight", 1 , res); // roomページへのアクセス権限がない場合の値は１
           res.render('room', {
             roomId: req.params.room_id,
             field: room[req.params.room_id],
@@ -288,6 +300,14 @@
       }
     }
     return false;
+  }
+  
+  // ルームの参加人数に空きがあるかどうか
+  function canIRoomIn(roomId, HTTP_method) {
+    let num = (HTTP_method == "get") ? 1 : 0;
+    let currentPlayerNum =  room[roomId]["currentPlayerNum"];
+    let playerNum =  room[roomId]["playerNum"];
+    return (currentPlayerNum >= playerNum + num) ? false : true;
   }
 
 
@@ -547,10 +567,15 @@ io.sockets.on('connection', socket => {
 
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
-    console.log("ok");
+    console.log("----room----")
     console.log(room);
-    let flag =  room[roomId]["players"][sessionId]["master"];
-    socket.emit("master_or_not", flag);
+    
+    let currentPlayerNum = room[roomId]["currentPlayerNum"];
+    let playerNum =  room[roomId]["playerNum"];
+    let startFlag = currentPlayerNum == playerNum ? 1 : 0; //プレイヤー人数が揃ったかどうか
+    let masterFlag =  room[roomId]["players"][sessionId]["master"]; //入室プレイヤーがmasterかどうか
+    
+    socket.emit("master_or_not", startFlag, masterFlag);
   })
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
@@ -590,7 +615,6 @@ io.sockets.on('connection', socket => {
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す
   socket.on("request_role", (roomId, sessionId) => {
     socket.emit('give_role', room[roomId].players[sessionId]);
-  
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });
