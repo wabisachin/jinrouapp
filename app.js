@@ -301,6 +301,11 @@
     let playerNum =  room[roomId]["playerNum"];
     return (currentPlayerNum >= playerNum + num) ? false : true;
   }
+  
+  // ルームの解散
+  function dissolveRoom(roomId) {
+    
+  }
 
 
   // カードをシャッフルする。
@@ -602,6 +607,13 @@ io.sockets.on('connection', socket => {
     else {
       players[sessionId]["flag"] = 0
     }
+  })
+  
+  // 接続が切れた時
+  socket.on("disconnect", (reason) => {
+    console.log(reason);
+    console.log(socket.id);
+    // socket.connect();
   })
   
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す
