@@ -88,8 +88,12 @@ function getCookieArray(){
 
 // タイマーをスタートし、残り時間を表示。
 function startTimer(time) {
+    let resetFlag = 0;
     let countDown = function() {
-        
+        // タイマーを停止して関数から抜ける処理
+        if (resetFlag == 1) {
+            return false;
+        }
         $('#restTime').text(`Time: ${Math.floor(time/60)}分${time%60}秒`);
         time--;
         var id = setTimeout(countDown, 1000);
@@ -101,6 +105,10 @@ function startTimer(time) {
         }
     }
     countDown();
+    // 結果発表時にタイマーの停止
+    $('.vote').on('click', () =>  {
+        resetFlag = 1;
+    })
 }
 
 // Initialフェーズ画面表示
