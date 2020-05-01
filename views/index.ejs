@@ -10,7 +10,7 @@
 
     <body>
       
-    <!--<div class="container">-->
+    
       <% if (alert_message) { %>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <strong><%= alert_title %></strong>　<%= alert_message %>
@@ -24,180 +24,188 @@
       
       <div class="topImage"></div>
       <div class="plate">
-
-        <h2>部屋作成</h2>
-        <form id="settings" action="/" method="post">
-            <input type="hidden" name="makeRoom" value="true"> 
-          
-            <div class="form-group">
-              <div class="form-row align-items-center">
-                <div class="col-auto">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="playerNum">プレイ人数</span>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-6">
+                  <h2>部屋作成</h2>
+                  <form id="settings" action="/" method="post">
+                      <input type="hidden" name="makeRoom" value="true"> 
+                    
+                      <div class="form-group">
+                        <div class="form-row align-items-center">
+                          <div class="col-auto">
+                            <div class="input-group">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" id="playerNum">プレイ人数</span>
+                              </div>
+                              <select class="form-control" v-model.number = "playerNum" name="playerNum" aria-describedby="playerNum">
+                                  <!--<option value="1">1</option>-->
+                                  <!--<option value="2">2</option>-->
+                                  <option value="3">3</option>
+                                  <option value="4">4</option>
+                                  <option value="5">5</option>
+                                  <option value="6">6</option>
+                              </select>
+              					    </div>
+              				    </div>
+              			    </div>
+              		    </div>
+                    
+                    <div class="form-row align-items-center">
+                      <div class="col-auto">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="villager">村人</span>
+                          </div>
+                          <select class="form-control" v-model.number="villager" name="villager" aria-describedby="villager">
+                              <!--<option value="0">0</option>-->
+                              <option value="1">1</option>
+                              <option value="2">2</option>    
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                          </select>
+                        </div>
+                      </div>
+                    
+                      <div class="col-auto">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="wolfman">人狼</span>
+                          </div>
+                          
+                          <select class="form-control" id="wolfman" v-model.number="wolfman" name="wolfman" aria-describedby="wolfman">
+                            <!--<option value="0">0</option>-->
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                          </select>
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-auto">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="fortune">占い師</span>
+                          </div>
+                          
+                          <select class="form-control" v-model.number="fortune" name="fortune" aria-describedby="fortne">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                          </select>
+                          
+                        </div>
+                      </div>
+                      
+                       <div class="col-auto">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="thief">怪盗</span>
+                          </div>
+                          
+                          <select class="form-control" v-model.number="thief" name="thief" aria-describedby="thief">
+                              <option value="0">0</option>
+                              <option value="1">1</option>
+                              <!--<option value="2">2</option>-->
+                              <!--<option value="3">3</option>-->
+                          </select>
+                        </div>
+                      </div>
                     </div>
-                    <select class="form-control" v-model.number = "playerNum" name="playerNum" aria-describedby="playerNum">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-    					    </div>
-    				    </div>
-    			    </div>
-    		    </div>
+                    
+                    <label>現在の合計枚数: {{total}}</label>
+                    
+                    <div class="form-group">
+                      <div class="form-row align-items-center">
+                        <div class="col-auto">
+                          <div class="input-group">
+                            <div class="input-group-prepend" id="playerName">
+                              <span class="input-group-text">プレイヤー名</span>
+                            </div>
+                            <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <div class="form-row align-items-center">
+                      <div class="col-auto">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend" id="roomId">
+                          <span class="input-group-text">ルーム番号</span>
+                        </div>
+                                        <input class="form-control" type="number" min="1" name="roomId" required pattern="^[0-9]+$">
           
-          <div class="form-row align-items-center">
-            <div class="col-auto">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="villager">村人</span>
-                </div>
-                <select class="form-control" v-model.number="villager" name="villager" aria-describedby="villager">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>    
-                    <option value="3">3</option>
-                </select>
-              </div>
-            </div>
+                      
+                        
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <input class="btn btn-primary" v-if="total == playerNum + 2" type="submit" value="ルーム作成" >
+                    <div v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</div>
+                    </div>
+                      
+                  </form>
+                  
+                  <h2>入室</h2>
+                      <form id="enter" action="/" method="post">
+                           <input type="hidden" name="makeRoom" value="false"> 
+                           
+                        
+                                  <div class="form-group">
+                      <div class="form-row align-items-center">
+                        <div class="col-auto">
+                      <div class="input-group">
+                        <div class="input-group-prepend" id="playerName">
+                          <span class="input-group-text">プレイヤー名</span>
+                        </div>
+                      <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内" required >
+                          </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="form-row align-items-center">
+                        <div class="col-auto">
+                      <div class="input-group">
+                        <div class="input-group-prepend" id="roomId">
+                          <span class="input-group-text">ルーム番号</span>
+                        </div>
+                      <input  class="form-control" type="number" min="1" name="roomId" aria-describedby="roomId" required pattern="^[0-9]+$">
+                          </div>
+                        </div>
+                    </div>
+                    </div>
+                           <input type="submit" value="入室" class="btn btn-primary mb-3">
+                      </form>
           
-            <div class="col-auto">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="wolfman">人狼</span>
-                </div>
-                
-                <select class="form-control" id="wolfman" v-model.number="wolfman" name="wolfman" aria-describedby="wolfman">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-                
-              </div>
-            </div>
-          
-            <div class="col-auto">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="fortune">占い師</span>
-                </div>
-                
-                <select class="form-control" v-model.number="fortune" name="fortune" aria-describedby="fortne">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-                
-              </div>
-            </div>
-            
-             <div class="col-auto">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="thief">怪盗</span>
-                </div>
-                
-                <select class="form-control" v-model.number="thief" name="thief" aria-describedby="thief">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                </select>
-              </div>
-            </div>
           </div>
           
-          <label>現在の合計枚数: {{total}}</label>
-          
-          <div class="form-group">
-            <div class="form-row align-items-center">
-              <div class="col-auto">
-                <div class="input-group">
-                  <div class="input-group-prepend" id="playerName">
-                    <span class="input-group-text">プレイヤー名</span>
-                  </div>
-                  <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内" required>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <div class="form-row align-items-center">
-            <div class="col-auto">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend" id="roomId">
-                <span class="input-group-text">ルーム番号</span>
-              </div>
-                              <input class="form-control" type="number" min="1" name="roomId" required pattern="^[0-9]+$">
-
-            
-              
-              </div>
-              
-            </div>
-          </div>
-          <input class="btn btn-primary" v-if="total == playerNum + 2" type="submit" value="ルーム作成" >
-          <div v-else>カードの合計枚数がプレイ人数+2になるように設定してください。</div>
-          </div>
-            
-        </form>
-        
-        <h2>入室</h2>
-            <form id="enter" action="/" method="post">
-                 <input type="hidden" name="makeRoom" value="false"> 
-                 
-              
-                        <div class="form-group">
-            <div class="form-row align-items-center">
-              <div class="col-auto">
-            <div class="input-group">
-              <div class="input-group-prepend" id="playerName">
-                <span class="input-group-text">プレイヤー名</span>
-              </div>
-            <input  class="form-control" type="text" name="name" aria-describedby="playerName" maxlength="8" placeholder="8文字以内" required >
-                </div>
-              </div>
-          </div>
-          </div>
-          <div class="form-group">
-            <div class="form-row align-items-center">
-              <div class="col-auto">
-            <div class="input-group">
-              <div class="input-group-prepend" id="roomId">
-                <span class="input-group-text">ルーム番号</span>
-              </div>
-            <input  class="form-control" type="number" min="1" name="roomId" aria-describedby="roomId" required pattern="^[0-9]+$">
-                </div>
-              </div>
-          </div>
-          </div>
-                 <input type="submit" value="入室" class="btn btn-primary mb-3">
-            </form>
-
-        <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">部屋番号</th>
-                <th scope="col">Master</th>
-              </tr>
-            </thead>
-            <% if (!(masters == {})) { %> 
-            <% Object.keys(masters).forEach( (roomId) => { %>
-            <tbody>
-              <tr>
-                <th scope="row"><%= roomId %></th>
-                <td><%=masters[roomId]%></td>
-              </tr>
-            </tbody>
-            <% }) %>
-            <% } %>
-        </table>
+          <div class="col-lg-6">
+            <h2>部屋一覧</h2>
+                <table class="table table-striped table-dark small">
+                    <thead>
+                      <tr>
+                        <th scope="col">部屋番号</th>
+                        <th scope="col">Master</th>
+                        <th scope="col">プレイ人数</th>
+                        <th scope="col">入室済</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <% Object.keys(masters).forEach( (roomId) => { %>
+                      <tr>
+                        <th scope="row"><%= roomId %></th>
+                        <td><%=masters[roomId].masterName%></td>
+                        <td><%=masters[roomId].playerNum%></td>
+                        <td><%=masters[roomId].currentPlayerNum%></td>
+                      </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+        </div>
 
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -205,7 +213,9 @@
             <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
             <script src="/socket.io/socket.io.js"></script>
             <script src="js/main.js"></script>
-
+            
+              </div>
+            </div>
           </div>
           
           <!--</div>-->

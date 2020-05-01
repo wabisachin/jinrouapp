@@ -88,9 +88,13 @@ function getCookieArray(){
 
 // タイマーをスタートし、残り時間を表示。
 function startTimer(time) {
+    let resetFlag = 0;
     let countDown = function() {
-        
-        $('#restTime').text(`Time: ${Math.round(time/60)}分${time%60}秒`);
+        // タイマーを停止して関数から抜ける処理
+        if (resetFlag == 1) {
+            return false;
+        }
+        $('#restTime').text(`Time: ${Math.floor(time/60)}分${time%60}秒`);
         time--;
         var id = setTimeout(countDown, 1000);
         if (time < 0) {
@@ -101,6 +105,10 @@ function startTimer(time) {
         }
     }
     countDown();
+    // 結果発表時にタイマーの停止
+    $('.vote').on('click', () =>  {
+        resetFlag = 1;
+    })
 }
 
 // Initialフェーズ画面表示
@@ -162,10 +170,11 @@ function date () {
 var app = new Vue({
   el: '#settings',
   data: { 
+    //   役職の初期値設定
     playerNum: 3,
-    villager: 2,
+    villager: 1,
     wolfman: 2,
-    thief: 0,
+    thief: 1,
     fortune: 1,
 },
   computed: {
@@ -369,7 +378,7 @@ $(function(){
     socket.on("notice_day_started", (playerNum) => {
         // タイマーの秒数を設定
         console.log("days start!")
-        let setCount = 5;
+        let setCount = 300;
         let sessionId = cookie["sessionId"];
         // 画面状態を昼に変更
         date();
