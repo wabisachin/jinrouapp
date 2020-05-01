@@ -93,6 +93,13 @@
           masters: masters
           })
         }
+        else if (req.query.reason == "dissolved") {
+          res.render('index', {
+          alert_title: "Notice", 
+          alert_message: "roomが解散されました",
+          masters: masters
+          })
+        }
         else {
           res.render('index', {
           alert_title: "", 
@@ -719,12 +726,18 @@ io.sockets.on('connection', socket => {
       //サーバー仕様による切断でない場合、ルームに参加している他プレイヤー全員をトップページに戻す
       if (room[roomId]["dissolvedFlag"] == 0) {
         // ルームの解散
-        io.to(roomId).emit("dissolved_room!", playerName);
+        io.to(roomId).emit("playerLeaving!", playerName);
         // 切断ユーザーが参加していたルームをDBから削除
         delete room[roomId];
       }
     })
     console.log("-----END-----")
+  })
+  
+  socket.on("quitGame", (roomId) => {
+    io.to(roomId).emit("room_dissolved!");
+    // 切断ユーザーが参加していたルームをDBから削除
+    delete room[roomId];
   })
   
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す

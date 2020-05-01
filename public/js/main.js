@@ -255,11 +255,18 @@ $(function(){
         window.location.reload();
     });
     
-    // ルームが解散された時
-    socket.on('dissolved_room!', (name) => {
+    // プレイヤーがゲームを退出した時
+    socket.on('playerLeaving!', (name) => {
         console.log("dissolved!")
         // クエリパラメータにページ遷移理由を記載(alert表示で利用)
         window.location.replace(`/?reason=leaving&name=${name}`);
+    })
+    
+    // masterによってルームが解散された時
+    socket.on('room_dissolved!', (name) => {
+        console.log("dissolved!")
+        // クエリパラメータにページ遷移理由を記載(alert表示で利用)
+        window.location.replace(`/?reason=dissolved`);
     })
     
     // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
@@ -488,8 +495,13 @@ $(function(){
         // masterユーザーの場合Replayボタンの設置
         if (flag == 1) {
             $('#modalContents').append('<button id="replay" type="button" class="btn btn-success">もう一度遊ぶ</button> ');
+            $('#modalContents').append('<button id="quit" type="button" class="btn btn-success">ゲームを終了</button> ');
             $('#replay').on('click', () => {
                 socket.emit("request_replay", getRoomId());
+            })
+            
+            $('#quit').on('click', () => {
+                socket.emit("quitGame", getRoomId());
             })
         }
     })
