@@ -179,6 +179,25 @@
           </div>
                  <input type="submit" value="入室" class="btn btn-primary mb-3">
             </form>
+            
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">部屋番号</th>
+                <th scope="col">Master</th>
+              </tr>
+            </thead>
+            <% if (!(masters == {})) { %> 
+            <% Object.keys(masters).forEach( (roomId) => { %>
+            <tbody>
+              <tr>
+                <th scope="row"><%= roomId %></th>
+                <td><%=masters[roomId]%></td>
+              </tr>
+            </tbody>
+            <% }) %>
+            <% } %>
+        </table>
 
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

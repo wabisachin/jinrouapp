@@ -246,6 +246,12 @@ $(function(){
         window.location.reload();
     });
     
+    // ルームが解散された時
+    socket.on('dissolved_room!', () => {
+        console.log("dissolved!")
+        window.location.replace("/");
+    })
+    
     // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
     socket.on('roles_asigned', ()=> {
         let roomId = getRoomId();

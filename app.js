@@ -73,9 +73,17 @@
       // トップページ ->アクセスしたときクライアントCookieにセッション保存
       app.get('/', function(req, res){
         setCookie("sessionId", req.session.id, res);
+        // indexに現在存在するルーム一覧とmasterを取得
+        let rooms = Object.keys(room);
+        let masters = {};
+        rooms.forEach(roomId => {
+          masters[roomId] = Object.values(room[roomId].players)[0].userName; 
+        });
+        console.log(masters);
         res.render('index', {
           alert_title: "", 
-          alert_message: ""
+          alert_message: "",
+          masters: masters
         });
       });
       
@@ -98,6 +106,13 @@
           // 同じ部屋番号のルームがない場合は新規作成
           else {
             // fieldの初期化
+            /* -------------------------補則------------------------------------
+            dissolvedFlag追加について。新しいプレイヤーが入室した時にページをリロードするが、
+            その時にsocketの接続が一度切れてしまう。接続が切れるとユーザーをトップページに帰してしまう仕様の為,
+            (※詳しくはapp,js内のsocket.on("disconnect")のコードを参照）
+            そのsocketの切断が実装の中で生じる切断or単純にクライアント側による切断かを
+            判別するFlagを追加する必要があった
+            -------------------------------------------------------------------*/
             let field = { 
                 currentPlayerNum :0,
                 currentVotedCount:0,
@@ -106,6 +121,7 @@
                 wolfman : 0,
                 fortune : 0,
                 thief : 0,
+                dissolvedFlag: 0, 
                 players : {},
               }
               
@@ -166,7 +182,7 @@
             alert_message: "ルームが存在しませんでした"
           });
         }
-        // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
+        // ルー��内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!verificateSessionId(sessionId, roomId, req)) {
           setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
           res.render('index', {
@@ -219,6 +235,7 @@
             userName: userName,
             userRole: "",
             master: 0,
+            socketId: "",
             votedCount: 0,
             flag: 0, //直近の更新が手動or自動リロードかを判別するフラグ
           };
@@ -236,7 +253,7 @@
             userRole: "",
             master: 0,
             votedCount: 0,
-            flag: 0, //直近の更新が手動or自動リロードかを判別するフラグ
+            flag: 0, //直近の更新が手動or自動��ロードかを判別するフラグ
           };
           
           //墓地ユーザ追加
@@ -305,6 +322,22 @@
   // ルームの解散
   function dissolveRoom(roomId) {
     
+  }
+  
+  // 切断ユーザーの検知
+  function disconnectedPlayer(socketId) {
+    let rooms = [];
+    let sessionId;
+    
+    for (let roomId in room) {
+      for (let session in room[roomId]["players"]) {
+        if ( room[roomId]["players"][session]["socketId"] == socketId) {
+          rooms.push(roomId);
+          sessionId = session;
+        }
+      }
+    }
+    return {rooms: rooms, sessionId: sessionId}
   }
 
 
@@ -566,6 +599,7 @@ io.sockets.on('connection', socket => {
   socket.on("i_am_master?", (roomId, sessionId) => {
     console.log("----room----")
     console.log(room);
+    console.log(room[roomId]["players"]);
     
     let currentPlayerNum = room[roomId]["currentPlayerNum"];
     let playerNum =  room[roomId]["playerNum"];
@@ -577,6 +611,9 @@ io.sockets.on('connection', socket => {
   
   // toNightボタンがクリックされたらカードシャッフルして役職割当、完了したら通知
   socket.on('toNightClicked', (roomId) => {
+    // フラグの初期化
+    room[roomId]["dissolvedFlag"] = 0;
+    
     // io.to(roomId).emit('roles_from_server', roleAsign(room[roomId],randomRole(room[roomId])));
     roleAsign(room[roomId],randomRole(room[roomId]));
     io.to(roomId).emit('roles_asigned');
@@ -599,8 +636,13 @@ io.sockets.on('connection', socket => {
     let myFlag = players[sessionId]["flag"];
     
     socket.join(data.roomId);
+    // 現在のsocketIdをデータベースに登録
+    room[roomId]["players"][sessionId]["socketId"] = socket.id;
     // 新規playerがjoinした時だけリロードされるように条件分岐
+    console.log("joinRoom!")
     if (myFlag == 0){
+      console.log("myflag-------")
+      room[roomId]["dissolvedFlag"] = 1;
       changeOthersFlag(players, sessionId);
       socket.broadcast.to(data.roomId).emit('new_client_join');
     }
@@ -611,9 +653,27 @@ io.sockets.on('connection', socket => {
   
   // 接続が切れた時
   socket.on("disconnect", (reason) => {
-    console.log(reason);
-    console.log(socket.id);
+    // console.log("---disconnect---")
+    // console.log(reason);
+    // console.log(socket.id);
+    // console.log(room);
     // socket.connect();
+    let disconnected = disconnectedPlayer(socket.id);
+    let roomIds = disconnected["rooms"];
+    console.log("----disconnected----");
+    console.log(disconnected);
+    roomIds.forEach(roomId =>  {
+      console.log("forEachIn")
+      console.log(room[roomId]["dissolvedFlag"]);
+      //サーバー仕様による切断でない場合、ルームに参加している他プレイヤー全員をトップページに戻す
+      if (room[roomId]["dissolvedFlag"] = 0) {
+        console.log("dissolved!!");
+        // ルームの解散
+        io.to(roomId).emit("dissolved_room!");
+        // 切断ユーザーが参加していたルームをDBから削除
+        delete room[roomId];
+      }
+    })
   })
   
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す
