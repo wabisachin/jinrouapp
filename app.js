@@ -77,9 +77,12 @@
         let rooms = Object.keys(room);
         let masters = {};
         rooms.forEach(roomId => {
-          masters[roomId] = Object.values(room[roomId].players)[0].userName; 
+          let roomInfo = {}
+          roomInfo['masterName'] = Object.values(room[roomId].players)[0].userName;
+          roomInfo['playerNum'] = room[roomId].playerNum;
+          roomInfo['currentPlayerNum'] = room[roomId].currentPlayerNum;
+          masters[roomId] = roomInfo;
         });
-        console.log(masters);
         res.render('index', {
           alert_title: "", 
           alert_message: "",
