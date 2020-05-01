@@ -67,9 +67,17 @@
       // トップページ ->アクセスしたときクライアントCookieにセッション保存
       app.get('/', function(req, res){
         setCookie("sessionId", req.session.id, res);
+        // indexに現在存在するルーム一覧とmasterを取得
+        let rooms = Object.keys(room);
+        let masters = {};
+        rooms.forEach(roomId => {
+          masters[roomId] = Object.values(room[roomId].players)[0].userName; 
+        });
+        console.log(masters);
         res.render('index', {
           alert_title: "", 
-          alert_message: ""
+          alert_message: "",
+          masters: masters
         });
       });
       
@@ -154,7 +162,7 @@
             alert_message: "ルームが存在しませんでした"
           });
         }
-        // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
+        // ルー��内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!verificateSessionId(sessionId, roomId, req)) {
           // roomページへのアクセス権限がない場合の値は０
           // console.log("verificate");
@@ -224,7 +232,7 @@
             userRole: "",
             master: 0,
             votedCount: 0,
-            flag: 0, //直近の更新が手動or自動リロードかを判別するフラグ
+            flag: 0, //直近の更新が手動or自動��ロードかを判別するフラグ
           };
           
           //墓地ユーザ追加
