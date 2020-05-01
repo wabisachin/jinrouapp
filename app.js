@@ -80,11 +80,25 @@
           masters[roomId] = Object.values(room[roomId].players)[0].userName; 
         });
         console.log(masters);
-        res.render('index', {
+        if (req.query.reason == "leaving") {
+          res.render('index', {
+          alert_title: "Notice", 
+          alert_message: `${req.query.name}が退出しました`,
+          masters: masters
+          })
+        }
+        else {
+          res.render('index', {
           alert_title: "", 
           alert_message: "",
           masters: masters
-        });
+          })
+        };
+        // res.render('index', {
+        //   alert_title: "", 
+        //   alert_message: "",
+        //   masters: masters
+        // });
       });
       
       // 条件をパスすればroomページへリダイレクト
@@ -292,7 +306,7 @@
     return unescape(msgValue);
 }
 
-  // 遷移先のroomページに参加者としてsessionIdが登録されているか
+  // 遷移先のroomの参加playerリストにsessionIdが登録されているか
   function verificateSessionId(sessionId , roomId, request) {
     for (let id in room[roomId]["players"]) {
       if (id == sessionId) {
@@ -319,25 +333,38 @@
     return (currentPlayerNum >= playerNum + num) ? false : true;
   }
   
-  // ルームの解散
-  function dissolveRoom(roomId) {
+  // // ルームの解散
+  // function dissolveRoom(roomId) {
     
-  }
-  
+  // }
+  // // socketIdからプレイヤー名を取得
+  // function getPlayerName(socketId) {
+  //   let name;
+    
+  //   for (let roomId in room) {
+  //     for (let sessionId in room[roomId]["players"]) {
+  //       if (room[roomId]["players"]["sessionId"]["socketId"] == socketId)
+  //       name =  room[roomId]["players"]["sessionId"]["userName"]
+  //     }
+  //   }
+  //   return name;
+  // }
   // 切断ユーザーの検知
   function disconnectedPlayer(socketId) {
     let rooms = [];
     let sessionId;
+    let playerName;
     
     for (let roomId in room) {
       for (let session in room[roomId]["players"]) {
         if ( room[roomId]["players"][session]["socketId"] == socketId) {
           rooms.push(roomId);
           sessionId = session;
+          playerName =  room[roomId]["players"][session]["userName"]
         }
       }
     }
-    return {rooms: rooms, sessionId: sessionId}
+    return {rooms: rooms, sessionId: sessionId, playerName: playerName}
   }
 
 
@@ -655,25 +682,25 @@ io.sockets.on('connection', socket => {
   socket.on("disconnect", (reason) => {
     // console.log("---disconnect---")
     // console.log(reason);
-    // console.log(socket.id);
-    // console.log(room);
     // socket.connect();
     let disconnected = disconnectedPlayer(socket.id);
     let roomIds = disconnected["rooms"];
+    let playerName =  disconnected["playerName"]
     console.log("----disconnected----");
+    console.log(socket.id);
     console.log(disconnected);
+    console.log(room);
     roomIds.forEach(roomId =>  {
-      console.log("forEachIn")
-      console.log(room[roomId]["dissolvedFlag"]);
+      console.log(room[roomId]["players"]);
       //サーバー仕様による切断でない場合、ルームに参加している他プレイヤー全員をトップページに戻す
-      if (room[roomId]["dissolvedFlag"] = 0) {
-        console.log("dissolved!!");
+      if (room[roomId]["dissolvedFlag"] == 0) {
         // ルームの解散
-        io.to(roomId).emit("dissolved_room!");
+        io.to(roomId).emit("dissolved_room!", playerName);
         // 切断ユーザーが参加していたルームをDBから削除
         delete room[roomId];
       }
     })
+    console.log("-----END-----")
   })
   
   // 各クライアントの要求をトリガにそれぞれのplayer{}を渡す

@@ -247,9 +247,10 @@ $(function(){
     });
     
     // ルームが解散された時
-    socket.on('dissolved_room!', () => {
+    socket.on('dissolved_room!', (name) => {
         console.log("dissolved!")
-        window.location.replace("/");
+        // クエリパラメータにページ遷移理由を記載(alert表示で利用)
+        window.location.replace(`/?reason=leaving&name=${name}`);
     })
     
     // 自分のsessionIdでサーバに自分のプレイヤー情報問い合せ
