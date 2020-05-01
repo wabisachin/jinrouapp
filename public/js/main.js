@@ -100,7 +100,7 @@ function startTimer(time) {
         if (time < 0) {
             clearTimeout(id);
             // 音声ファイルの再生
-            // $( '#sound-file' ).get(0).play();
+            $( '#sound-file' ).get(0).play();
             $('#restTime').text('timeUp！人狼を選択！');
         }
     }
