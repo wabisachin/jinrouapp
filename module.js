@@ -30,9 +30,9 @@ module.exports = {
 }
  --------------------------------リンセーへ-----------------------------------*/
        
+ module.exports = {
+   
 //  sessionと[セッション番号、ユーザー名]のディクショナリ追加
-module.exports = {
-  
   userAdd: function(field, sessionId, userName){
     if (field.currentPlayerNum < field.playerNum - 1) {
       field.players[sessionId] = {
@@ -50,39 +50,54 @@ module.exports = {
       } 
       field.currentPlayerNum++;
     } 
-    
-    else if (field.currentPlayerNum === field.playerNum - 1)
+    else if (field.currentPlayerNum === field.playerNum - 1) {
     // 最後の一人が入った後に墓地ユーザ追加
-     {
-        field.players[sessionId] = {
-          playerNo:  field.currentPlayerNum, 
-          userName: userName,
-          userRole: "",
-          master: 0,
-          votedCount: 0,
-          flag: 0, //直近の更新が手動or自動��ロードかを判別するフラグ
-        };
+      field.players[sessionId] = {
+        playerNo:  field.currentPlayerNum, 
+        userName: userName,
+        userRole: "",
+        master: 0,
+        votedCount: 0,
+        flag: 0, //直近の更新が手動or自動��ロードかを判別するフラグ
+      };
       
-        //墓地ユーザ追加
-        for (var i = 1; i < 3; i++) {
-          field.players[`cemetary${i}`] = {
-            playerNo: -i,
-            userName: 'cemetary' + i,
-            flag: 0
-          };
-        }
+      //墓地ユーザ追加
+      for (var i = 1; i < 3; i++) {
+        field.players[`cemetary${i}`] = {
+          playerNo: -i,
+          userName: '無投票',
+          votedCount: 0,
+          flag: 0
+        };
+      }
       // console.log(field.players);
       field.currentPlayerNum++;
-     }
-     
+    }
+    
     else {
       //プレイヤー数以上のアクセスが有った場合の処理
-      
     }
 
-  }, 
+  },
       
   
+  //ユーザのブラウザにCookie保存する
+  setCookie: function(key, value, res) {
+    const escapedValue = escape(value);
+    res.setHeader('Set-Cookie', [`${key}=${escapedValue}`]);
+    // res.cookie(key, value);
+  },
+  
+  // cookieに保存されたキーから値を取得
+  getCookie: function (key, request) {
+    const cookieData = request.headers.cookie !== undefined ? request.headers.cookie : '';
+    const datas = cookieData.split(';').map(data => data.trim());
+    const msgKeyValue = datas.find(data => data.startsWith(`${key}=`));
+    if (msgKeyValue === undefined) return '';
+    const msgValue = msgKeyValue.replace(`${key}=`, '');
+    return unescape(msgValue);
+},
+
   // 遷移先のroomの参加playerリストにsessionIdが登録されているか
   verificateSessionId: function(room, sessionId , roomId, request) {
     for (let id in room[roomId]["players"]) {
@@ -92,9 +107,8 @@ module.exports = {
     }
     return false;
   },
-  
   // ルームが存在するかどうかのcheck
-  checkRoomExisting: function(room, roomId) {
+  checkRoomExisting: function (room, roomId) {
     for (let id in room) {
       if (id == roomId) {
         return true;
@@ -128,7 +142,7 @@ module.exports = {
   //   return name;
   // }
   // 切断ユーザーの検知
-  disconnectedPlayer: function(room, socketId) {
+  disconnectedPlayer: function (room, socketId) {
     let rooms = [];
     let sessionId;
     let playerName;
@@ -211,7 +225,7 @@ module.exports = {
   },
   
   // 怪盗メソッド1：選択したカードがなにかを教える
-  thiefBefore: function(room, roomId, targetNo, thiefNo) {
+  thiefBefore: function (room, roomId, targetNo, thiefNo) {
     let players = room[roomId].players;
     let thiefResult = Object.values(players).filter(v => v.playerNo === targetNo );
     return thiefResult;
@@ -276,15 +290,18 @@ module.exports = {
     const peaceVillage = 0;
     const wolfVillage = 1;
     const teruteruVillage = 2;
-    const wolfteruVillage = 3;
+    const wolfteruVillagerVillage = 3;
+    const wolfteruVillage = 4;
     
     let players = room[roomId]["players"];
     
     // for (let key in players) {
       // if (players[key]["userRole"] == "wolfman" && players[key]["playerNo"] >= 0) {
-      if (this.findRole(players, "wolfman") && this.findRole(players, "teruteru")) {
+      if (this.findRole(players, "wolfman") && this.findRole(players, "teruteru") && this.findRole(players, "villager")) {
+        return wolfteruVillagerVillage;
+      } else if (this.findRole(players, "wolfman") && this.findRole(players, "teruteru")) {
         return wolfteruVillage;
-      } else if (this.findRole(players, "wolfman")) {
+      } else if (this.findRole(players, "wolfman")){
         return wolfVillage;
       } else if (this.findRole(players, "teruteru")){
         return teruteruVillage;
@@ -307,12 +324,12 @@ module.exports = {
   
   
   // 全てのプレイヤーが一票ずつ票を分け合う結果だった場合trueを返す
-  isOneVoted: function(room, roomId) {
+  noOneVoted: function(room, roomId) {
 
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["votedCount"] != 1 && players[key]["playerNo"] >= 0) {
+      if (players[key]["votedCount"] != 0 && players[key]["playerNo"] >= 0) {
         return false;
       }
     }
@@ -394,7 +411,7 @@ module.exports = {
       // 平和村の場合
       case 0:
         console.log("******平和村******")
-              switch (this.isOneVoted(room, roomId)) {
+              switch (this.noOneVoted(room, roomId)) {
               // 村人全員勝利
               case true:
                 result = this.setWinner(players, 0);
@@ -407,7 +424,7 @@ module.exports = {
                 break;
               }
             break;
-      // 人狼村の場合
+      // 人狼村人村の場合
       case 1:
         console.log("******人狼村******")
               switch (this.includeRole(room, roomId, mostVotedPlayers, 'wolfman')) {
@@ -423,7 +440,7 @@ module.exports = {
                 break;
               }
             break;
-      // テルテル村の場合
+      // テルテル村人村の場合
       case 2:
            　  console.log("******テルテル村******")
               switch (this.includeRole(room, roomId, mostVotedPlayers, 'teruteru')) {
@@ -434,7 +451,7 @@ module.exports = {
                 break;
               // 村人サイドの勝利
               case false:
-                if(this.isOneVoted(room, roomId)){
+                if(this.noOneVoted(room, roomId)){
                   result = this.setWinner(players, 0);
                   result["details"] = "村人サイドの勝利";
                 } else {
@@ -446,9 +463,9 @@ module.exports = {
                 }
               
             break;
-      // テルテル人狼村の場合
+      // テルテル人狼村人村の場合
       case 3:
-              console.log("******テルテル人狼村******")
+              console.log("******テルテル人狼村人村******")
               switch (this.includeRole(room, roomId, mostVotedPlayers, 'teruteru')) {
                // テルテルサイドの勝利
               case true:
@@ -466,6 +483,22 @@ module.exports = {
                 }
                 break;
               }
+            break;
+      case 4:
+              console.log("******テルテル人狼村******")
+              switch (this.includeRole(room, roomId, mostVotedPlayers, 'teruteru')) {
+               // テルテルサイドの勝利
+              case true:
+                result = this.setWinner(players, 2);
+                result["details"] = "テルテルの勝利";
+                break;
+              case false:
+                // 人狼サイドの勝利
+                  result = this.setWinner(players, 1);
+                  result["details"] = "人狼サイドの勝利";
+                break;
+                }
+              
             break;
         
       default:
@@ -517,7 +550,6 @@ module.exports = {
   },
   
   setMasterInfo: function(room){
-        
         let rooms = Object.keys(room);
         let masters = {};
           
@@ -530,5 +562,5 @@ module.exports = {
         });
         return masters;
   }
-
+  
 }

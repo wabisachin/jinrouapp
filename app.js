@@ -179,7 +179,7 @@
             field.thief = req.body.thief;
             field.teruteru = req.body.teruteru;
             
-            jinrou.userAdd(field, req.session.id,req.body.name);
+            jinrou.userAdd(field, req.session.id, req.body.name);
             //新規room作成し、fieldを入れる
             room[roomId] = field;
             res.redirect(`/${roomId}`);
@@ -274,7 +274,8 @@
       //     console.log(reply);
       // });
 
-/*----------------------------------------------------------------------------
+
+ /*----------------------------------------------------------------------------
  
                   SocketIOの設定
  
