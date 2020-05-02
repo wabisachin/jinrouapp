@@ -12,18 +12,18 @@
  ----------------------------------------------------------------------------*/
 
 
-//設定値を初期化
-// let playerNum = 0;
-// let villager = 0;
-// let wolfman = 0;
-// let thief = 0;
-// let fortune = 0;
+// 設定値を初期化
+let playerNum = 0;
+let villager = 0;
+let wolfman = 0;
+let thief = 0;
+let fortune = 0;
 
- /*----------------------------------------------------------------------------
+//  /*----------------------------------------------------------------------------
  
-                  関数定義
+//                   関数定義
  
- ----------------------------------------------------------------------------*/
+//  ----------------------------------------------------------------------------*/
 
 // 隠しフィールドの追加、未設定だったid,classの指定
 function showForm (num) {
@@ -167,24 +167,24 @@ function date () {
  
  ----------------------------------------------------------------------------*/
  //部屋作成の設定値の審査
-var app = new Vue({
-  el: '#settings',
-  data: { 
-    //   役職の初期値設定
-    playerNum: 3,
-    villager: 1,
-    wolfman: 2,
-    thief: 1,
-    fortune: 1,
-    teruteru: 0,
-},
-  computed: {
-    total: function(){
-        return this.villager + this.wolfman + this.thief + this.fortune + this.teruteru
-    }
-  }
+// var app = new Vue({
+//   el: '#settings',
+//   data: { 
+//     //   役職の初期値設定
+//     playerNum: 3,
+//     villager: 1,
+//     wolfman: 2,
+//     thief: 1,
+//     fortune: 1,
+//     teruteru: 0,
+// },
+//   computed: {
+//     total: function(){
+//         return this.villager + this.wolfman + this.thief + this.fortune + this.teruteru
+//     }
+//   }
 
-  });
+//   });
   
  /*----------------------------------------------------------------------------
  
@@ -194,6 +194,7 @@ var app = new Vue({
             
 $(function(){
 
+    console.log("room")
     let socket = io.connect();
     let cookie = getCookieArray();
     let accessRight;
@@ -202,7 +203,7 @@ $(function(){
     
     // roomページへのアクセス権がある時だけ以下の処理
     // if (isRoomPage()) {
-    if (isRoomPage() && accessRight == 1) {
+    if (accessRight == 1) {
         let roomId = getRoomId();
         let sessionId = cookie["sessionId"];
         initial();
@@ -214,19 +215,8 @@ $(function(){
             roomId: roomId, 
             sessionId: sessionId
         });
-        
-        // // 夜へボタンを押した時
-        // $('#toNight').on('click', () => {
-        //     $('#toNight').off();
-        //     // 昼へボタンのクリックアクションを有効化
-        //     $('#toDate').on('click', () => {
-        //         $('#toDate').off();
-        //         socket.emit("day_begins", roomId);
-        //     })
-        
-        //     socket.emit('toNightClicked', roomId);
-        // });
     }
+    
     // masterではない場合、フェーズボタンを非表示
     socket.on("master_or_not", (startFlag, masterFlag) => {
         
