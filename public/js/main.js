@@ -126,6 +126,7 @@ function initial () {
     $('.vote').removeClass("hidden");
     $('.votedPlayer').removeClass("hidden");
     $('.attention').addClass('hidden');
+    $('#modalCemetary').off();
 }
 // 夜フェーズ画面表示
 function night () {
@@ -410,6 +411,16 @@ $(function(){
             //   $(`#vote${id}`).off();
             })
         }
+        $('.cemetaryArea').click(function(){
+            $('#modalCemetary').modal('toggle');
+            // 墓地に投票
+            $(`#voteCemetary`).on('click', () => {
+               socket.emit("vote_for_wolfman", -1, getRoomId(), sessionId );
+               console.log('墓地に投票')
+            //   $(`#vote${id}`).off();
+            })
+            
+        })
         
     })
     

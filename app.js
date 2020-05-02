@@ -293,7 +293,8 @@
           for (var i = 1; i < 3; i++) {
             field.players[`cemetary${i}`] = {
               playerNo: -i,
-              userName: 'cemetary' + i,
+              userName: '無投票',
+              votedCount: 0,
               flag: 0
             };
           }
