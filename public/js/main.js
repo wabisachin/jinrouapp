@@ -13,11 +13,11 @@
 
 
 //設定値を初期化
-let playerNum = 0;
-let villager = 0;
-let wolfman = 0;
-let thief = 0;
-let fortune = 0;
+// let playerNum = 0;
+// let villager = 0;
+// let wolfman = 0;
+// let thief = 0;
+// let fortune = 0;
 
  /*----------------------------------------------------------------------------
  
@@ -176,10 +176,11 @@ var app = new Vue({
     wolfman: 2,
     thief: 1,
     fortune: 1,
+    teruteru: 0,
 },
   computed: {
     total: function(){
-        return this.villager + this.wolfman + this.thief + this.fortune
+        return this.villager + this.wolfman + this.thief + this.fortune + this.teruteru
     }
   }
 

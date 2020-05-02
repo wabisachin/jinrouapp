@@ -150,6 +150,7 @@
                 wolfman : 0,
                 fortune : 0,
                 thief : 0,
+                teruteru : 0,
                 dissolvedFlag: 0, 
                 players : {},
               }
@@ -159,6 +160,7 @@
             field.wolfman = req.body.wolfman;
             field.fortune = req.body.fortune;
             field.thief = req.body.thief;
+            field.teruteru = req.body.teruteru;
             
             userAdd(field, req.session.id,req.body.name);
             //新規room作成し、fieldを入れる
@@ -401,6 +403,9 @@
     for (var i = 0; i < field.fortune; i++) {
       roles.push('fortune');
     }
+    for (var i = 0; i < field.teruteru; i++) {
+      roles.push('teruteru');
+    }
     for(let i = roles.length - 1; i > 0; i--){
       let r = Math.floor(Math.random() * (i + 1));
       let tmp = roles[i];
@@ -505,17 +510,42 @@
   }
   
   //平和村(人狼が一人もいない状態)かどうかの判定
-  function isPeaceVillage(roomId) {
-
+  // 村の種類の判定
+  // function 
+  // isPeaceVillage(roomId) {
+  function kindOfVillage(roomId) {
+    const peaceVillage = 0;
+    const wolfVillage = 1;
+    const teruteruVillage = 2;
+    const wolfteruVillage = 3;
+    
     let players = room[roomId]["players"];
     
-    for (let key in players) {
-      if (players[key]["userRole"] == "wolfman" && players[key]["playerNo"] >= 0) {
-        return false;
+    // for (let key in players) {
+      // if (players[key]["userRole"] == "wolfman" && players[key]["playerNo"] >= 0) {
+      if (findRole(players, "wolfman") && findRole(players, "teruteru")) {
+        return wolfteruVillage;
+      } else if (findRole(players, "wolfman")) {
+        return wolfVillage;
+      } else if (findRole(players, "teruteru")){
+        return teruteruVillage;
+      } else {
+        return peaceVillage;
       }
-    }
-    return true;
+    // }
+    // return true;
   }
+  
+  // プレイヤーに役職がいるかの判定
+  function findRole(players, role){
+    let temp = Object.values(players).filter(x => x.userRole == role && x.playerNo >= 0);
+    if (temp.length != 0){
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   
   // 全てのプレイヤーが一票ずつ票を分け合う結果だった場合trueを返す
   function isOneVoted(roomId) {
@@ -531,13 +561,15 @@
   }
   
   // 渡されたplayerリストの中に人狼がいた場合trueを返す
-  function IncludeWolf(roomId, sessionIds) {
+  // function IncludeWolf(roomId, sessionIds) {
+  // 渡されたplayerリストの中にroleがいた場合trueを返す
+  function includeRole(roomId, sessionIds, role) {
     
     let players =  room[roomId]["players"];
     
     for (let i= 0; i < sessionIds.length; i++) {
       let id =  sessionIds[i];
-      if (players[id]["userRole"] ==  'wolfman'  && players[id]["playerNo"] >= 0) {
+      if (players[id]["userRole"] ==  role  && players[id]["playerNo"] >= 0) {
         return true;
       }
     }
@@ -554,7 +586,7 @@
       // 村人勝利
       case 0:
         for (let key in players) {
-          if (players[key]["userRole"] == "wolfman"  && players[key]["playerNo"] >= 0) {
+          if ((players[key]["userRole"] == "wolfman" || players[key]["userRole"] == "teruteru" ) && players[key]["playerNo"] >= 0) {
             result["lose"].push(key);
           }
           else if (players[key]["playerNo"] >= 0){
@@ -566,6 +598,17 @@
       case 1:
         for (let key in players) {
           if (players[key]["userRole"] == "wolfman"  && players[key]["playerNo"] >= 0) {
+            result["win"].push(key);
+          }
+          else if (players[key]["playerNo"] >= 0){
+            result["lose"].push(key);
+          }
+        }
+        break;
+        // テルテル勝利
+      case 2:
+        for (let key in players) {
+          if (players[key]["userRole"] == "teruteru"  && players[key]["playerNo"] >= 0) {
             result["win"].push(key);
           }
           else if (players[key]["playerNo"] >= 0){
@@ -587,35 +630,117 @@
     // 最も投票されたプレイヤーのsessionIdを格納
     mostVotedPlayers = getMostVoted(roomId);
     // 平和村の場合の処理
-    if (isPeaceVillage(roomId)) {
-      switch (isOneVoted(roomId)) {
-        // 村人全員勝利
-        case true:
-          result = setWinner(players, 0);
-          result["details"] = "村人全員生存";
-          break;
-        // 村人全員敗北
-        case false:
-          result = setWinner(players, 1);
-          result["details"] = "村人全員処刑";
-          break;
-      }
-    }
-    // 平和村でない場合の処理
-    else {
-      switch (IncludeWolf(roomId, mostVotedPlayers)) {
-        // 村人サイドの勝利
-        case true:
-          result = setWinner(players, 0);
-          result["details"] = "村人サイドの勝利";
-          break;
-        // 人狼サイドの勝利
-        case false:
-          result = setWinner(players, 1);
-          result["details"] = "人狼サイドの勝利";
-          break;
-      }
-    }
+    // if (isPeaceVillage(roomId)) {
+    switch (kindOfVillage(roomId)) {
+      // 平和村の場合
+      case 0:
+        console.log("******平和村******")
+              switch (isOneVoted(roomId)) {
+              // 村人全員勝利
+              case true:
+                result = setWinner(players, 0);
+                result["details"] = "村人全員生存";
+                break;
+              // 村人全員敗北
+              case false:
+                result = setWinner(players, 1);
+                result["details"] = "村人全員処刑";
+                break;
+              }
+            break;
+      // 人狼村の場合
+      case 1:
+        console.log("******人狼村******")
+              switch (includeRole(roomId, mostVotedPlayers, 'wolfman')) {
+               // 村人サイドの勝利
+              case true:
+                result = setWinner(players, 0);
+                result["details"] = "村人サイドの勝利";
+                break;
+              // 人狼サイドの勝利
+              case false:
+                result = setWinner(players, 1);
+                result["details"] = "人狼サイドの勝利";
+                break;
+              }
+            break;
+      // テルテル村の場合
+      case 2:
+           　  console.log("******テルテル村******")
+              switch (includeRole(roomId, mostVotedPlayers, 'teruteru')) {
+               // テルテルサイドの勝利
+              case true:
+                result = setWinner(players, 2);
+                result["details"] = "テルテルの勝利";
+                break;
+              // 村人サイドの勝利
+              case false:
+                if(isOneVoted(roomId)){
+                  result = setWinner(players, 0);
+                  result["details"] = "村人サイドの勝利";
+                } else {
+                  result = setWinner(players, 1);
+                  result["details"] = "村人全員処刑";
+                }
+              break;
+                  
+                }
+              
+            break;
+      // テルテル人狼村の場合
+      case 3:
+              console.log("******テルテル人狼村******")
+              switch (includeRole(roomId, mostVotedPlayers, 'teruteru')) {
+               // テルテルサイドの勝利
+              case true:
+                result = setWinner(players, 2);
+                result["details"] = "テルテルの勝利";
+                break;
+              case false:
+                // 村人サイドの勝利
+                if (includeRole(roomId, mostVotedPlayers, 'wolfman')) {
+                  result = setWinner(players, 0);
+                  result["details"] = "村人サイドの勝利";
+                } else{
+                  result = setWinner(players, 1);
+                  result["details"] = "人狼サイドの勝利";
+                }
+                break;
+              }
+            break;
+        
+      default:
+        // code
+    } 
+    // (isPeaceVillage(roomId)) {
+      // switch (isOneVoted(roomId)) {
+      //   // 村人全員勝利
+      //   case true:
+      //     result = setWinner(players, 0);
+      //     result["details"] = "村人全員生存";
+      //     break;
+      //   // 村人全員敗北
+      //   case false:
+      //     result = setWinner(players, 1);
+      //     result["details"] = "村人全員処刑";
+      //     break;
+      // }
+    // }
+    // // 平和村でない場合の処理
+    // else {
+    //   // switch (IncludeWolf(roomId, mostVotedPlayers)) {
+    //   //   // 村人サイドの勝利
+    //   //   case true:
+    //   //     result = setWinner(players, 0);
+    //   //     result["details"] = "村人サイドの勝利";
+    //   //     break;
+    //   //   // 人狼サイドの勝利
+    //   //   case false:
+    //   //     result = setWinner(players, 1);
+    //   //     result["details"] = "人狼サイドの勝利";
+    //   //     break;
+    //   // }
+    // }
     return result;
   }
   
@@ -821,8 +946,6 @@ io.sockets.on('connection', socket => {
     let finalState = Object.values(room[roomId].players);
 
     masterFlag =  room[roomId]["players"][sessionId]["master"];
-    
-    // 最初と最後のユーザ役職状態表示
 
     result ="You lose...";
     for (let i =0; i < gameResult["win"].length; i++) {
