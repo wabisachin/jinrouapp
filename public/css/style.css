@@ -20,7 +20,7 @@ body{
     padding-top: calc(300 / 1000 * 100%); /* calc(画像高さ ÷ 画像横幅 × 100%) */
     background: url("../images/title.png") center center / cover no-repeat;
 }
-.card {
+.cards {
     width: 100%;
     height: auto;
     display: flexbox;
