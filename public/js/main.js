@@ -111,6 +111,16 @@ function startTimer(time) {
     })
 }
 
+function getUserName(finalState, i){
+    let voteTo = finalState[i].voteTo;
+    if (voteTo >= 0) {
+        return finalState[voteTo].userName
+    } else {
+        return "無投票";
+    }
+    
+}
+
 // Initialフェーズ画面表示
 function initial () {
     $('body').removeClass('date');
@@ -149,12 +159,12 @@ function date () {
     $('#votedCount').removeClass('hidden');
     
         // ポインターイベントの変更処理
-    $('.userArea').css('pointer-events', 'auto');
-    $('.userArea').css('cursor', 'pointer');
+    $('.userArea, .cemetaryArea').css('pointer-events', 'auto');
+    $('.userArea, .cemetaryArea').css('cursor', 'pointer');
     $('.userArea, .cemetaryArea').children('img').attr('src', './images/cards/card.png');
     
     // ホバー時の見た目変化
-    $('.userArea').hover(function() {
+    $('.userArea, .cemetaryArea').hover(function() {
         $(this).css('background',"darkgray");
     }, function() {
         $(this).css('background', '');
@@ -485,7 +495,7 @@ $(function(){
             $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${finalState[i].userName}</div>`);
             $(`#finalModalUserArea${i}`).append(`<img src=./images/cards/${finalState[i].userRole}.png class="modalCard"></img>`);
             $(`#finalModalUserArea${i}`).append('<div class="modalUserName">投票先</div>');
-            $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${finalState[finalState[i].voteTo].userName}</div>`);
+            $(`#finalModalUserArea${i}`).append(`<div class="modalUserName">${getUserName(finalState, i)}</div>`);
             
         }
         $('#modalContents').append(`<div>墓地</div>`);
