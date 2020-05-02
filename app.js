@@ -518,15 +518,18 @@
     const peaceVillage = 0;
     const wolfVillage = 1;
     const teruteruVillage = 2;
-    const wolfteruVillage = 3;
+    const wolfteruVillagerVillage = 3;
+    const wolfteruVillage = 4;
     
     let players = room[roomId]["players"];
     
     // for (let key in players) {
       // if (players[key]["userRole"] == "wolfman" && players[key]["playerNo"] >= 0) {
-      if (findRole(players, "wolfman") && findRole(players, "teruteru")) {
+      if (findRole(players, "wolfman") && findRole(players, "teruteru") && findRole(players, "villager")) {
+        return wolfteruVillagerVillage;
+      } else if (findRole(players, "wolfman") && findRole(players, "teruteru")) {
         return wolfteruVillage;
-      } else if (findRole(players, "wolfman")) {
+      } else if (findRole(players, "wolfman")){
         return wolfVillage;
       } else if (findRole(players, "teruteru")){
         return teruteruVillage;
@@ -549,12 +552,12 @@
   
   
   // 全てのプレイヤーが一票ずつ票を分け合う結果だった場合trueを返す
-  function isOneVoted(roomId) {
+  function noOneVoted(roomId) {
 
     let players = room[roomId]["players"];
     
     for (let key in players) {
-      if (players[key]["votedCount"] != 1 && players[key]["playerNo"] >= 0) {
+      if (players[key]["votedCount"] != 0 && players[key]["playerNo"] >= 0) {
         return false;
       }
     }
@@ -636,7 +639,7 @@
       // 平和村の場合
       case 0:
         console.log("******平和村******")
-              switch (isOneVoted(roomId)) {
+              switch (noOneVoted(roomId)) {
               // 村人全員勝利
               case true:
                 result = setWinner(players, 0);
@@ -649,7 +652,7 @@
                 break;
               }
             break;
-      // 人狼村の場合
+      // 人狼村人村の場合
       case 1:
         console.log("******人狼村******")
               switch (includeRole(roomId, mostVotedPlayers, 'wolfman')) {
@@ -665,7 +668,7 @@
                 break;
               }
             break;
-      // テルテル村の場合
+      // テルテル村人村の場合
       case 2:
            　  console.log("******テルテル村******")
               switch (includeRole(roomId, mostVotedPlayers, 'teruteru')) {
@@ -676,7 +679,7 @@
                 break;
               // 村人サイドの勝利
               case false:
-                if(isOneVoted(roomId)){
+                if(noOneVoted(roomId)){
                   result = setWinner(players, 0);
                   result["details"] = "村人サイドの勝利";
                 } else {
@@ -688,9 +691,9 @@
                 }
               
             break;
-      // テルテル人狼村の場合
+      // テルテル人狼村人村の場合
       case 3:
-              console.log("******テルテル人狼村******")
+              console.log("******テルテル人狼村人村******")
               switch (includeRole(roomId, mostVotedPlayers, 'teruteru')) {
                // テルテルサイドの勝利
               case true:
@@ -708,6 +711,22 @@
                 }
                 break;
               }
+            break;
+      case 4:
+              console.log("******テルテル人狼村******")
+              switch (includeRole(roomId, mostVotedPlayers, 'teruteru')) {
+               // テルテルサイドの勝利
+              case true:
+                result = setWinner(players, 2);
+                result["details"] = "テルテルの勝利";
+                break;
+              case false:
+                // 人狼サイドの勝利
+                  result = setWinner(players, 1);
+                  result["details"] = "人狼サイドの勝利";
+                break;
+                }
+              
             break;
         
       default:
