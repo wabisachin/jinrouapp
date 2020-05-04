@@ -258,7 +258,8 @@
           setCookie("accessRight", 1 , res); // roomページへのアクセス権限がない場合の値は１
           res.render('room', {
             roomId: req.params.room_id,
-            field: room[req.params.room_id],
+            sessionId: sessionId,
+            field: room[req.params.room_id]
           });
         }
       });

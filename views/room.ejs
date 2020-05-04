@@ -26,17 +26,17 @@
         
         <div class="field">
             <% Object.keys(field.players).forEach( (id, i) => { %>
-            <% let playerNum = field.players[id].playerNo %>
+            <% let playerNo = field.players[id].playerNo %>
             <% let playerName = field.players[id].userName %>
-            <% if(playerNum >= 0) { %>
-                <div class="userArea shadow" id="userArea<%= playerNum %>">
+            <% if(playerNo >= 0) { %>
+                <div class="userArea shadow" id="userArea<%= playerNo %>">
                     <!--<p><%= id %></p>-->
-                    <div class="userName" id="name<%= playerNum %>"><%= playerName %></div>
-                    <img src="./images/cards/card.png" class="cards" id="card<%= playerNum %>">
+                    <div class="userName" id="name<%= playerNo %>"><%= playerName %></div>
+                    <img src="./images/cards/card.png" class="cards" id="card<%= playerNo %>">
                 </div>
                 <!-- モーダルエリアここから -->
-                <div  class="modal fade" id="modalArea<%= playerNum %>" tabindex="-1" role="dialog" aria-labelledby="modalArea">
-                  <!--<div class="modalBg" id="modalBg<%= playerNum %>"></div>-->
+                <div  class="modal fade" id="modalArea<%= playerNo %>" tabindex="-1" role="dialog" aria-labelledby="modalArea">
+                  <!--<div class="modalBg" id="modalBg<%= playerNo %>"></div>-->
                   <!--<div class="modalWrapper">-->
                   <div class="modal-dialog" role="document">
                     <!--<div class="modalContents">-->
@@ -46,14 +46,20 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">     
+                        <div class="modal-body">
+                        <!--自分には投票できないように条件分岐-->
+                        <% if (id == sessionId) { %>
+                            <h1 class="votedPlayer">自分には投票できません。</h1>
+                            <h1 class="attention hidden">既に投票済みです</h1>
+                        <% } else { %>
                             <h1 class="votedPlayer"><%= playerName %>を人狼に投票しますか？</h1>
                             <h1 class="attention hidden">既に投票済みです</h1>
-                            <button class ="vote btn btn-secondary" id="vote<%= playerNum %>" data-dismiss="modal">はい</button>
+                            <button class ="vote btn btn-secondary" id="vote<%= playerNo %>" data-dismiss="modal">はい</button>
+                        <% } %>
                         </div>
                     </div>
                     </div>
-                    <div id="closeModal<%= playerNum %>" class="closeModal">
+                    <div id="closeModal<%= playerNo %>" class="closeModal">
                     </div>
                   
                 </div>
