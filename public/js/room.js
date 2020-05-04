@@ -237,7 +237,14 @@ $(function(){
             // $('#toNight, #toDate, #result').addClass("hidden");
             $('.operation').addClass("hidden");
         }
-        else if (startFlag ==  1 && masterFlag ==  1 ) {
+        
+        else if (startFlag ==  0 && masterFlag == 1) {
+            $('#toNight').on('click', function() {
+                alert("まだ人数が揃っていません。")
+            })
+        }
+        else if (startFlag ==  1 && masterFlag == 1) {
+            $('#toNight').off();
             // プレイ人数が上限に達したら夜へボタンを有効か
             $('#toNight').on('click', () => {
                 $('#toNight').off();
