@@ -162,6 +162,7 @@
             let field = { 
                 currentPlayerNum :0,
                 currentVotedCount:0,
+                currentActionCount:0,
                 playerNum : 0,
                 villager : 0,
                 wolfman : 0,
@@ -235,7 +236,7 @@
             masters: masters
           });
         }
-        // ルー��内にsessionIdが登録されていないプレイヤーがアクセスした場合
+        // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!jinrou.verificateSessionId(room, sessionId, roomId, req)) {
           setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
           console.log(room);
@@ -377,6 +378,18 @@ io.sockets.on('connection', socket => {
     // let role = room[roomId].players[sessionId][2];
     // socket.emit('give_role', role);
   });
+  
+  // master以外の各プレイヤーからアクション完了の通知を受け取る
+  socket.on("I_am_ready", (roomId) => {
+    
+    let playerNum = room[roomId]["playerNum"];
+    
+    room[roomId]["currentActionCount"]++;
+    // master以外の全員が準備okならmasterに昼フェーズへの移行許可
+    if (room[roomId]["currentActionCount"] == playerNum -1) {
+      io.to(roomId).emit("permit_moving_to_date", roomId)
+    }
+  })
   
   // wolfmanのユーザーに他のwolfmanを教える
   socket.on("i_am_wolfman", (roomId) => {

@@ -543,6 +543,7 @@ module.exports = {
     
     // 値の初期化
     room[roomId]["currentVotedCount"] = 0;
+    room[roomId]["currentActionCount"] = 0;
     for (let id in players) {
       players[id]["userRole"] = "";
       players[id]["votedCount"] = 0;

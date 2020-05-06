@@ -248,11 +248,11 @@ $(function(){
             // プレイ人数が上限に達したら夜へボタンを有効か
             $('#toNight').on('click', () => {
                 $('#toNight').off();
-                // 昼へボタンのクリックアクションを有効化
-                $('#toDate').on('click', () => {
-                    $('#toDate').off();
-                    socket.emit("day_begins", roomId);
-                })
+                // // 昼へボタンのクリックアクションを有効化
+                // $('#toDate').on('click', () => {
+                //     $('#toDate').off();
+                //     socket.emit("day_begins", roomId);
+                // })
             
                 socket.emit('toNightClicked', roomId);
             });
@@ -291,8 +291,18 @@ $(function(){
     
     // 自分のフィールドに役職表示、自分の役職をサーバに通知
     socket.on('give_role', data => {
+        
+        let masterFlag = data["master"];
+        
         $(`#card${data.playerNo}`).attr('src', `./images/cards/${data.userRole}.png`);
-
+        // master以外にアクション済みボタンの表示
+        if (masterFlag == 0) {
+            $('#ready').removeClass('hidden');
+            $('#ready').on('click', function() {
+                $('#ready').addClass('hidden');
+                socket.emit("I_am_ready", getRoomId());
+            })
+        }
         // 自分の役職のメソッドをサーバに要求する
         switch (data.userRole) {
             case 'wolfman':
@@ -389,6 +399,14 @@ $(function(){
                 // code
         }
     });
+    
+    socket.on("permit_moving_to_date", (roomId) => {
+        // 昼へボタンのクリックアクションを有効化
+        $('#toDate').on('click', () => {
+            $('#toDate').off();
+            socket.emit("day_begins", roomId);
+        })
+    })
     
     // 昼のスタート
     socket.on("notice_day_started", (playerNum) => {
@@ -534,16 +552,17 @@ $(function(){
         // クリックアクションの初期化
         $('#result').off('click');
         $('.userArea, .cemetaryArea').off('click');
+        $('#toDate').off();
         $('#toNight').on('click', () => {
             
             $('#toNight').off();
             $('#toNight').addClass("disabled");
             $('#toDate').removeClass("disabled")
-            $('#toDate').on('click', () => {
-                $('#toDate').off();
-                $('#toDate').addClass("disabled");
-                socket.emit("day_begins", getRoomId());
-            })
+            // $('#toDate').on('click', () => {
+            //     $('#toDate').off();
+            //     $('#toDate').addClass("disabled");
+            //     socket.emit("day_begins", getRoomId());
+            // })
             socket.emit('toNightClicked', getRoomId());
         });
     })
