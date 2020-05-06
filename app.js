@@ -347,6 +347,7 @@ io.sockets.on('connection', socket => {
     // console.log(reason);
     // socket.connect();
     let disconnected = jinrou.disconnectedPlayer(room, socket.id);
+    let sessionId =  disconnected["sessionId"]
     let roomIds = disconnected["rooms"];
     let playerName =  disconnected["playerName"]
     console.log("----disconnected----");
@@ -360,6 +361,12 @@ io.sockets.on('connection', socket => {
         // ルームの解散
         io.to(roomId).emit("playerLeaving!", playerName);
         // 切断ユーザーが参加していたルームをDBから削除
+        delete room[roomId];
+      }
+      
+      // 待機フェーズ(プレイヤーが揃うまで）中のmaster切断時はルームを解散
+      else if(room[roomId]["dissolvedFlag"] == 1 && room[roomId]["players"][sessionId]["master"] == 1 && room[roomId]["players"][sessionId]["flag"] == 0) {
+        io.to(roomId).emit("room_dissolved!");
         delete room[roomId];
       }
     })

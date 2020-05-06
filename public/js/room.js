@@ -272,7 +272,7 @@ $(function(){
     })
     
     // masterによってルームが解散された時
-    socket.on('room_dissolved!', (name) => {
+    socket.on('room_dissolved!', () => {
         console.log("dissolved!")
         // クエリパラメータにページ遷移理由を記載(alert表示で利用)
         window.location.replace(`/?reason=dissolved`);
@@ -400,6 +400,7 @@ $(function(){
         }
     });
     
+    // 昼フェーズへの移行許可
     socket.on("permit_moving_to_date", (roomId) => {
         // 昼へボタンのクリックアクションを有効化
         $('#toDate').on('click', () => {
