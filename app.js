@@ -68,7 +68,6 @@
       //テンプレートはviewsフォルダに保存
       app.set('views', __dirname + '/views');
       app.set('view engine', 'ejs');
-      // app.set('port', (process.env.PORT || 8080));
       
       // server.listen(PORT, 'localhost');
       server.listen(PORT);
@@ -211,8 +210,6 @@
           else {
             jinrou.userAdd(room[req.body.roomId], req.session.id, req.body.name);
             res.redirect(`/${req.body.roomId}`);
-            console.log("ーーー入室ーーーー")
-            console.log(room);
           }
           
         }
@@ -239,7 +236,6 @@
         // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!jinrou.verificateSessionId(room, sessionId, roomId, req)) {
           setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
-          console.log(room);
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい",
@@ -289,6 +285,7 @@ io.sockets.on('connection', socket => {
   socket.on("i_am_master?", (roomId, sessionId) => {
     console.log("----room----")
     console.log(room);
+    console.log("----players----")
     console.log(room[roomId]["players"]);
     
     let currentPlayerNum = room[roomId]["currentPlayerNum"];
@@ -329,9 +326,7 @@ io.sockets.on('connection', socket => {
     // 現在のsocketIdをデータベースに登録
     room[roomId]["players"][sessionId]["socketId"] = socket.id;
     // 新規playerがjoinした時だけリロードされるように条件分岐
-    console.log("joinRoom!")
     if (myFlag == 0){
-      console.log("myflag-------")
       room[roomId]["dissolvedFlag"] = 1;
       jinrou.changeOthersFlag(players, sessionId);
       socket.broadcast.to(data.roomId).emit('new_client_join');
@@ -343,24 +338,18 @@ io.sockets.on('connection', socket => {
   
   // 接続が切れた時
   socket.on("disconnect", (reason) => {
-    // console.log("---disconnect---")
-    // console.log(reason);
-    // socket.connect();
+    
     let disconnected = jinrou.disconnectedPlayer(room, socket.id);
-    let sessionId =  disconnected["sessionId"]
+    let sessionId =  disconnected["sessionId"];
     let roomIds = disconnected["rooms"];
-    let playerName =  disconnected["playerName"]
-    console.log("----disconnected----");
-    console.log(socket.id);
-    console.log(disconnected);
-    console.log(room);
+    let playerName =  disconnected["playerName"];
+    
     roomIds.forEach(roomId =>  {
-      console.log(room[roomId]["players"]);
       //サーバー仕様による切断でない場合、ルームに参加している他プレイヤー全員をトップページに戻す
       if (room[roomId]["dissolvedFlag"] == 0) {
         // ルームの解散
         io.to(roomId).emit("playerLeaving!", playerName);
-        // 切断ユーザーが参加していたルームをDBから削除
+         // 切断ユーザーが参加していたルームをDBから削除
         delete room[roomId];
       }
       
@@ -369,8 +358,20 @@ io.sockets.on('connection', socket => {
         io.to(roomId).emit("room_dissolved!");
         delete room[roomId];
       }
+      
+      // 待機フェーズ(プレイヤーが揃うまで）中の子プレイヤー切断時はルームからプレイヤー情報を削除
+      else if(room[roomId]["dissolvedFlag"] == 1 && room[roomId]["players"][sessionId]["master"] == 0 && room[roomId]["players"][sessionId]["flag"] == 0) {
+        
+        let players = room[roomId]["players"];
+        
+        // DBから退出ユーザーのkeyを削除
+        jinrou.userDelete(room, roomId, sessionId);
+        room[roomId]["currentPlayerNum"]--;
+        jinrou.changeOthersFlag(players, sessionId);
+        socket.broadcast.to(roomId).emit("new_client_join");
+      }
     })
-    console.log("-----END-----")
+    
   })
   
   socket.on("quitGame", (roomId) => {

@@ -79,6 +79,12 @@ module.exports = {
     }
 
   },
+  
+  userDelete: function(room, roomId, sessionId) {
+    delete room[roomId]["players"][sessionId];
+    delete room[roomId]["players"]["cemetary1"];
+    delete room[roomId]["players"]["cemetary2"];
+  },
       
   
   //ユーザのブラウザにCookie保存する
@@ -142,7 +148,7 @@ module.exports = {
   //   return name;
   // }
   // 切断ユーザーの検知
-  disconnectedPlayer: function (room, socketId) {
+  disconnectedPlayer: function(room, socketId) {
     let rooms = [];
     let sessionId;
     let playerName;
