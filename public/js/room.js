@@ -210,7 +210,7 @@ $(function(){
     let cookie = getCookieArray();
     let accessRight;
     
-    accessRight = cookie["accessRight"]
+    accessRight = cookie["accessRight"];
     
     // roomページへのアクセス権がある時だけ以下の処理
     // if (isRoomPage()) {
@@ -227,6 +227,11 @@ $(function(){
             sessionId: sessionId
         });
     }
+    
+    // サーバーがリセットされた時
+    socket.on("server_reseted!", () => {
+        window.location.replace(`/?reason=reboot`);
+    })
     
     // masterではない場合、フェーズボタンを非表示
     socket.on("master_or_not", (startFlag, masterFlag) => {
@@ -567,5 +572,9 @@ $(function(){
             socket.emit('toNightClicked', getRoomId());
         });
     })
+    
+    socket.on("admin", () => {
+        window.location.replace(`/?reason=Serverエラー`);
+    });
     
 });

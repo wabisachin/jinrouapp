@@ -33,6 +33,7 @@
     // roomには
     
     let room = {}
+    const PASSWORD = "rinrinwabisa"
     
  /*----------------------------------------------------------------------------
  
@@ -117,6 +118,13 @@
           res.render('index', {
           alert_title: "Notice", 
           alert_message: "roomが解散されました",
+          masters: masters
+          })
+        }
+        else if (req.query.reason == "reboot") {
+          res.render('index', {
+          alert_title: "Notice", 
+          alert_message: "サーバーが再起動されました",
           masters: masters
           })
         }
@@ -215,6 +223,32 @@
         }
       })
       
+      // adminページ
+      app.get('/admin', function(req, res) {
+        res.render('admin');
+      });
+      // adminページ
+      // app.post('/admin', function(req, res) {
+        
+      //   let masters = jinrou.setMasterInfo(room);
+        
+      //   if (req.body.password == PASSWORD) {
+      //     room =  {};
+      //     res.render('index', {
+      //       alert_title: "Success", 
+      //       alert_message: "初期化しました",
+      //       masters: masters
+      //     });
+      //   }
+      //   else {
+      //     res.render('index', {
+      //       alert_title: "Failure", 
+      //       alert_message: "パスワードが一致しませんでした",
+      //       masters: masters
+      //     });
+      //   }
+      // });
+      
       // roomページにfieldを渡す
       app.get('/:room_id', function(req, res){
         // let masters = jinrou.setMasterInfo(room);
@@ -281,6 +315,17 @@
 
 io.sockets.on('connection', socket => {
 
+
+  socket.on("reset_server_by_admin", (password) => {
+    console.log("back_to_top")
+    if (password == PASSWORD) {
+      room = {};
+      io.emit("server_reseted!");
+    }
+    else {
+      socket.emit("mismatch_password")
+    }
+  })
   // 入室したプレイヤーがmasterであれば1を返す
   socket.on("i_am_master?", (roomId, sessionId) => {
     console.log("----room----")
@@ -337,7 +382,7 @@ io.sockets.on('connection', socket => {
   })
   
   // 接続が切れた時
-  socket.on("disconnect", (reason) => {
+  socket.on("disconnect", () => {
     
     let disconnected = jinrou.disconnectedPlayer(room, socket.id);
     let sessionId =  disconnected["sessionId"];
