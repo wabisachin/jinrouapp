@@ -208,25 +208,38 @@ $(function(){
     console.log("room")
     let socket = io.connect();
     let cookie = getCookieArray();
-    let accessRight;
+    // let accessRight;
     
-    accessRight = cookie["accessRight"];
+    // accessRight = cookie["accessRight"];
     
     // roomページへのアクセス権がある時だけ以下の処理
-    // if (isRoomPage()) {
-    if (accessRight == 1) {
-        let roomId = getRoomId();
-        let sessionId = cookie["sessionId"];
-        initial();
-        // 自分がmasterかどうかをサーバーに問い合わせ
-        socket.emit("i_am_master?", roomId, sessionId);
+    
+    // if (accessRight == 1) {
+    //     let roomId = getRoomId();
+    //     let sessionId = cookie["sessionId"];
+    //     initial();
+    //     // 自分がmasterかどうかをサーバーに問い合わせ
+    //     socket.emit("i_am_master?", roomId, sessionId);
         
-        // socketに部屋番号に応じたルームを作成
-        socket.emit('joinRoom_from_client', {
-            roomId: roomId, 
-            sessionId: sessionId
-        });
-    }
+    //     // socketに部屋番号に応じたルームを作成
+    //     socket.emit('joinRoom_from_client', {
+    //         roomId: roomId, 
+    //         sessionId: sessionId
+    //     });
+    // }
+    
+    let roomId = getRoomId();
+    let sessionId = cookie["sessionId"];
+    
+    initial();
+    // 自分がmasterかどうかをサーバーに問い合わせ
+    socket.emit("i_am_master?", roomId, sessionId);
+    
+    // socketに部屋番号に応じたルームを作成
+    socket.emit('joinRoom_from_client', {
+        roomId: roomId, 
+        sessionId: sessionId
+    });
     
     // サーバーがリセットされた時
     socket.on("server_reseted!", () => {

@@ -260,7 +260,7 @@
 
         // 建てられてない部屋にアクセスした場合
         if (!jinrou.checkRoomExisting(room, roomId)) {
-          setCookie("accessRight", 0 , res);
+          // setCookie("accessRight", 0 , res);
           res.render('index', {
             alert_title: "Error", 
             alert_message: "ルームが存在しませんでした",
@@ -269,7 +269,7 @@
         }
         // ルーム内にsessionIdが登録されていないプレイヤーがアクセスした場合
         else if (!jinrou.verificateSessionId(room, sessionId, roomId, req)) {
-          setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
+          // setCookie("accessRight", 0 , res); // roomページへのアクセス権限がない場合の値は０
           res.render('index', {
             alert_title: "Error", 
             alert_message: "入室フォームから入室して下さい",
@@ -286,7 +286,7 @@
         }
         // 入室許可
         else {
-          setCookie("accessRight", 1 , res); // roomページへのアクセス権限がない場合の値は１
+          // setCookie("accessRight", 1 , res); // roomページへのアクセス権限がある場合の値は１
           res.render('room', {
             roomId: req.params.room_id,
             sessionId: sessionId,
